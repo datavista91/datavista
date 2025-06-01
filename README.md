@@ -8,18 +8,3 @@ To run the devserver:
 npm install
 npm run dev
 ```
-
-DataVista/
-├── frontend/               # Next.js-based frontend
-│   ├── components/
-│   ├── pages/
-│   └── styles/
-├── backend/                # Express/FastAPI/Django-based backend
-│   ├── routes/
-│   ├── services/
-│   └── utils/
-├── public/
-├── .env.example
-├── README.md
-└── package.json
-
