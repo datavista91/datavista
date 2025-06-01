@@ -1,2 +1,10 @@
-# datavista
-DataVista instantly turns your raw data into AI-powered analytics, visualizations and presentation-ready reports. No code needed.
+## DataVista
+
+This app was created using https://getmocha.com.
+Need help or want to join the community? Join our [Discord](https://discord.gg/shDEGBSe2d).
+
+To run the devserver:
+```
+npm install
+npm run dev
+```
