@@ -7,10 +7,8 @@ import Header from './components/Header';
 import { DataProvider } from './context/DataContext';
 import { AuthProvider } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
+import GoogleSignInPage from './pages/GoogleSignInPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useAuth } from './context/AuthContext';
 
 // Dashboard layout component
 const DashboardLayout = () => {
@@ -39,8 +37,8 @@ export function App() {
         <DataProvider>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<GoogleSignInPage />} />
+            <Route path="/signup" element={<GoogleSignInPage />} />
             <Route 
               path="/*" 
               element={

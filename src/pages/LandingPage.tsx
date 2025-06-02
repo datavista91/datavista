@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import HeroSection from '../components/landing/HeroSection';
 import FeaturesSection from '../components/landing/FeaturesSection';
 import TestimonialsSection from '../components/landing/TestimonialsSection';
@@ -8,17 +9,23 @@ import FAQSection from '../components/FAQSection';
 import CTASection from '../components/landing/CTASection';
 
 const LandingPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
+    // Redirect to dashboard if already logged in
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
     // Load fonts
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
-    
     return () => {
       document.head.removeChild(link);
     };
-  }, []);
+  }, [user, navigate]);
 
   return (
     <div className="bg-white">
@@ -26,20 +33,11 @@ const LandingPage = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2">
               <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg">
-                <svg
-                  width={14}
-                  height={14}
-                  viewBox="0 0 1920 1084"
-                  fill="white"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width={14} height={14} viewBox="0 0 1920 1084" fill="white" xmlns="http://www.w3.org/2000/svg">
                   <g clipPath="url(#clip0_6727_1730)">
-                    <path
-                      d="M496.36 933.52V714.848C496.36 561.289 291.434 507.242 214.842 640.703L139.842 771.304C118.857 807.887 71.5077 820.157 35.068 798.026C-0.0838509 776.723 -9.85666 729.978 10.5223 694.373L365.525 76.1461C442.117 -57.2398 647.043 -3.26819 647.043 150.367V369.866C647.043 523.35 851.893 577.397 928.56 444.162L1140.46 75.6945C1217.12 -57.6162 1421.97 -3.56926 1421.97 149.99V371.071C1421.97 524.555 1626.67 578.602 1703.42 445.442L1780.23 312.131C1801.29 275.623 1848.64 263.353 1885.01 285.559C1920.16 307.012 1929.86 353.682 1909.4 389.287L1552.73 1008.42C1475.99 1141.58 1271.29 1087.53 1271.29 934.047V713.719C1271.29 560.235 1066.44 506.188 989.773 639.423L777.877 1007.89C701.21 1141.2 496.36 1087.15 496.36 933.595V933.52Z"
-                      fill="white"
-                    />
+                    <path d="M496.36 933.52V714.848C496.36 561.289 291.434 507.242 214.842 640.703L139.842 771.304C118.857 807.887 71.5077 820.157 35.068 798.026C-0.0838509 776.723 -9.85666 729.978 10.5223 694.373L365.525 76.1461C442.117 -57.2398 647.043 -3.26819 647.043 150.367V369.866C647.043 523.35 851.893 577.397 928.56 444.162L1140.46 75.6945C1217.12 -57.6162 1421.97 -3.56926 1421.97 149.99V371.071C1421.97 524.555 1626.67 578.602 1703.42 445.442L1780.23 312.131C1801.29 275.623 1848.64 263.353 1885.01 285.559C1920.16 307.012 1929.86 353.682 1909.4 389.287L1552.73 1008.42C1475.99 1141.58 1271.29 1087.53 1271.29 934.047V713.719C1271.29 560.235 1066.44 506.188 989.773 639.423L777.877 1007.89C701.21 1141.2 496.36 1087.15 496.36 933.595V933.52Z" fill="white" />
                   </g>
                   <defs>
                     <clipPath id="clip0_6727_1730">
@@ -51,41 +49,18 @@ const LandingPage = () => {
               <div>
                 <span className="font-bold text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>DataVista</span>
               </div>
-            </Link>
-          </div>
-          
-          <div className="hidden md:flex space-x-8">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 relative group">
-              Features
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
-            </a>
-            <a href="#testimonials" className="text-gray-600 hover:text-gray-900 relative group">
-              Testimonials
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
-            </a>
-            <a href="#pricing" className="text-gray-600 hover:text-gray-900 relative group">
-              Pricing
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
             </a>
           </div>
-          
           <div className="flex items-center space-x-4">
-            <Link 
-              to="/login" 
-              className="text-gray-700 hover:text-gray-900 font-medium"
-            >
-              Log in
-            </Link>
-            <Link 
-              to="/signup"
+            <a
+              href="/login"
               className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:from-purple-700 hover:to-indigo-700 transition-colors"
             >
-              Sign up free
-            </Link>
+              Sign in with Google
+            </a>
           </div>
         </nav>
       </header>
-
       <main className="pt-16">
         <HeroSection />
         <div id="features"><FeaturesSection /></div>
@@ -94,7 +69,6 @@ const LandingPage = () => {
         <FAQSection />
         <CTASection />
       </main>
-
       <footer className="bg-gray-50 border-t border-gray-200">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
