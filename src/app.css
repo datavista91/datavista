@@ -1,0 +1,49 @@
+/* Dark Gray & Cyan Theme Variables */
+:root {
+   --color-bg: #181c20;
+   --color-bg-secondary: #23272b;
+   --color-surface: #23272b;
+   --color-cyan: #22d3ee;
+   --color-cyan-dark: #0891b2;
+   --color-text: #e5e7eb;
+   --color-text-secondary: #94a3b8;
+   --color-border: #2d333b;
+   --color-accent: #0ea5e9;
+   --color-danger: #ef4444;
+}
+
+body {
+   background: var(--color-bg);
+   color: var(--color-text);
+}
+
+.bg-main {
+   background: var(--color-bg);
+}
+.bg-surface {
+   background: var(--color-surface);
+}
+.bg-cyan {
+   background: var(--color-cyan);
+}
+.text-main {
+   color: var(--color-text);
+}
+.text-cyan {
+   color: var(--color-cyan);
+}
+.text-cyan-dark {
+   color: var(--color-cyan-dark);
+}
+.text-secondary {
+   color: var(--color-text-secondary);
+}
+.border-main {
+   border-color: var(--color-border);
+}
+.light-bg {
+   background: #424345;
+}
+.border-cyan {
+   border-color: var(--color-cyan);
+}

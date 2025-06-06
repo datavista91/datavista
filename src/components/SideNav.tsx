@@ -19,14 +19,14 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
       <div
          className={`${
             isOpen ? 'translate-x-0' : '-translate-x-full'
-         } md:translate-x-0 fixed md:relative inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out flex flex-col`}
+         } md:translate-x-0 fixed md:relative inset-y-0 left-0 z-30 w-64 bg-surface border-r border-main transition-transform duration-300 ease-in-out flex flex-col`}
       >
-         <div className='flex items-center justify-between p-4 border-b border-gray-200'>
+         <div className='flex items-center justify-between p-4 border-b border-main'>
             <Link
                to='/'
                className='flex items-center space-x-2'
             >
-               <div className='flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg'>
+               <div className='flex items-center justify-center w-8 h-8 bg-cyan rounded-lg'>
                   <svg
                      width={14}
                      height={14}
@@ -53,17 +53,17 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                </div>
                <div>
                   <div
-                     className='font-bold text-lg'
+                     className='font-bold text-lg text-main'
                      style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
                      AIDash
                   </div>
-                  <div className='text-xs text-gray-500'>Data Analytics</div>
+                  <div className='text-xs text-secondary'>Data Analytics</div>
                </div>
             </Link>
             <button
                onClick={() => setIsOpen(false)}
-               className='md:hidden text-gray-500'
+               className='md:hidden text-secondary'
             >
                <X size={20} />
             </button>
@@ -74,21 +74,19 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                <Link
                   key={item.name}
                   to={item.path}
-                  className='flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-100 text-gray-700 hover:text-purple-700 transition-colors'
+                  className='flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-cyan/10 text-main hover:text-cyan transition-colors'
                >
-                  <span className='text-gray-500 mr-3'>{item.icon}</span>
+                  <span className='text-secondary mr-3'>{item.icon}</span>
                   {item.name}
                </Link>
             ))}
          </nav>
 
          <div className='p-4'>
-            <div className='p-4 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-lg text-white'>
+            <div className='p-4 bg-cyan rounded-lg text-main'>
                <h4 className='font-semibold mb-1'>Upgrade to Pro</h4>
-               <p className='text-xs text-purple-200 mb-3'>Get advanced analytics and unlimited reports</p>
-               <button className='w-full py-1.5 bg-white text-purple-700 rounded-md text-sm font-medium'>
-                  Upgrade
-               </button>
+               <p className='text-xs text-cyan-dark mb-3'>Get advanced analytics and unlimited reports</p>
+               <button className='w-full py-1.5 bg-main text-cyan rounded-md text-sm font-medium'>Upgrade</button>
             </div>
          </div>
       </div>
