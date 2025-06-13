@@ -1,63 +1,14 @@
 import { useState } from 'react'
-import { ChartBar, ChartPie, CloudUpload, FileText, TrendingUp } from 'lucide-react'
 import FileUploader from './FileUploader'
 import DataPreview from './DataPreview'
-import InsightCard from './InsightCard'
 import ChartPanel from './ChartPanel'
 import { useData } from '../context/DataContext'
 import { motion } from 'framer-motion'
+import AIChat from './AIChat'
 
 const Dashboard = () => {
-   const { data, hasData } = useData()
+   const { hasData } = useData()
    const [activeSection, setActiveSection] = useState('data')
-
-   // Sample insights for demonstration
-   const sampleInsights = [
-      {
-         title: 'Key Trends',
-         description: 'Sales are growing 24% month-over-month with strongest performance in Q4.',
-         icon: (
-            <TrendingUp
-               size={20}
-               className='text-emerald-500'
-            />
-         ),
-         color: 'emerald',
-      },
-      {
-         title: 'Distribution Analysis',
-         description: 'Product A accounts for 42% of total revenue across all regions.',
-         icon: (
-            <ChartPie
-               size={20}
-               className='text-blue-500'
-            />
-         ),
-         color: 'blue',
-      },
-      {
-         title: 'Performance Metrics',
-         description: 'Customer acquisition cost has decreased by 18% since implementing new strategy.',
-         icon: (
-            <ChartBar
-               size={20}
-               className='text-purple-500'
-            />
-         ),
-         color: 'purple',
-      },
-      {
-         title: 'Recommendations',
-         description: 'Consider reallocating 15% of marketing budget from Channel B to Channel A.',
-         icon: (
-            <FileText
-               size={20}
-               className='text-amber-500'
-            />
-         ),
-         color: 'amber',
-      },
-   ]
 
    return (
       <div className='h-full'>
@@ -140,12 +91,29 @@ const Dashboard = () => {
                            }`}
                         >
                            Upload New
+                        </button>{' '}
+                        <button
+                           onClick={() => setActiveSection('chat')}
+                           className={`px-4 py-3 text-sm font-medium ${
+                              activeSection === 'chat'
+                                 ? 'border-b-2 border-purple-600 text-purple-600'
+                                 : 'text-gray-500 hover:text-gray-700'
+                           }`}
+                        >
+                           Chat with AI
                         </button>
                      </nav>
-                  </div>
+                  </div>{' '}
                   <div className='p-4'>
                      {activeSection === 'data' && <DataPreview />}
                      {activeSection === 'charts' && <ChartPanel />}
+                     {activeSection === 'chat' && (
+                        <div className='flex justify-center'>
+                           <div className='w-full max-w-4xl'>
+                              <AIChat />
+                           </div>
+                        </div>
+                     )}
                      {activeSection === 'upload' && (
                         <div className='py-8 flex justify-center'>
                            <FileUploader compact />
