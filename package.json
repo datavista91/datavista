@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@getmocha/vite-plugins": "latest",
+    "@types/papaparse": "^5.3.16",
     "@types/react": "^18.3.6",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
