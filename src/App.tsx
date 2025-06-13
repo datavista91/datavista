@@ -8,6 +8,7 @@ import { DataProvider } from './context/DataContext'
 import { AuthProvider } from './context/AuthContext'
 import LandingPage from './pages/LandingPage'
 import GoogleSignInPage from './pages/GoogleSignInPage'
+import PricingPage from './pages/PricingPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import DataPreview from './components/DataPreview'
 import ChartPanel from './components/ChartPanel'
@@ -48,6 +49,10 @@ const DashboardLayout = () => {
                   <Route
                      path='/settings'
                      element={<div>Settings</div>}
+                  />
+                  <Route
+                     path='/pricing'
+                     element={<PricingPage />}
                   />
                   <Route
                      path='*'

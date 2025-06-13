@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ChartBar, FileText, House, Settings, Share2, X } from 'lucide-react'
 
 interface SideNavProps {
@@ -7,6 +7,8 @@ interface SideNavProps {
 }
 
 const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
+   const navigate = useNavigate()
+   
    const navItems = [
       { name: 'Dashboard', icon: <House size={20} />, path: '/dashboard' },
       { name: 'Visualizations', icon: <ChartBar size={20} />, path: '/visualizations' },
@@ -80,13 +82,14 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                   {item.name}
                </Link>
             ))}
-         </nav>
-
-         <div className='p-4'>
+         </nav>         <div className='p-4'>
             <div className='p-4 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-lg text-white'>
                <h4 className='font-semibold mb-1'>Upgrade to Pro</h4>
                <p className='text-xs text-purple-200 mb-3'>Get advanced analytics and unlimited reports</p>
-               <button className='w-full py-1.5 bg-white text-purple-700 rounded-md text-sm font-medium'>
+               <button 
+                  onClick={() => navigate('/pricing')}
+                  className='w-full py-1.5 bg-white text-purple-700 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors'
+               >
                   Upgrade
                </button>
             </div>
