@@ -18,6 +18,14 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
          const file = acceptedFiles[0]
          if (!file) return
 
+         // Check file size first!
+         const maxSize = 50 * 1024 * 1024 // 50MB limit
+         if (file.size > maxSize) {
+            setUploadStatus('error')
+            alert(`File too large! Maximum size is ${maxSize / 1024 / 1024}MB`)
+            return
+         }
+
          setFileName(file.name)
          setUploadStatus('loading')
 
@@ -116,7 +124,7 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
                   <p className='mt-4 text-gray-600'>
                      Drag & drop your CSV file here, or <span className='text-purple-600 font-medium'>browse</span>
                   </p>
-                  <p className='mt-2 text-sm text-gray-500'>Supports CSV, XLS, XLSX (max 10MB)</p>
+                  <p className='mt-2 text-sm text-gray-500'>Supports CSV, XLS, XLSX (max 50MB)</p>
                </>
             )}
 
