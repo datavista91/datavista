@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { ChartBar, Check, CloudUpload, FileText, Squircle } from 'lucide-react'
 import Papa from 'papaparse'
@@ -10,7 +10,7 @@ interface FileUploaderProps {
 }
 
 const FileUploader = ({ compact = false }: FileUploaderProps) => {
-   const { data, setData } = useData()
+   const { setData } = useData()
    const { analysisData, analyzeData } = useAnalysis()
    const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'analyzing' | 'success' | 'error'>('idle')
    const [fileName, setFileName] = useState('')
@@ -40,9 +40,10 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
 
                // Start analysis in background
                setUploadStatus('analyzing')
-               await analyzeData(results.data)
+               await analyzeData(results.data, file.name, file.size)
 
                setUploadStatus('success')
+               // Mark analysis as complete
             },
             error: () => {
                setUploadStatus('error')

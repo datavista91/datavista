@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { ChartBar, FileText, House, Settings, Share2, X } from 'lucide-react'
+import { ChartBar, FileText, House, Settings, Share2, X, Clock } from 'lucide-react'
 
 interface SideNavProps {
    isOpen: boolean
@@ -13,6 +13,7 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
       { name: 'Dashboard', icon: <House size={20} />, path: '/dashboard' },
       { name: 'Visualizations', icon: <ChartBar size={20} />, path: '/visualizations' },
       { name: 'Smart Reports', icon: <FileText size={20} />, path: '/reports' },
+      { name: 'Analysis History', icon: <Clock size={20} />, path: '/history' },
       { name: 'Presentations', icon: <Share2 size={20} />, path: '/share' },
       { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
    ]

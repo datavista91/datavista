@@ -135,7 +135,7 @@ const Dashboard = () => {
                               <AIChat />
                            </div>
                         </div>
-                     )}
+                     )}{' '}
                      {activeSection === 'upload' && (
                         <div className='py-8 flex justify-center'>
                            <FileUploader compact />

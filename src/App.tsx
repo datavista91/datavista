@@ -13,6 +13,7 @@ import PricingPage from './pages/PricingPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import DataPreview from './components/DataPreview'
 import ChartPanel from './components/ChartPanel'
+import AnalysisHistory from './components/AnalysisHistory'
 
 // Dashboard layout component
 const DashboardLayout = () => {
@@ -38,10 +39,14 @@ const DashboardLayout = () => {
                   <Route
                      path='/visualizations'
                      element={<ChartPanel />}
-                  />
+                  />{' '}
                   <Route
                      path='/reports'
                      element={<DataPreview />}
+                  />
+                  <Route
+                     path='/history'
+                     element={<AnalysisHistory />}
                   />
                   <Route
                      path='/share'
