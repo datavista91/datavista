@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { ChartBar, Check, CloudUpload, FileText, Squircle } from 'lucide-react'
-import Papa from 'papaparse'
+import Papa, { ParseResult } from 'papaparse'
 import { useData } from '../context/DataContext'
 import { useAnalysis } from '../context/AnalysisContext'
 
@@ -34,7 +34,7 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
          // Parse CSV
          Papa.parse(file, {
             header: true,
-            complete: async (results) => {
+            complete: async (results: ParseResult<any>) => {
                // Store raw data
                setData(results.data)
 

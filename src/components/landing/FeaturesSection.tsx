@@ -44,11 +44,6 @@ const container = {
    },
 }
 
-const item = {
-   hidden: { opacity: 0, y: 20 },
-   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-}
-
 // Additional animation for hover effect
 const hoverAnimation = {
    rest: { scale: 1, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' },
