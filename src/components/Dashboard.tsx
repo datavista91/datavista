@@ -3,12 +3,15 @@ import FileUploader from './FileUploader'
 import DataPreview from './DataPreview'
 import ChartPanel from './ChartPanel'
 import { useData } from '../context/DataContext'
+import { useAnalysis } from '../context/AnalysisContext'
 import { motion } from 'framer-motion'
 import AIChat from './AIChat'
 
 const Dashboard = () => {
    const { hasData } = useData()
+   const { analysisData } = useAnalysis()
    const [activeSection, setActiveSection] = useState('data')
+   console.log('Analysis Data:', analysisData)
 
    return (
       <div className='h-full'>
@@ -27,6 +30,7 @@ const Dashboard = () => {
                transition={{ duration: 0.5 }}
                className='space-y-6'
             >
+               {' '}
                <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
                   <div>
                      <h1
@@ -46,7 +50,26 @@ const Dashboard = () => {
                      </button>
                   </div> */}
                </div>
-
+               {/* Analysis Progress Bar */}
+               {analysisData.isProcessing && (
+                  <motion.div
+                     initial={{ opacity: 0, y: -10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className='bg-white rounded-lg shadow-sm border border-gray-200 p-4'
+                  >
+                     <div className='flex items-center justify-between mb-2'>
+                        <span className='text-sm font-medium text-gray-700'>Analyzing data...</span>
+                        <span className='text-sm text-gray-500'>{analysisData.progress}%</span>
+                     </div>
+                     <div className='w-full bg-gray-200 rounded-full h-2'>
+                        <motion.div
+                           className='bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full'
+                           style={{ width: `${analysisData.progress}%` }}
+                           transition={{ duration: 0.3 }}
+                        />
+                     </div>
+                  </motion.div>
+               )}
                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {sampleInsights.map((insight, index) => (
               <InsightCard 
@@ -58,7 +81,6 @@ const Dashboard = () => {
               />
             ))}
           </div> */}
-
                <div className='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden'>
                   <div className='border-b border-gray-200'>
                      <nav className='flex'>

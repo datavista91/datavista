@@ -6,6 +6,7 @@ import SideNav from './components/SideNav'
 import Header from './components/Header'
 import { DataProvider } from './context/DataContext'
 import { AuthProvider } from './context/AuthContext'
+import { AnalysisProvider } from './context/AnalysisContext'
 import LandingPage from './pages/LandingPage'
 import GoogleSignInPage from './pages/GoogleSignInPage'
 import PricingPage from './pages/PricingPage'
@@ -75,28 +76,30 @@ export function App() {
       <BrowserRouter>
          <AuthProvider>
             <DataProvider>
-               <Routes>
-                  <Route
-                     path='/'
-                     element={<LandingPage />}
-                  />
-                  <Route
-                     path='/login'
-                     element={<GoogleSignInPage />}
-                  />
-                  <Route
-                     path='/signup'
-                     element={<GoogleSignInPage />}
-                  />
-                  <Route
-                     path='/*'
-                     element={
-                        <ProtectedRoute>
-                           <DashboardLayout />
-                        </ProtectedRoute>
-                     }
-                  />
-               </Routes>
+               <AnalysisProvider>
+                  <Routes>
+                     <Route
+                        path='/'
+                        element={<LandingPage />}
+                     />
+                     <Route
+                        path='/login'
+                        element={<GoogleSignInPage />}
+                     />
+                     <Route
+                        path='/signup'
+                        element={<GoogleSignInPage />}
+                     />
+                     <Route
+                        path='/*'
+                        element={
+                           <ProtectedRoute>
+                              <DashboardLayout />
+                           </ProtectedRoute>
+                        }
+                     />
+                  </Routes>
+               </AnalysisProvider>
             </DataProvider>
          </AuthProvider>
       </BrowserRouter>

@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import { ChartBar, Check, CloudUpload, FileText, Squircle } from 'lucide-react'
 import Papa from 'papaparse'
 import { useData } from '../context/DataContext'
+import { useAnalysis } from '../context/AnalysisContext'
 
 interface FileUploaderProps {
    compact?: boolean
@@ -10,21 +11,22 @@ interface FileUploaderProps {
 
 const FileUploader = ({ compact = false }: FileUploaderProps) => {
    const { data, setData } = useData()
-   const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+   const { analysisData, analyzeData } = useAnalysis()
+   const [uploadStatus, setUploadStatus] = useState<'idle' | 'loading' | 'analyzing' | 'success' | 'error'>('idle')
    const [fileName, setFileName] = useState('')
 
    const onDrop = useCallback(
-      (acceptedFiles: File[]) => {
+      async (acceptedFiles: File[]) => {
          const file = acceptedFiles[0]
          if (!file) return
 
          // Check file size first!
-         const maxSize = 50 * 1024 * 1024 // 50MB limit
-         if (file.size > maxSize) {
-            setUploadStatus('error')
-            alert(`File too large! Maximum size is ${maxSize / 1024 / 1024}MB`)
-            return
-         }
+         // const maxSize = 50 * 1024 * 1024 // 50MB limit
+         // if (file.size > maxSize) {
+         //    setUploadStatus('error')
+         //    alert(`File too large! Maximum size is ${maxSize / 1024 / 1024}MB`)
+         //    return
+         // }
 
          setFileName(file.name)
          setUploadStatus('loading')
@@ -32,29 +34,32 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
          // Parse CSV
          Papa.parse(file, {
             header: true,
-            complete: (results) => {
-               // Process the data
-               setTimeout(() => {
-                  setData(results.data)
-                  setUploadStatus('success')
-               }, 1000) // Simulate processing time
+            complete: async (results) => {
+               // Store raw data
+               setData(results.data)
+
+               // Start analysis in background
+               setUploadStatus('analyzing')
+               await analyzeData(results.data)
+
+               setUploadStatus('success')
             },
             error: () => {
                setUploadStatus('error')
             },
          })
       },
-      [setData]
+      [setData, analyzeData]
    )
 
-   useEffect(() => {
-      if (data && data.length > 0) {
-         console.log('Data in context:', data)
-         console.log('First row:', data[0])
-         console.log('Column headers:', Object.keys(data[0]))
-         console.log('Total rows:', data.length)
-      }
-   }, [data]) // Watch data changes, not setData
+   // useEffect(() => {
+   //    if (data && data.length > 0) {
+   //       console.log('Data in context:', data)
+   //       console.log('First row:', data[0])
+   //       console.log('Column headers:', Object.keys(data[0]))
+   //       console.log('Total rows:', data.length)
+   //    }
+   // }, [data]) // Watch data changes, not setData
 
    const { getRootProps, getInputProps, isDragActive } = useDropzone({
       onDrop,
@@ -83,12 +88,27 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
                <p className='mt-2 text-sm text-gray-600'>
                   Drag & drop a CSV file, or <span className='text-purple-600 font-medium'>browse</span>
                </p>
-            </div>
-
+            </div>{' '}
             {uploadStatus === 'loading' && (
                <div className='mt-4 flex items-center justify-center'>
                   <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600 mr-2'></div>
                   <span className='text-sm text-gray-600'>Processing {fileName}...</span>
+               </div>
+            )}
+            {uploadStatus === 'analyzing' && (
+               <div className='mt-4'>
+                  <div className='flex items-center justify-center mb-2'>
+                     <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
+                     <span className='text-sm text-gray-600'>Analyzing data...</span>
+                  </div>
+                  {analysisData.progress > 0 && (
+                     <div className='w-full bg-gray-200 rounded-full h-1.5'>
+                        <div
+                           className='bg-blue-600 h-1.5 rounded-full transition-all duration-300'
+                           style={{ width: `${analysisData.progress}%` }}
+                        ></div>
+                     </div>
+                  )}
                </div>
             )}
          </div>
@@ -117,7 +137,6 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
           }`}
          >
             <input {...getInputProps()} />
-
             {uploadStatus === 'idle' && (
                <>
                   <CloudUpload className='mx-auto h-12 w-12 text-gray-400' />
@@ -126,18 +145,37 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
                   </p>
                   <p className='mt-2 text-sm text-gray-500'>Supports CSV, XLS, XLSX (max 50MB)</p>
                </>
-            )}
-
+            )}{' '}
             {uploadStatus === 'loading' && (
                <>
                   <div className='mx-auto h-12 w-12 flex items-center justify-center'>
                      <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600'></div>
                   </div>
-                  <p className='mt-4 text-gray-600'>Analyzing your data...</p>
-                  <p className='mt-2 text-sm text-gray-500'>This might take a few seconds</p>
+                  <p className='mt-4 text-gray-600'>Processing your file...</p>
+                  <p className='mt-2 text-sm text-gray-500'>Parsing CSV data</p>
                </>
             )}
-
+            {uploadStatus === 'analyzing' && (
+               <>
+                  <div className='mx-auto h-12 w-12 flex items-center justify-center'>
+                     <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600'></div>
+                  </div>
+                  <p className='mt-4 text-gray-600'>Analyzing your data...</p>
+                  <p className='mt-2 text-sm text-gray-500'>
+                     {analysisData.isProcessing
+                        ? `Creating insights... ${analysisData.progress}%`
+                        : 'Preparing analysis...'}
+                  </p>
+                  {analysisData.progress > 0 && (
+                     <div className='mt-3 w-48 mx-auto bg-gray-200 rounded-full h-2'>
+                        <div
+                           className='bg-blue-600 h-2 rounded-full transition-all duration-300'
+                           style={{ width: `${analysisData.progress}%` }}
+                        ></div>
+                     </div>
+                  )}
+               </>
+            )}
             {uploadStatus === 'success' && (
                <>
                   <div className='mx-auto h-12 w-12 bg-green-100 rounded-full flex items-center justify-center'>
@@ -149,7 +187,6 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
                   <p className='mt-2 text-sm text-gray-500'>Your insights are ready to view</p>
                </>
             )}
-
             {uploadStatus === 'error' && (
                <>
                   <div className='mx-auto h-12 w-12 bg-red-100 rounded-full flex items-center justify-center'>
