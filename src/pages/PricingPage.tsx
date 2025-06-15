@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Check, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Check, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
 
 const plans = [
    {
@@ -64,7 +63,6 @@ const cardVariants = {
 
 const PricingPage = () => {
    const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
-   const navigate = useNavigate()
 
    const handleUpgrade = (plan: string) => {
       if (plan === 'Pro') {
