@@ -1,6 +1,8 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { House, X, Clock, Sparkles, BarChart3, TrendingUp, Presentation, Database } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useData } from '../context/DataContext'
+import { useAnalysis } from '../context/AnalysisContext'
 
 interface SideNavProps {
    isOpen: boolean
@@ -10,6 +12,8 @@ interface SideNavProps {
 const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
    const navigate = useNavigate()
    const location = useLocation()
+   const { hasData } = useData()
+   const { analysisData } = useAnalysis()
 
    const navItems = [
       {
@@ -130,14 +134,30 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                   )
                })}
             </div>            {/* Data Status */}
-            <div className='px-4 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-200'>
+            <div className={`px-4 py-4 rounded-lg border ${
+               hasData 
+                  ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
+                  : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
+            }`}>
                <div className='flex items-center space-x-2 mb-2'>
-                  <Database className='w-4 h-4 text-emerald-600' />
-                  <span className='text-sm font-medium text-emerald-900'>Data Status</span>
+                  <Database className={`w-4 h-4 ${hasData ? 'text-emerald-600' : 'text-gray-500'}`} />
+                  <span className={`text-sm font-medium ${hasData ? 'text-emerald-900' : 'text-gray-700'}`}>
+                     Data Status
+                  </span>
                </div>
-               <p className='text-xs text-emerald-700 mb-3'>Ready for analysis</p>
-               <div className='w-full bg-emerald-200 rounded-full h-1.5'>
-                  <div className='bg-emerald-500 h-1.5 rounded-full w-full'></div>
+               <p className={`text-xs mb-3 ${hasData ? 'text-emerald-700' : 'text-gray-600'}`}>
+                  {hasData ? (
+                     analysisData?.fileName ? 
+                        `${analysisData.fileName} - Ready for analysis` : 
+                        'Data uploaded - Ready for analysis'
+                  ) : (
+                     'No data uploaded yet'
+                  )}
+               </p>
+               <div className={`w-full rounded-full h-1.5 ${hasData ? 'bg-emerald-200' : 'bg-gray-200'}`}>
+                  <div className={`h-1.5 rounded-full ${
+                     hasData ? 'bg-emerald-500 w-full' : 'bg-gray-400 w-0'
+                  }`}></div>
                </div>
             </div>
          </nav>         {/* Bottom Section */}

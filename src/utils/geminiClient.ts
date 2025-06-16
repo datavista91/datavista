@@ -246,14 +246,14 @@ Provide a comprehensive and well-formatted response using proper markdown:
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
    }   private categorizeQuery(query: string): 'general' | 'visualization' | 'insights' | 'presentation' {
       const lowerQuery = query.toLowerCase()
-      
-      // Presentation keywords - CHECK FIRST to catch "create presentation about insights" etc.
+        // Presentation keywords - CHECK FIRST but be more specific
       if (lowerQuery.includes('presentation') || 
           lowerQuery.includes('slide') ||
           lowerQuery.includes('ppt') ||
           lowerQuery.includes('powerpoint') ||
+          lowerQuery.includes('slideshow') ||
           (lowerQuery.includes('create') || lowerQuery.includes('make') || lowerQuery.includes('generate')) && 
-          (lowerQuery.includes('presentation') || lowerQuery.includes('slide') || lowerQuery.includes('report')) ||
+          (lowerQuery.includes('presentation') || lowerQuery.includes('slide')) ||
           lowerQuery.includes('export') && (lowerQuery.includes('presentation') || lowerQuery.includes('slide'))) {
          return 'presentation'
       }
@@ -273,8 +273,7 @@ Provide a comprehensive and well-formatted response using proper markdown:
           lowerQuery.includes('histogram') ||
           lowerQuery.includes('heatmap')) {
          return 'visualization'
-      }      
-      // Insights keywords - expanded (moved after presentation check)
+      }        // Insights keywords - expanded (moved after presentation check)
       if (lowerQuery.includes('insight') || 
           lowerQuery.includes('summary') || 
           lowerQuery.includes('overview') ||
@@ -289,7 +288,12 @@ Provide a comprehensive and well-formatted response using proper markdown:
           lowerQuery.includes('key points') ||
           lowerQuery.includes('important') ||
           lowerQuery.includes('correlation') ||
-          lowerQuery.includes('relationship')) {
+          lowerQuery.includes('relationship') ||
+          lowerQuery.includes('report') && !lowerQuery.includes('presentation') ||
+          lowerQuery.includes('recommendations') ||
+          lowerQuery.includes('smart report') ||
+          (lowerQuery.includes('show me') || lowerQuery.includes('give me')) && 
+          (lowerQuery.includes('insight') || lowerQuery.includes('analysis') || lowerQuery.includes('report'))) {
          return 'insights'
       }
       
