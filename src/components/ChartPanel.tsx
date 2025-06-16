@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ChartPie as PieChartIcon, ChartBar, Settings, TrendingUp, Sparkles, Clock } from 'lucide-react';
 import { useAIResponses } from '../context/AIResponseContext';
+import { useAnalysis } from '../context/AnalysisContext';
 import MarkdownRenderer from './MarkdownRenderer';
 
 // Sample data for demonstration
@@ -28,7 +29,37 @@ type ChartType = 'bar' | 'pie' | 'line';
 const ChartPanel = () => {
   const [chartType, setChartType] = useState<ChartType>('bar');
   const { getResponsesByType } = useAIResponses();
+  const { analysisData } = useAnalysis();
   const aiVisualizations = getResponsesByType('visualization');
+  
+  const hasData = analysisData?.summary !== null;
+
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Visualizations</h1>
+            <p className="text-gray-600">Data visualizations and charts</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center h-96 text-center bg-white rounded-lg border border-gray-200">
+          <ChartBar className="w-16 h-16 text-gray-400 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Data Available</h2>
+          <p className="text-gray-600 mb-4 max-w-md">
+            Upload a dataset to start creating visualizations and charts from your data.
+          </p>
+          <div className="flex flex-col space-y-2 text-sm text-gray-500">
+            <p>💡 After uploading data, try asking:</p>
+            <p>"Create a bar chart of my data"</p>
+            <p>"Show me a pie chart"</p>
+            <p>"What visualizations work best?"</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div>
