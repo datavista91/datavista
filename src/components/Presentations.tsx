@@ -147,15 +147,68 @@ Feel free to ask the AI for more specific insights or analysis.
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
-  const handleExport = () => {
-    // In a real implementation, this would generate and download a PDF/PPTX
-    alert('Export functionality would be implemented here - generating PDF/PPTX');
+  const handleExport = async () => {
+    if (!selectedPresentation) return;
+    
+    try {
+      // Create a simple text export of the presentation
+      const slides = generateSlides(selectedPresentation);
+      let exportContent = `${selectedPresentation.title}\n`;
+      exportContent += `Generated on: ${new Date(selectedPresentation.timestamp).toLocaleDateString()}\n`;
+      exportContent += `Dataset: ${analysisData?.fileName || 'Unknown'}\n\n`;
+      
+      slides.forEach((slide, index) => {
+        exportContent += `SLIDE ${index + 1}: ${slide.title}\n`;
+        exportContent += `${'-'.repeat(50)}\n`;
+        exportContent += `${slide.content}\n\n`;
+      });
+      
+      // Create and download the file
+      const blob = new Blob([exportContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `presentation-${selectedPresentation.id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Show success message
+      alert('Presentation exported successfully! In a production app, this would generate PDF/PPTX files.');
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
+    }
   };
 
-  const handleShare = () => {
-    // In a real implementation, this would share the presentation
-    alert('Share functionality would be implemented here');
+  const handleShare = async () => {
+    if (!selectedPresentation) return;
+    
+    try {
+      // Create a shareable link/text
+      const shareText = `Check out this AI-generated presentation: "${selectedPresentation.title}"`;
+      const shareUrl = window.location.href;
+      
+      // Use Web Share API if available
+      if (navigator.share) {
+        await navigator.share({
+          title: selectedPresentation.title,
+          text: shareText,
+          url: shareUrl,
+        });
+      } else {
+        // Fallback: copy to clipboard
+        const shareContent = `${shareText}\n\nView at: ${shareUrl}`;
+        await navigator.clipboard.writeText(shareContent);
+        alert('Presentation link copied to clipboard! You can now share it with others.');
+      }
+    } catch (error) {
+      console.error('Share failed:', error);
+      // Fallback fallback: show the text
+      const shareContent = `${selectedPresentation.title}\n\nGenerated on: ${new Date(selectedPresentation.timestamp).toLocaleDateString()}\n\nView at: ${window.location.href}`;
+      prompt('Copy this text to share:', shareContent);
+    }
   };
 
   if (!hasData) {

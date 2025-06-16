@@ -130,19 +130,50 @@ const SmartReports = () => {
                       <TrendingUp className="w-4 h-4 mr-2" />
                       Key Metrics
                     </h4>
-                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                      {insight.data.keyMetrics.slice(0, 6).map((metric: any, index: number) => (
-                        <div key={index} className="bg-white rounded-lg p-3 border border-gray-200">
-                          <div className="text-xs font-medium text-gray-700 mb-1">
-                            {typeof metric === 'object' ? metric.column || 'Metric' : 'Finding'}
+                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">                      {insight.data.keyMetrics.slice(0, 6).map((metric: any, index: number) => {
+                        // Clean up metric text by removing markdown formatting
+                        const getCleanText = (text: string) => {
+                          return text.replace(/\*\*|\*/g, '').trim();
+                        };
+                        
+                        const getMetricTitle = () => {
+                          if (typeof metric === 'object') {
+                            return metric.column || 'Metric';
+                          }
+                          // Extract title from string like "**Title:** value"
+                          if (typeof metric === 'string' && metric.includes(':')) {
+                            return getCleanText(metric.split(':')[0]);
+                          }
+                          return 'Finding';
+                        };
+                        
+                        const getMetricValue = () => {
+                          if (typeof metric === 'string') {
+                            if (metric.includes(':')) {
+                              return getCleanText(metric.split(':').slice(1).join(':'));
+                            }
+                            return getCleanText(metric);
+                          }
+                          if (metric.text) {
+                            return getCleanText(metric.text);
+                          }
+                          if (metric.mean) {
+                            return `Avg: ${metric.mean.toFixed(2)}`;
+                          }
+                          return 'N/A';
+                        };
+                        
+                        return (
+                          <div key={index} className="bg-white rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs font-medium text-gray-700 mb-1">
+                              {getMetricTitle()}
+                            </div>
+                            <div className="text-sm font-semibold text-gray-900">
+                              {getMetricValue()}
+                            </div>
                           </div>
-                          <div className="text-sm font-semibold text-gray-900">
-                            {typeof metric === 'string' ? metric : 
-                             metric.text || 
-                             (metric.mean ? `Avg: ${metric.mean.toFixed(2)}` : 'N/A')}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
