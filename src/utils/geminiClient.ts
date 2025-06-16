@@ -251,7 +251,19 @@ Use clear markdown formatting with headers and bullet points. Keep the response 
          case 'insights':
             return `Data Insights: ${truncatedQuery}`
          case 'presentation':
-            return `Presentation: ${truncatedQuery}`
+            // Generate more descriptive titles for presentations
+            const timestamp = new Date().toLocaleDateString()
+            if (truncatedQuery.toLowerCase().includes('summary')) {
+               return `Data Summary Report - ${timestamp}`
+            } else if (truncatedQuery.toLowerCase().includes('analysis')) {
+               return `Data Analysis Presentation - ${timestamp}`
+            } else if (truncatedQuery.toLowerCase().includes('trend')) {
+               return `Trend Analysis Report - ${timestamp}`
+            } else if (truncatedQuery.toLowerCase().includes('insight')) {
+               return `Key Insights Presentation - ${timestamp}`
+            } else {
+               return `Data Presentation - ${timestamp}`
+            }
          default:
             return `AI Analysis: ${truncatedQuery}`
       }

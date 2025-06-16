@@ -11,8 +11,6 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Maximize2,
-  Play,
-  Pause,
   BarChart3,
   TrendingUp,
   Eye,
@@ -33,13 +31,82 @@ interface Slide {
 const Presentations = () => {
   const { getResponsesByType } = useAIResponses();
   const { analysisData } = useAnalysis();
-  const aiPresentations = getResponsesByType('presentation');
-  const [selectedPresentation, setSelectedPresentation] = useState<any>(null);
+  const aiPresentations = getResponsesByType('presentation');  const [selectedPresentation, setSelectedPresentation] = useState<any>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState<string | null>(null);
+  const [showPresentationExportMenu, setShowPresentationExportMenu] = useState(false);
 
   const hasData = analysisData?.summary !== null;
+
+  // Export functions
+  const exportToPDF = (presentation: any) => {
+    const content = `
+      ${presentation.title}
+      
+      Generated: ${new Date(presentation.timestamp).toLocaleString()}
+      
+      ${presentation.content}
+      
+      ${presentation.data?.sections ? 
+        'Sections:\n' + presentation.data.sections.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n') 
+        : ''}
+      
+      ${presentation.data?.keyPoints ? 
+        'Key Points:\n' + presentation.data.keyPoints.map((p: string) => `• ${p}`).join('\n')
+        : ''}
+    `;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${presentation.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  const exportToPPT = (presentation: any) => {
+    // For PPT, we'll create a structured text that could be imported into PowerPoint
+    const slides = generateSlides(presentation);
+    const pptContent = slides.map((slide: Slide, index: number) => `
+SLIDE ${index + 1}: ${slide.title}
+${slide.subtitle ? slide.subtitle : ''}
+
+${slide.content}
+
+---
+`).join('\n');
+
+    const blob = new Blob([pptContent], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${presentation.title.replace(/[^a-z0-9]/gi, '_')}_presentation.pptx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const sharePresentation = (presentation: any) => {
+    if (navigator.share) {
+      navigator.share({
+        title: presentation.title,
+        text: `Check out this AI-generated presentation: ${presentation.title}`,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      // Fallback - copy to clipboard
+      const shareText = `${presentation.title}\n\nGenerated: ${new Date(presentation.timestamp).toLocaleString()}\n\n${presentation.content.substring(0, 200)}...`;
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Presentation details copied to clipboard!');
+      }).catch(() => {
+        alert('Unable to copy to clipboard. Please copy manually.');
+      });
+    }
+  };
 
   // Generate sample data from analysisData for charts
   const generateChartData = () => {
@@ -146,40 +213,11 @@ Feel free to ask the AI for more specific insights or analysis.
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-  const handleExport = async () => {
+  };  const handleExport = async () => {
     if (!selectedPresentation) return;
     
-    try {
-      // Create a simple text export of the presentation
-      const slides = generateSlides(selectedPresentation);
-      let exportContent = `${selectedPresentation.title}\n`;
-      exportContent += `Generated on: ${new Date(selectedPresentation.timestamp).toLocaleDateString()}\n`;
-      exportContent += `Dataset: ${analysisData?.fileName || 'Unknown'}\n\n`;
-      
-      slides.forEach((slide, index) => {
-        exportContent += `SLIDE ${index + 1}: ${slide.title}\n`;
-        exportContent += `${'-'.repeat(50)}\n`;
-        exportContent += `${slide.content}\n\n`;
-      });
-      
-      // Create and download the file
-      const blob = new Blob([exportContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `presentation-${selectedPresentation.id}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      // Show success message
-      alert('Presentation exported successfully! In a production app, this would generate PDF/PPTX files.');
-    } catch (error) {
-      console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
-    }
+    // Toggle export menu instead of direct export
+    setShowPresentationExportMenu(!showPresentationExportMenu);
   };
 
   const handleShare = async () => {
@@ -273,35 +311,51 @@ Feel free to ask the AI for more specific insights or analysis.
               <p className="text-sm text-gray-500">Slide {currentSlide + 1} of {slides.length}</p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="flex items-center space-x-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
-            >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              <span>{isPlaying ? 'Pause' : 'Play'}</span>
-            </button>
+            <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
               className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
             >
               <Maximize2 className="w-4 h-4" />
-            </button>
-            <button
+            </button>            <button
               onClick={handleShare}
               className="flex items-center space-x-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
             >
               <Share className="w-4 h-4" />
               <span>Share</span>
             </button>
-            <button
-              onClick={handleExport}
-              className="flex items-center space-x-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export</span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={handleExport}
+                className="flex items-center space-x-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+              >
+                <Download className="w-4 h-4" />
+                <span>Export</span>
+              </button>
+              
+              {showPresentationExportMenu && (
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                  <button
+                    onClick={() => {
+                      exportToPDF(selectedPresentation);
+                      setShowPresentationExportMenu(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-t-lg"
+                  >
+                    Export as PDF
+                  </button>
+                  <button
+                    onClick={() => {
+                      exportToPPT(selectedPresentation);
+                      setShowPresentationExportMenu(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-b-lg"
+                  >
+                    Export as PPTX
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -490,20 +544,46 @@ Feel free to ask the AI for more specific insights or analysis.
                 <Eye className="w-4 h-4" />
                 <span>View Presentation</span>
               </button>
-              
-              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                 <button
-                  onClick={handleShare}
+                  onClick={() => sharePresentation(presentation)}
                   className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                  title="Share presentation"
                 >
                   <Share className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={handleExport}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(showExportMenu === presentation.id ? null : presentation.id)}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    title="Export presentation"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                  
+                  {showExportMenu === presentation.id && (
+                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                      <button
+                        onClick={() => {
+                          exportToPDF(presentation);
+                          setShowExportMenu(null);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-t-lg"
+                      >
+                        Export as PDF
+                      </button>
+                      <button
+                        onClick={() => {
+                          exportToPPT(presentation);
+                          setShowExportMenu(null);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 rounded-b-lg"
+                      >
+                        Export as PPT
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

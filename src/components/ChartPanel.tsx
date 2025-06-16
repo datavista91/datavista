@@ -115,9 +115,22 @@ const ChartPanel = () => {
 
   const chartData = generateChartData();
   const pieChartData = pieData();
-  
-  return (
-    <div>
+    return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Visualizations</h1>
+          <p className="text-gray-600">AI-powered data visualizations and charts</p>
+        </div>
+        {aiVisualizations.length > 0 && (
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Sparkles className="w-4 h-4" />
+            <span>{aiVisualizations.length} AI suggestions</span>
+          </div>
+        )}
+      </div>
+
       {/* AI Visualization Suggestions */}
       <div className="mb-6 space-y-3">
         <div className="flex items-center space-x-2">
