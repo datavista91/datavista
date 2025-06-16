@@ -81,13 +81,14 @@ class SafeGeminiClient {
 
          throw new Error(`AI service error: ${error.message || 'Unknown error occurred'}`)
       }
-   }
-
-   private createDataAnalysisPrompt(userMessage: string, analysisData: any): string {
+   }   private createDataAnalysisPrompt(userMessage: string, analysisData: any): string {
       const overview = analysisData?.summary?.overview
       const statistics = analysisData?.summary?.statistics
       const dataQuality = analysisData?.summary?.dataQuality
       const sample = analysisData?.sample
+      
+      // Determine the response type to customize the prompt
+      const responseType = this.categorizeQuery(userMessage)
 
       const prompt = `
 You are an expert data analyst AI assistant specializing in data insights and analysis. Your role is to help users understand their data and provide actionable insights.
@@ -141,38 +142,9 @@ ${
 ## USER QUESTION:
 ${userMessage}
 
-## INSTRUCTIONS:
-Please provide a comprehensive and well-formatted response using proper markdown. Your response should include:
+## RESPONSE TYPE: ${responseType.toUpperCase()}
 
-1. **Direct Answer**: Address the user's specific question clearly and concisely
-2. **Key Data Insights**: Highlight the most important findings from the dataset
-3. **Actionable Recommendations**: Provide specific, practical suggestions
-4. **Visualization Suggestions**: If relevant, recommend specific chart types
-
-## FORMATTING REQUIREMENTS:
-- Use clear markdown headers (##, ###) to organize sections
-- Use bullet points (•) for lists and key points
-- Use **bold** for emphasis on important numbers or findings
-- Use code blocks for column names or specific data values
-- Include relevant emojis to make the response engaging
-- Keep paragraphs concise and readable
-- Use tables when comparing multiple data points
-
-## RESPONSE STRUCTURE:
-Start with a brief summary, then provide detailed sections based on the user's question type.
-
-For data analysis questions, structure your response as:
-### 📊 Summary
-### 🔍 Key Findings  
-### 📈 Insights & Patterns
-### 💡 Recommendations
-### 📋 Next Steps
-
-Make your response actionable and specific to the provided dataset.
-5. **Follow-up Questions**: Suggest 2-3 follow-up questions the user might find interesting
-
-## RESPONSE FORMAT:
-Use clear markdown formatting with headers and bullet points. Keep the response informative but concise.
+${this.getResponseTypeInstructions(responseType)}
 
 ## IMPORTANT GUIDELINES:
 - Base all insights on the actual data provided
@@ -187,6 +159,82 @@ Use clear markdown formatting with headers and bullet points. Keep the response 
       return prompt
    }
 
+   private getResponseTypeInstructions(responseType: string): string {
+      switch (responseType) {
+         case 'presentation':
+            return `
+## PRESENTATION INSTRUCTIONS:
+You are creating content for a presentation. Structure your response as presentation slides:
+
+### 🎯 Slide 1: Executive Summary
+- Brief overview of key findings
+- 2-3 most important insights
+
+### 📊 Slide 2: Data Overview  
+- Dataset size and structure
+- Data quality highlights
+
+### 🔍 Slide 3: Key Findings
+- Top 3-4 insights from analysis
+- Include specific numbers and percentages
+
+### 📈 Slide 4: Trends & Patterns
+- Notable trends in the data
+- Relationships between variables
+
+### 💡 Slide 5: Recommendations
+- 3-4 actionable recommendations
+- Next steps for analysis
+
+### 🎯 Slide 6: Conclusion
+- Summary of main points
+- Call to action
+
+**Format each slide with clear headers and bullet points suitable for presentation.**`
+
+         case 'visualization':
+            return `
+## VISUALIZATION INSTRUCTIONS:
+Focus on recommending specific charts and visual representations:
+
+### 📊 Recommended Visualizations
+- Suggest 2-3 specific chart types (bar chart, pie chart, line chart, etc.)
+- Explain why each chart type is suitable for this data
+- Identify which columns should be used for each visualization
+
+### 📈 Chart Specifications
+- Specify x-axis and y-axis for each chart
+- Suggest appropriate titles and labels
+- Recommend color schemes if relevant
+
+**Use clear markdown formatting and be specific about implementation.**`
+
+         case 'insights':
+            return `
+## INSIGHTS INSTRUCTIONS:
+Provide comprehensive data analysis and insights:
+
+### 📊 Summary
+### 🔍 Key Findings  
+### 📈 Insights & Patterns
+### 💡 Recommendations
+### 📋 Next Steps
+
+**Focus on actionable insights and specific findings from the data.**`
+
+         default:
+            return `
+## GENERAL INSTRUCTIONS:
+Provide a comprehensive and well-formatted response using proper markdown:
+
+### 📊 Summary
+### 🔍 Analysis
+### 💡 Recommendations
+
+**Use clear markdown headers, bullet points, and emphasis for readability.**`
+      }
+   }
+
    private formatFileSize(bytes?: number): string {
       if (!bytes) return 'Unknown'
       if (bytes === 0) return '0 Bytes'
@@ -198,6 +246,17 @@ Use clear markdown formatting with headers and bullet points. Keep the response 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
    }   private categorizeQuery(query: string): 'general' | 'visualization' | 'insights' | 'presentation' {
       const lowerQuery = query.toLowerCase()
+      
+      // Presentation keywords - CHECK FIRST to catch "create presentation about insights" etc.
+      if (lowerQuery.includes('presentation') || 
+          lowerQuery.includes('slide') ||
+          lowerQuery.includes('ppt') ||
+          lowerQuery.includes('powerpoint') ||
+          (lowerQuery.includes('create') || lowerQuery.includes('make') || lowerQuery.includes('generate')) && 
+          (lowerQuery.includes('presentation') || lowerQuery.includes('slide') || lowerQuery.includes('report')) ||
+          lowerQuery.includes('export') && (lowerQuery.includes('presentation') || lowerQuery.includes('slide'))) {
+         return 'presentation'
+      }
       
       // Visualization keywords - expanded
       if (lowerQuery.includes('chart') || 
@@ -215,7 +274,7 @@ Use clear markdown formatting with headers and bullet points. Keep the response 
           lowerQuery.includes('heatmap')) {
          return 'visualization'
       }      
-      // Insights keywords - expanded
+      // Insights keywords - expanded (moved after presentation check)
       if (lowerQuery.includes('insight') || 
           lowerQuery.includes('summary') || 
           lowerQuery.includes('overview') ||
@@ -232,13 +291,6 @@ Use clear markdown formatting with headers and bullet points. Keep the response 
           lowerQuery.includes('correlation') ||
           lowerQuery.includes('relationship')) {
          return 'insights'
-      }
-      
-      if (lowerQuery.includes('presentation') || 
-          lowerQuery.includes('report') || 
-          lowerQuery.includes('slide') ||
-          lowerQuery.includes('export')) {
-         return 'presentation'
       }
       
       return 'general'

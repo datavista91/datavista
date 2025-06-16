@@ -57,7 +57,6 @@ const ChartPanel = () => {
       value: stat.unique || stat.count || 0
     }));
   };
-
   if (!hasData) {
     return (
       <div className="space-y-6">
@@ -68,18 +67,12 @@ const ChartPanel = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center h-96 text-center bg-white rounded-lg border border-gray-200">
+        <div className="flex flex-col items-center justify-center h-96 text-center">
           <ChartBar className="w-16 h-16 text-gray-400 mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">No Data Available</h2>
-          <p className="text-gray-600 mb-4 max-w-md">
+          <p className="text-gray-600 mb-4">
             Upload a dataset to start creating visualizations and charts from your data.
           </p>
-          <div className="flex flex-col space-y-2 text-sm text-gray-500">
-            <p>💡 After uploading data, try asking:</p>
-            <p>"Create a bar chart of my data"</p>
-            <p>"Show me a pie chart"</p>
-            <p>"What visualizations work best?"</p>
-          </div>
         </div>
       </div>
     );
@@ -94,16 +87,15 @@ const ChartPanel = () => {
             <h1 className="text-2xl font-bold text-gray-900">Visualizations</h1>
             <p className="text-gray-600">AI-generated charts and visualizations</p>
           </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center h-96 text-center bg-white rounded-lg border border-gray-200">
+        </div>        <div className="flex flex-col items-center justify-center h-96 text-center">
           <Sparkles className="w-16 h-16 text-purple-400 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Visualizations Yet</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No AI Visualizations Yet</h2>
           <p className="text-gray-600 mb-4 max-w-md">
-            Ask the AI to create visualizations from your data. Charts will appear here based on AI recommendations.
+            Ask the AI questions about your data to generate visualizations that will appear here. 
+            Try asking for charts or data analysis to get started.
           </p>
           <div className="flex flex-col space-y-2 text-sm text-gray-500">
-            <p>💡 Try asking the AI:</p>
+            <p>💡 Try asking:</p>
             <p>"Create a bar chart of my data"</p>
             <p>"Show me visualizations"</p>
             <p>"What charts work best for this data?"</p>

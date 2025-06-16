@@ -177,8 +177,7 @@ const SmartReports = () => {
                     </div>
                   </div>
                 )}
-                
-                {/* Recommendations Display */}
+                  {/* Recommendations Display */}
                 {insight.data?.recommendations && insight.data.recommendations.length > 0 && (
                   <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                     <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
@@ -186,12 +185,16 @@ const SmartReports = () => {
                       Recommendations
                     </h4>
                     <ul className="space-y-2">
-                      {insight.data.recommendations.slice(0, 3).map((rec: string, index: number) => (
-                        <li key={index} className="text-sm text-gray-700 flex items-start">
-                          <span className="text-blue-500 mr-2">•</span>
-                          {rec}
-                        </li>
-                      ))}
+                      {insight.data.recommendations.slice(0, 3).map((rec: string, index: number) => {
+                        // Clean up recommendation text by removing markdown formatting
+                        const cleanRec = rec.replace(/\*\*|\*/g, '').trim();
+                        return (
+                          <li key={index} className="text-sm text-gray-700 flex items-start">
+                            <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                            <span>{cleanRec}</span>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
