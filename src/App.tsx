@@ -7,13 +7,15 @@ import Header from './components/Header'
 import { DataProvider } from './context/DataContext'
 import { AuthProvider } from './context/AuthContext'
 import { AnalysisProvider } from './context/AnalysisContext'
+import { AIResponseProvider } from './context/AIResponseContext'
 import LandingPage from './pages/LandingPage'
 import GoogleSignInPage from './pages/GoogleSignInPage'
 import PricingPage from './pages/PricingPage'
 import ProtectedRoute from './components/ProtectedRoute'
-import DataPreview from './components/DataPreview'
 import ChartPanel from './components/ChartPanel'
 import AnalysisHistory from './components/AnalysisHistory'
+import SmartReports from './components/SmartReports'
+import Presentations from './components/Presentations'
 
 // Dashboard layout component
 const DashboardLayout = () => {
@@ -39,18 +41,16 @@ const DashboardLayout = () => {
                   <Route
                      path='/visualizations'
                      element={<ChartPanel />}
-                  />{' '}
-                  <Route
+                  />{' '}                  <Route
                      path='/reports'
-                     element={<DataPreview />}
+                     element={<SmartReports />}
                   />
                   <Route
                      path='/history'
                      element={<AnalysisHistory />}
-                  />
-                  <Route
+                  />                  <Route
                      path='/share'
-                     element={<div>Presentations</div>}
+                     element={<Presentations />}
                   />
                   <Route
                      path='/settings'
@@ -78,10 +78,10 @@ const DashboardLayout = () => {
 
 export function App() {
    return (
-      <BrowserRouter>
-         <AuthProvider>
+      <BrowserRouter>         <AuthProvider>
             <DataProvider>
                <AnalysisProvider>
+                  <AIResponseProvider>
                   <Routes>
                      <Route
                         path='/'
@@ -102,8 +102,8 @@ export function App() {
                               <DashboardLayout />
                            </ProtectedRoute>
                         }
-                     />
-                  </Routes>
+                     />                  </Routes>
+                  </AIResponseProvider>
                </AnalysisProvider>
             </DataProvider>
          </AuthProvider>

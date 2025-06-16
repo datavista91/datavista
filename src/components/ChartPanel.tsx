@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ChartPie as PieChartIcon, ChartBar, Settings, TrendingUp } from 'lucide-react';
+import { ChartPie as PieChartIcon, ChartBar, Settings, TrendingUp, Sparkles, Clock } from 'lucide-react';
+import { useAIResponses } from '../context/AIResponseContext';
+import MarkdownRenderer from './MarkdownRenderer';
 
 // Sample data for demonstration
 const data = [
@@ -25,9 +27,61 @@ type ChartType = 'bar' | 'pie' | 'line';
 
 const ChartPanel = () => {
   const [chartType, setChartType] = useState<ChartType>('bar');
+  const { getResponsesByType } = useAIResponses();
+  const aiVisualizations = getResponsesByType('visualization');
   
   return (
     <div>
+      {/* AI Visualization Suggestions */}
+      {aiVisualizations.length > 0 && (
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="w-4 h-4 text-purple-600" />
+            <h4 className="text-sm font-medium text-gray-900">AI Visualization Suggestions</h4>
+          </div>
+          
+          {aiVisualizations.slice(0, 2).map((viz) => (
+            <div key={viz.id} className={`bg-white rounded-lg shadow-sm border p-4 ${
+              viz.isNew ? 'border-purple-300 bg-purple-50' : 'border-gray-200'
+            }`}>
+              <div className="flex items-start justify-between mb-2">
+                <h5 className="font-medium text-gray-900 text-sm">{viz.title}</h5>
+                {viz.isNew && (
+                  <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                    New
+                  </span>
+                )}
+              </div>
+              
+              <div className="text-sm mb-3">
+                <MarkdownRenderer content={viz.content} />
+              </div>
+              
+              {/* Suggested chart types */}
+              {viz.data?.suggestedCharts && viz.data.suggestedCharts.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {viz.data.suggestedCharts.map((chartSuggestion: string, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => setChartType(chartSuggestion as ChartType)}
+                      className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
+                    >
+                      {chartSuggestion} chart
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex items-center space-x-2 pt-2 border-t border-gray-100">
+                <Clock className="w-3 h-3 text-gray-400" />
+                <span className="text-xs text-gray-500">
+                  {viz.timestamp.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex justify-between mb-6">
         <div className="flex space-x-2">
           <button

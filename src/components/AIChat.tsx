@@ -1,18 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, AlertTriangle, Database } from 'lucide-react'
+import { Send, Bot, User, Sparkles, AlertTriangle, Database, ExternalLink, BarChart3, Presentation, Lightbulb } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { useAnalysis } from '../context/AnalysisContext'
+import { useAIResponses } from '../context/AIResponseContext'
 import { getGeminiClient, GeminiResponse } from '../utils/geminiClient'
+import MarkdownRenderer from './MarkdownRenderer'
 
 interface Message {
    id: string
    type: 'user' | 'ai'
    content: string
    timestamp: Date
+   responseType?: 'general' | 'visualization' | 'insights' | 'presentation'
+   actionData?: any
+   hasAction?: boolean
 }
 
 function AIChat() {
    const { analysisData } = useAnalysis()
+   const { addResponse } = useAIResponses()
+   const navigate = useNavigate()
    const [messages, setMessages] = useState<Message[]>([
       {
          id: '1',
@@ -101,19 +109,31 @@ Once you have data loaded, feel free to ask questions like:
             setMessages((prev) => [...prev, noDataMessage])
             setIsTyping(false)
             return
-         }
-
-         // Call Gemini API with analysis context
+         }         // Call Gemini API with analysis context
          const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)
 
+         // Create AI message with enhanced data
          const aiMessage: Message = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response.message,
             timestamp: new Date(),
+            responseType: response.responseType,
+            actionData: response.actionData,
+            hasAction: response.responseType !== 'general'
          }
 
          setMessages((prev) => [...prev, aiMessage])
+
+         // If it's not a general response, also add to appropriate context
+         if (response.responseType !== 'general') {
+            addResponse({
+               type: response.responseType,
+               title: response.title,
+               content: response.message,
+               data: response.actionData
+            })
+         }
       } catch (err: any) {
          console.error('Error getting AI response:', err)
          
@@ -136,10 +156,54 @@ ${err.message.includes('API key') ?
       }
    }
 
-   const handleKeyPress = (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+   const handleKeyPress = (e: React.KeyboardEvent) => {      if (e.key === 'Enter' && !e.shiftKey) {
          e.preventDefault()
          handleSendMessage()
+      }
+   }
+
+   const handleActionClick = (responseType: string, actionData: any) => {
+      console.log('Navigating to:', responseType, 'with data:', actionData)
+      
+      // Navigate to the appropriate tab/page
+      switch (responseType) {
+         case 'visualization':
+            navigate('/visualizations')
+            break
+         case 'insights':
+            navigate('/reports')
+            break
+         case 'presentation':
+            navigate('/share')
+            break
+         default:
+            console.log('Unknown response type:', responseType)
+      }
+   }
+
+   const getActionIcon = (responseType: string) => {
+      switch (responseType) {
+         case 'visualization':
+            return <BarChart3 className='w-3 h-3' />
+         case 'insights':
+            return <Lightbulb className='w-3 h-3' />
+         case 'presentation':
+            return <Presentation className='w-3 h-3' />
+         default:
+            return <ExternalLink className='w-3 h-3' />
+      }
+   }
+
+   const getTabName = (responseType: string) => {
+      switch (responseType) {
+         case 'visualization':
+            return 'Charts'
+         case 'insights':
+            return 'Smart Reports'
+         case 'presentation':
+            return 'Presentations'
+         default:
+            return 'Tab'
       }
    }
 
@@ -228,9 +292,7 @@ ${err.message.includes('API key') ?
                         }`}
                      >
                         {message.type === 'user' ? <User className='w-4 h-4' /> : <Bot className='w-4 h-4' />}
-                     </div>
-
-                     {/* Message Bubble */}
+                     </div>                     {/* Message Bubble */}
                      <div
                         className={`px-4 py-3 rounded-2xl ${
                            message.type === 'user'
@@ -238,7 +300,31 @@ ${err.message.includes('API key') ?
                               : 'bg-white border border-gray-200 text-gray-900'
                         }`}
                      >
-                        <p className='text-sm leading-relaxed'>{message.content}</p>
+                        {message.type === 'user' ? (
+                           <p className='text-sm leading-relaxed'>{message.content}</p>
+                        ) : (
+                           <MarkdownRenderer content={message.content} />
+                        )}
+                        
+                        {/* Action buttons for AI responses */}
+                        {message.hasAction && message.responseType !== 'general' && (
+                           <div className='mt-3 pt-3 border-t border-gray-100'>
+                              <div className='flex items-center space-x-2'>
+                                 <button 
+                                    onClick={() => handleActionClick(message.responseType!, message.actionData)}
+                                    className='flex items-center space-x-2 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-xs font-medium transition-colors'
+                                 >
+                                    {getActionIcon(message.responseType!)}
+                                    <span>View in {getTabName(message.responseType!)}</span>
+                                    <ExternalLink className='w-3 h-3' />
+                                 </button>
+                                 <div className='px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium'>
+                                    ✓ Generated
+                                 </div>
+                              </div>
+                           </div>
+                        )}
+                        
                         <p className={`text-xs mt-2 ${message.type === 'user' ? 'text-purple-100' : 'text-gray-500'}`}>
                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
