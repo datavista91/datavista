@@ -8,6 +8,7 @@ import { DataProvider } from './context/DataContext'
 import { AuthProvider } from './context/AuthContext'
 import { AnalysisProvider } from './context/AnalysisContext'
 import { AIResponseProvider } from './context/AIResponseContext'
+import { ChatProvider } from './context/ChatContext'
 import LandingPage from './pages/LandingPage'
 import GoogleSignInPage from './pages/GoogleSignInPage'
 import PricingPage from './pages/PricingPage'
@@ -79,9 +80,9 @@ const DashboardLayout = () => {
 export function App() {
    return (
       <BrowserRouter>         <AuthProvider>
-            <DataProvider>
-               <AnalysisProvider>
+            <DataProvider>               <AnalysisProvider>
                   <AIResponseProvider>
+                     <ChatProvider>
                   <Routes>
                      <Route
                         path='/'
@@ -103,6 +104,7 @@ export function App() {
                            </ProtectedRoute>
                         }
                      />                  </Routes>
+                     </ChatProvider>
                   </AIResponseProvider>
                </AnalysisProvider>
             </DataProvider>
