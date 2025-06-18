@@ -12,14 +12,7 @@ import {
    Pie,
    Cell,
 } from 'recharts'
-import {
-   ChartPie as PieChartIcon,
-   ChartBar,
-   Settings,
-   TrendingUp,
-   Sparkles,
-   Clock,   ChevronDown,
-} from 'lucide-react'
+import { ChartPie as PieChartIcon, ChartBar, Settings, TrendingUp, Sparkles, Clock, ChevronDown } from 'lucide-react'
 import { useAIResponses } from '../context/AIResponseContext'
 import { useAnalysis } from '../context/AnalysisContext'
 import MarkdownRenderer from './MarkdownRenderer'
@@ -136,12 +129,11 @@ const ChartPanel = () => {
          </div>
       )
    }
-
    const chartData = generateChartData()
    const pieChartData = pieData()
 
    return (
-      <div className='space-y-6'>
+      <div className='space-y-6 h-full overflow-y-auto custom-scrollbar'>
          {/* Header */}
          <div className='flex items-center justify-between'>
             <div>
@@ -155,7 +147,6 @@ const ChartPanel = () => {
                </div>
             )}
          </div>
-
          {/* AI Visualization Suggestions Accordion */}
          {aiVisualizations.length > 0 && (
             <div className='mb-6'>
@@ -167,7 +158,8 @@ const ChartPanel = () => {
                <div className='space-y-3'>
                   {aiVisualizations.map((viz) => {
                      const isExpanded = expandedVisualizations.has(viz.id)
-                     return (                        <div
+                     return (
+                        <div
                            key={viz.id}
                            className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden'
                         >
@@ -195,23 +187,31 @@ const ChartPanel = () => {
                                     </div>
                                  </div>
                                  <div className='flex items-center space-x-2'>
-                                    <div className={`transition-transform duration-300 ease-in-out ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                                    <div
+                                       className={`transition-transform duration-300 ease-in-out ${
+                                          isExpanded ? 'rotate-180' : 'rotate-0'
+                                       }`}
+                                    >
                                        <ChevronDown className='w-5 h-5 text-gray-400' />
                                     </div>
                                  </div>
                               </div>
-                           </div>
-
+                           </div>{' '}
                            {/* Accordion Content */}
-                           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                              isExpanded 
-                                 ? 'max-h-[2000px] opacity-100' 
-                                 : 'max-h-0 opacity-0'
-                           }`}>
-                              <div className='px-6 pb-6 border-t border-gray-100'>
-                                 <div className={`prose prose-sm max-w-none mt-4 ${isExpanded ? 'animate-slide-down' : ''}`}>
+                           <div
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                 isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+                              }`}
+                           >
+                              <div className='px-6 pb-6 border-t border-gray-100 max-h-96 overflow-y-auto custom-scrollbar'>
+                                 <div
+                                    className={`prose prose-sm max-w-none mt-4 ${
+                                       isExpanded ? 'animate-slide-down' : ''
+                                    }`}
+                                 >
                                     <MarkdownRenderer content={viz.content} />
-                                 </div>                                 {/* Suggested chart types */}
+                                 </div>{' '}
+                                 {/* Suggested chart types */}
                                  {viz.data?.suggestedCharts && viz.data.suggestedCharts.length > 0 && (
                                     <div className='mt-4'>
                                        <h4 className='text-sm font-medium text-gray-900 mb-2'>
@@ -238,7 +238,8 @@ const ChartPanel = () => {
                   })}
                </div>
             </div>
-         )}         {/* Chart Type Selection and Interactive Charts */}
+         )}{' '}
+         {/* Chart Type Selection and Interactive Charts */}
          <div className='flex justify-between mb-6'>
             <div className='flex space-x-2'>
                <button
@@ -287,7 +288,8 @@ const ChartPanel = () => {
             <button className='p-1.5 rounded-md text-gray-500 hover:bg-gray-100 transition-all duration-200 ease-in-out hover:scale-105'>
                <Settings size={18} />
             </button>
-         </div>         {/* Only show charts if we have data */}
+         </div>{' '}
+         {/* Only show charts if we have data */}
          {(chartData.length > 0 || pieChartData.length > 0) && (
             <div className='bg-white p-4 rounded-lg border border-gray-200 transition-all duration-300 ease-in-out animate-slide-down'>
                <h3 className='text-lg font-semibold mb-4'>

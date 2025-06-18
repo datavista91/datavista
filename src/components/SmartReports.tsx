@@ -104,7 +104,7 @@ const SmartReports = () => {
    }
 
    return (
-      <div className='space-y-6'>
+      <div className='space-y-6 h-full overflow-y-auto custom-scrollbar'>
          <div className='flex items-center justify-between'>
             <div>
                <h1 className='text-2xl font-bold text-gray-900'>Smart Reports</h1>
@@ -126,7 +126,8 @@ const SmartReports = () => {
                <div className='space-y-3'>
                   {aiInsights.map((insight) => {
                      const isExpanded = expandedInsights.has(insight.id)
-                     return (                        <div
+                     return (
+                        <div
                            key={insight.id}
                            className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden'
                         >
@@ -155,24 +156,30 @@ const SmartReports = () => {
                                     </div>
                                  </div>
                                  <div className='flex items-center space-x-2'>
-                                    <div className={`transition-transform duration-300 ease-in-out ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                                    <div
+                                       className={`transition-transform duration-300 ease-in-out ${
+                                          isExpanded ? 'rotate-180' : 'rotate-0'
+                                       }`}
+                                    >
                                        <ChevronDown className='w-5 h-5 text-gray-400' />
                                     </div>
                                  </div>
                               </div>
-                           </div>
-
+                           </div>{' '}
                            {/* Accordion Content */}
-                           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                              isExpanded 
-                                 ? 'max-h-[2000px] opacity-100' 
-                                 : 'max-h-0 opacity-0'
-                           }`}>
-                              <div className='px-6 pb-6 border-t border-gray-100'>
-                                 <div className={`prose prose-sm max-w-none mt-4 ${isExpanded ? 'animate-slide-down' : ''}`}>
+                           <div
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                 isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+                              }`}
+                           >
+                              <div className='px-6 pb-6 border-t border-gray-100 max-h-96 overflow-y-auto custom-scrollbar'>
+                                 <div
+                                    className={`prose prose-sm max-w-none mt-4 ${
+                                       isExpanded ? 'animate-slide-down' : ''
+                                    }`}
+                                 >
                                     <MarkdownRenderer content={insight.content} />
                                  </div>
-
                                  {/* Key Metrics Display */}
                                  {insight.data?.keyMetrics && insight.data.keyMetrics.length > 0 && (
                                     <div className='mt-6 p-4 bg-gray-50 rounded-lg'>
@@ -180,8 +187,8 @@ const SmartReports = () => {
                                           <TrendingUp className='w-4 h-4 mr-2' />
                                           Key Metrics
                                        </h4>
-                                       <div className='grid gap-3 md:grid-cols-2 lg:grid-cols-3'>
-                                          {insight.data.keyMetrics.slice(0, 6).map((metric: any, index: number) => {
+                                       <div className='grid gap-3 md:grid-cols-2 lg:grid-cols-3 max-h-60 overflow-y-auto custom-scrollbar'>
+                                          {insight.data.keyMetrics.map((metric: any, index: number) => {
                                              // Clean up metric text by removing markdown formatting
                                              const getCleanText = (text: string) => {
                                                 return text.replace(/\*\*|\*/g, '').trim()
@@ -230,32 +237,31 @@ const SmartReports = () => {
                                           })}
                                        </div>
                                     </div>
-                                 )}                                 {/* Recommendations Display */}
+                                 )}{' '}
+                                 {/* Recommendations Display */}
                                  {insight.data?.recommendations && insight.data.recommendations.length > 0 && (
                                     <div className='mt-4 p-4 bg-blue-50 rounded-lg'>
                                        <h4 className='text-sm font-medium text-gray-900 mb-3 flex items-center'>
                                           <AlertTriangle className='w-4 h-4 mr-2' />
                                           Recommendations
                                        </h4>
-                                       <ul className='space-y-2'>
-                                          {insight.data.recommendations
-                                             .slice(0, 3)
-                                             .map((rec: string, index: number) => {
-                                                // Clean up recommendation text
-                                                const cleanRec = rec
-                                                   .replace(/\*\*|\*/g, '')
-                                                   .replace(/^[•\-\*]\s*/, '')
-                                                   .trim()
-                                                return (
-                                                   <li
-                                                      key={index}
-                                                      className='text-sm text-gray-700 flex items-start'
-                                                   >
-                                                      <span className='text-blue-500 mr-2 flex-shrink-0'>•</span>
-                                                      <span>{cleanRec}</span>
-                                                   </li>
-                                                )
-                                             })}
+                                       <ul className='space-y-2 max-h-48 overflow-y-auto custom-scrollbar'>
+                                          {insight.data.recommendations.map((rec: string, index: number) => {
+                                             // Clean up recommendation text
+                                             const cleanRec = rec
+                                                .replace(/\*\*|\*/g, '')
+                                                .replace(/^[•\-\*]\s*/, '')
+                                                .trim()
+                                             return (
+                                                <li
+                                                   key={index}
+                                                   className='text-sm text-gray-700 flex items-start'
+                                                >
+                                                   <span className='text-blue-500 mr-2 flex-shrink-0'>•</span>
+                                                   <span>{cleanRec}</span>
+                                                </li>
+                                             )
+                                          })}
                                        </ul>
                                     </div>
                                  )}
@@ -278,7 +284,8 @@ const SmartReports = () => {
                <div className='space-y-3'>
                   {generalResponses.slice(0, 5).map((response) => {
                      const isExpanded = expandedResponses.has(response.id)
-                     return (                        <div
+                     return (
+                        <div
                            key={response.id}
                            className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden'
                         >
@@ -306,21 +313,28 @@ const SmartReports = () => {
                                     </div>
                                  </div>
                                  <div className='flex items-center space-x-2'>
-                                    <div className={`transition-transform duration-300 ease-in-out ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                                    <div
+                                       className={`transition-transform duration-300 ease-in-out ${
+                                          isExpanded ? 'rotate-180' : 'rotate-0'
+                                       }`}
+                                    >
                                        <ChevronDown className='w-5 h-5 text-gray-400' />
                                     </div>
                                  </div>
                               </div>
-                           </div>
-
+                           </div>{' '}
                            {/* Accordion Content */}
-                           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                              isExpanded 
-                                 ? 'max-h-[2000px] opacity-100' 
-                                 : 'max-h-0 opacity-0'
-                           }`}>
-                              <div className='px-6 pb-6 border-t border-gray-100'>
-                                 <div className={`prose prose-sm max-w-none mt-4 ${isExpanded ? 'animate-slide-down' : ''}`}>
+                           <div
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                 isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+                              }`}
+                           >
+                              <div className='px-6 pb-6 border-t border-gray-100 max-h-96 overflow-y-auto custom-scrollbar'>
+                                 <div
+                                    className={`prose prose-sm max-w-none mt-4 ${
+                                       isExpanded ? 'animate-slide-down' : ''
+                                    }`}
+                                 >
                                     <MarkdownRenderer content={response.content} />
                                  </div>
                               </div>
