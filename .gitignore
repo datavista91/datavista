@@ -1,3 +1,5 @@
 node_modules
 .env.local
 .env
+PRESENTATION_SYSTEM_COMPLETE.md
+PRESENTATION_FIXES_COMPLETE.md
