@@ -7,7 +7,7 @@ const exampleCsvPath = './public/public_response.csv'
 const loader = new CSVLoader(exampleCsvPath)
 
 const llm = new ChatGoogleGenerativeAI({
-   apiKey: 'AIzaSyAkubTFvZStnYklfDae2b_i7rW7f8_mxhU',
+   apiKey: process.env.GEMINI_API_KEY, // Use server-side environment variable
    model: 'gemini-2.0-flash-lite',
    temperature: 0,
    maxRetries: 2,
