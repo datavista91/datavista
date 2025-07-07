@@ -4,32 +4,15 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAnalysis } from '../context/AnalysisContext'
 import { useAIResponses } from '../context/AIResponseContext'
+import { useChat, ChatMessage } from '../context/ChatContext'
 import { getGeminiClient, GeminiResponse } from '../utils/geminiClient'
 import MarkdownRenderer from './MarkdownRenderer'
-
-interface Message {
-   id: string
-   type: 'user' | 'ai'
-   content: string
-   timestamp: Date
-   responseType?: 'general' | 'visualization' | 'insights' | 'presentation'
-   actionData?: any
-   hasAction?: boolean
-}
 
 function AIChat() {
    const { analysisData } = useAnalysis()
    const { addResponse } = useAIResponses()
+   const { messages, addMessage } = useChat()
    const navigate = useNavigate()
-   const [messages, setMessages] = useState<Message[]>([
-      {
-         id: '1',
-         type: 'ai',
-         content:
-            "Hello! I'm your AI data analyst assistant. I can help you analyze your uploaded data, create insights, and answer questions about your datasets. Upload some data first, then ask me anything!",
-         timestamp: new Date(),
-      },
-   ])
    const [input, setInput] = useState('')
    const [isTyping, setIsTyping] = useState(false)
    const [geminiClient, setGeminiClient] = useState<any>(null)
@@ -67,14 +50,14 @@ function AIChat() {
    const handleSendMessage = async () => {
       if (!input.trim()) return
 
-      const userMessage: Message = {
+      const userMessage: ChatMessage = {
          id: Date.now().toString(),
          type: 'user',
          content: input.trim(),
          timestamp: new Date(),
       }
 
-      setMessages((prev) => [...prev, userMessage])
+      addMessage(userMessage)
       const userQuery = input.trim()
       setInput('')
       setIsTyping(true)
@@ -83,10 +66,8 @@ function AIChat() {
       try {
          if (!geminiClient) {
             throw new Error('AI service is not available. Please check your configuration.')
-         }
-
-         if (!hasData) {
-            const noDataMessage: Message = {
+         }         if (!hasData) {
+            const noDataMessage: ChatMessage = {
                id: (Date.now() + 1).toString(),
                type: 'ai',
                content: `I'd love to help analyze your data, but I don't see any uploaded dataset yet. 
@@ -106,14 +87,12 @@ Once you have data loaded, feel free to ask questions like:
 - "Summarize the key insights"`,
                timestamp: new Date(),
             }
-            setMessages((prev) => [...prev, noDataMessage])
+            addMessage(noDataMessage)
             setIsTyping(false)
             return
          }         // Call Gemini API with analysis context
-         const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)
-
-         // Create AI message with enhanced data
-         const aiMessage: Message = {
+         const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)         // Create AI message with enhanced data
+         const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response.message,
@@ -123,7 +102,7 @@ Once you have data loaded, feel free to ask questions like:
             hasAction: response.responseType !== 'general'
          }
 
-         setMessages((prev) => [...prev, aiMessage])
+         addMessage(aiMessage)
 
          // If it's not a general response, also add to appropriate context
          if (response.responseType !== 'general') {
@@ -136,8 +115,7 @@ Once you have data loaded, feel free to ask questions like:
          }
       } catch (err: any) {
          console.error('Error getting AI response:', err)
-         
-         const errorMessage: Message = {
+           const errorMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: `I apologize, but I encountered an error: ${err.message}
@@ -149,7 +127,7 @@ ${err.message.includes('API key') ?
             timestamp: new Date(),
          }
          
-         setMessages((prev) => [...prev, errorMessage])
+         addMessage(errorMessage)
          setError(err.message)
       } finally {
          setIsTyping(false)
@@ -253,15 +231,13 @@ ${err.message.includes('API key') ?
                      </div>
                   )}
                </div>
-            </div>
-            
-            {/* Development warning */}
+            </div>                  {/* Development warning */}
             {import.meta.env.DEV && (
-               <div className='mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg'>
+               <div className='mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg'>
                   <div className='flex items-center space-x-2'>
-                     <AlertTriangle className='w-4 h-4 text-yellow-600' />
-                     <span className='text-sm text-yellow-700'>
-                        Development Mode: AI responses powered by Gemini API (client-side)
+                     <AlertTriangle className='w-4 h-4 text-blue-600' />
+                     <span className='text-sm text-blue-700'>
+                        Development Mode: AI responses powered by Gemini API (server-side)
                      </span>
                   </div>
                </div>
