@@ -16,13 +16,15 @@ export interface Slide {
     data: any[];
     title?: string;
   };
+  chartData?: any[];
+  chartType?: 'bar' | 'pie' | 'line';
   metrics?: Array<{
     label: string;
     value: string | number;
     trend?: 'up' | 'down' | 'neutral';
     change?: string;
   }>;
-  layout: 'single' | 'two-column' | 'metrics-grid' | 'chart-focus' | 'full-chart';
+  layout: 'single' | 'two-column' | 'metrics-grid' | 'chart-focus' | 'full-chart' | 'chart-single' | 'chart-grid';
   animation?: 'fade' | 'slide' | 'zoom';
   theme?: string;
 }
