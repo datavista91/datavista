@@ -4,10 +4,29 @@ import { getFirestore } from 'firebase-admin/firestore'
 // Initialize Firebase Admin SDK
 let adminApp
 if (getApps().length === 0) {
-   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}')
-   adminApp = initializeApp({
-      credential: cert(serviceAccount),
-   })
+   try {
+      const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
+      if (!serviceAccountKey) {
+         throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set')
+      }
+      
+      console.log('Service account key length:', serviceAccountKey.length)
+      console.log('Service account key starts with:', serviceAccountKey.substring(0, 50))
+      
+      const serviceAccount = JSON.parse(serviceAccountKey)
+      
+      if (!serviceAccount.project_id || !serviceAccount.private_key || !serviceAccount.client_email) {
+         throw new Error('Invalid service account key format')
+      }
+      
+      adminApp = initializeApp({
+         credential: cert(serviceAccount),
+      })
+      console.log('Firebase Admin initialized successfully')
+   } catch (error) {
+      console.error('Failed to initialize Firebase Admin:', error.message)
+      throw error
+   }
 } else {
    adminApp = getApps()[0]
 }
@@ -57,8 +76,12 @@ export default async function handler(req, res) {
       res.status(200).json({ received: true })
       
    } catch (error) {
-      console.error('❌ Webhook processing error:', error)
-      res.status(500).json({ error: 'Webhook processing failed' })
+      console.error('❌ Webhook processing error:', error.message)
+      console.error('❌ Error stack:', error.stack)
+      res.status(500).json({ 
+         error: 'Webhook processing failed',
+         details: error.message 
+      })
    }
 }
 
