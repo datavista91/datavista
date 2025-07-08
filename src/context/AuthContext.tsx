@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import userSubscriptionService from '../services/userSubscriptionService';
 
 type User = {
   id: string;
@@ -26,14 +27,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Listen for Firebase Auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
+        const userData: User = {
           id: firebaseUser.uid,
           name: firebaseUser.displayName || '',
           email: firebaseUser.email || '',
           photoURL: firebaseUser.photoURL || '', // Add photoURL
-        });
+        };
+        setUser(userData);
+        
+        // Initialize user subscription for new users
+        try {
+          await userSubscriptionService.initializeUserSubscription(firebaseUser.uid);
+        } catch (error) {
+          console.error('Failed to initialize user subscription:', error);
+        }
       } else {
         setUser(null);
       }

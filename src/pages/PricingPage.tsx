@@ -1,39 +1,54 @@
 import { useState } from 'react'
 import { Check, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const plans = [
    {
+      id: 'free',
       name: 'Free',
       price: '0',
       description: 'Perfect for trying out DataVista',
-      features: ['Upload up to 5 datasets', 'Basic visualizations', 'Export as PDF', 'Community support'],
+      features: [
+         'Upload up to 5 datasets',
+         'Basic visualizations',
+         'Export as PDF',
+         'Community support',
+         '10 AI requests/day',
+      ],
       mostPopular: false,
       buttonText: 'Current Plan',
       color: 'gray',
+      icon: '🚀',
    },
    {
+      id: 'pro',
       name: 'Pro',
       price: '49',
       description: 'For professionals and small teams',
       features: [
          'Everything in Free',
          'Upload unlimited datasets',
-         'Advanced AI insights',
+         'Advanced AI insights (500 requests/day)',
          'Custom charts and dashboards',
          'Priority email support',
          'Team collaboration (up to 3 users)',
+         'Advanced data export options',
       ],
       mostPopular: true,
       buttonText: 'Upgrade to Pro',
       color: 'purple',
+      icon: '⚡',
    },
    {
+      id: 'enterprise',
       name: 'Enterprise',
       price: '199',
       description: 'For organizations with advanced needs',
       features: [
          'Everything in Pro',
+         'Unlimited AI requests',
          'Dedicated success manager',
          'Custom integrations',
          'Advanced security features',
@@ -44,6 +59,7 @@ const plans = [
       mostPopular: false,
       buttonText: 'Contact Sales',
       color: 'indigo',
+      icon: '👑',
    },
 ]
 
@@ -63,14 +79,68 @@ const cardVariants = {
 
 const PricingPage = () => {
    const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
+   const [processingPlan, setProcessingPlan] = useState<string | null>(null)
+   const { user } = useAuth()
+   const navigate = useNavigate()
 
-   const handleUpgrade = (plan: string) => {
-      if (plan === 'Pro') {
-         // Handle Pro upgrade logic
-         alert('Redirecting to Pro upgrade...')
-      } else if (plan === 'Enterprise') {
-         // Handle Enterprise contact
-         alert('Redirecting to contact sales...')
+   const handleUpgrade = async (planId: string) => {
+      if (planId === 'free') return
+
+      if (!user) {
+         alert('Please sign in to upgrade your plan')
+         navigate('/signin')
+         return
+      }
+
+      setProcessingPlan(planId)
+
+      try {
+         if (planId === 'pro' || planId === 'enterprise') {
+            // Generate Dodo payment link
+            const productId =
+               planId === 'pro'
+                  ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID
+                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID
+
+            if (!productId) {
+               throw new Error(`Product ID not configured for ${planId} plan`)
+            }
+
+            const baseUrl = 'https://test.checkout.dodopayments.com'
+            const redirectUrl = `${window.location.origin}/payment-success`
+
+            const params = new URLSearchParams({
+               quantity: '1',
+               redirect_url: redirectUrl,
+               email: user.email || '',
+               metadata_userId: user.id,
+               metadata_planType: planId,
+               metadata_timestamp: new Date().toISOString(),
+            })
+
+            const paymentUrl = `${baseUrl}/buy/${productId}?${params.toString()}`
+
+            // Store payment attempt
+            const paymentAttempt = {
+               userId: user.id,
+               email: user.email,
+               planType: planId,
+               timestamp: new Date().toISOString(),
+               status: 'initiated',
+            }
+            localStorage.setItem('dodo_payment_attempt', JSON.stringify(paymentAttempt))
+
+            console.log('🚀 Redirecting to Dodo payment:', paymentUrl)
+            window.location.href = paymentUrl
+         } else {
+            // Handle enterprise contact
+            window.open('mailto:sales@datavista.com?subject=Enterprise Plan Inquiry', '_blank')
+         }
+      } catch (error) {
+         console.error('❌ Payment initiation error:', error)
+         alert('Failed to initiate payment. Please try again.')
+      } finally {
+         setProcessingPlan(null)
       }
    }
 
@@ -190,20 +260,29 @@ const PricingPage = () => {
                            </ul>
 
                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
+                              whileHover={{ scale: processingPlan === plan.id ? 1 : 1.02 }}
+                              whileTap={{ scale: processingPlan === plan.id ? 1 : 0.98 }}
                               className={`mt-8 w-full py-3 px-4 rounded-md flex items-center justify-center text-center font-medium transition-colors ${
-                                 plan.name === 'Free'
+                                 plan.id === 'free'
                                     ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed'
                                     : plan.mostPopular
                                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
                                     : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700'
-                              }`}
-                              onClick={() => handleUpgrade(plan.name)}
-                              disabled={plan.name === 'Free'}
+                              } ${processingPlan === plan.id ? 'opacity-75 cursor-not-allowed' : ''}`}
+                              onClick={() => handleUpgrade(plan.id)}
+                              disabled={plan.id === 'free' || processingPlan === plan.id}
                            >
-                              {plan.buttonText}
-                              <ChevronRight className='ml-1 w-4 h-4' />
+                              {processingPlan === plan.id ? (
+                                 <>
+                                    <div className='animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2'></div>
+                                    Processing...
+                                 </>
+                              ) : (
+                                 <>
+                                    {plan.buttonText}
+                                    <ChevronRight className='ml-1 w-4 h-4' />
+                                 </>
+                              )}
                            </motion.button>
                         </div>
                      </motion.div>
