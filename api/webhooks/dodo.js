@@ -5,26 +5,61 @@ import { getFirestore } from 'firebase-admin/firestore'
 let adminApp
 if (getApps().length === 0) {
    try {
-      const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-      if (!serviceAccountKey) {
-         throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set')
-      }
+      // Try individual environment variables first (more reliable for deployment)
+      const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
       
-      console.log('Service account key length:', serviceAccountKey.length)
-      console.log('Service account key starts with:', serviceAccountKey.substring(0, 50))
+      let serviceAccount
       
-      const serviceAccount = JSON.parse(serviceAccountKey)
-      
-      if (!serviceAccount.project_id || !serviceAccount.private_key || !serviceAccount.client_email) {
-         throw new Error('Invalid service account key format')
+      if (projectId && privateKey && clientEmail) {
+         console.log('Using individual Firebase env vars')
+         serviceAccount = {
+            type: 'service_account',
+            project_id: projectId,
+            private_key: privateKey.replace(/\\n/g, '\n'),
+            client_email: clientEmail,
+         }
+      } else {
+         // Fallback to JSON string
+         console.log('Using Firebase service account JSON string')
+         const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
+         if (!serviceAccountKey) {
+            throw new Error('Firebase credentials not found. Set either FIREBASE_SERVICE_ACCOUNT_KEY or individual FIREBASE_* variables')
+         }
+         
+         console.log('Service account key length:', serviceAccountKey.length)
+         console.log('Service account key starts with:', serviceAccountKey.substring(0, 100))
+         
+         try {
+            serviceAccount = JSON.parse(serviceAccountKey)
+         } catch (parseError) {
+            console.error('Failed to parse service account key as JSON:', parseError.message)
+            throw new Error('Invalid JSON format in FIREBASE_SERVICE_ACCOUNT_KEY')
+         }
+         
+         if (!serviceAccount.project_id || !serviceAccount.private_key || !serviceAccount.client_email) {
+            console.error('Missing required fields in service account:', {
+               hasProjectId: !!serviceAccount.project_id,
+               hasPrivateKey: !!serviceAccount.private_key,
+               hasClientEmail: !!serviceAccount.client_email
+            })
+            throw new Error('Invalid service account key format - missing required fields')
+         }
+
+         // Clean up private key formatting if needed
+         if (serviceAccount.private_key) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
+         }
       }
       
       adminApp = initializeApp({
          credential: cert(serviceAccount),
       })
-      console.log('Firebase Admin initialized successfully')
+      console.log('Firebase Admin initialized successfully for project:', serviceAccount.project_id)
    } catch (error) {
       console.error('Failed to initialize Firebase Admin:', error.message)
+      console.error('Full error:', error)
       throw error
    }
 } else {
