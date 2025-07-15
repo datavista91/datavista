@@ -1,10 +1,10 @@
+import { VercelRequest, VercelResponse } from '@vercel/node'
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
-import crypto from 'crypto'
 
 // Initialize Firebase Admin SDK with better error handling
-let adminApp
-let db
+let adminApp: any
+let db: any
 
 async function initializeFirebaseAdmin() {
    if (getApps().length === 0) {
@@ -24,7 +24,7 @@ async function initializeFirebaseAdmin() {
          const privateKey = process.env.FIREBASE_PRIVATE_KEY
          const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
 
-         let serviceAccount
+         let serviceAccount: any
 
          if (projectId && privateKey && clientEmail) {
             console.log('✅ Using individual Firebase env vars')
@@ -77,7 +77,7 @@ async function initializeFirebaseAdmin() {
                serviceAccount = JSON.parse(cleanedKey)
                console.log('✅ Successfully parsed service account JSON')
                
-            } catch (parseError) {
+            } catch (parseError: any) {
                console.error('❌ Failed to parse service account key as JSON:', parseError.message)
                console.error('🔍 Raw key preview:', serviceAccountKey.substring(0, 200))
                throw new Error(`Invalid JSON format in FIREBASE_SERVICE_ACCOUNT_KEY: ${parseError.message}`)
@@ -120,7 +120,7 @@ async function initializeFirebaseAdmin() {
          console.log('✅ Firebase Admin initialized successfully for project:', serviceAccount.project_id)
          return { adminApp, db }
          
-      } catch (error) {
+      } catch (error: any) {
          console.error('❌ Failed to initialize Firebase Admin:', error.message)
          console.error('🔍 Full error:', error)
          throw error
@@ -137,7 +137,7 @@ async function initializeFirebaseAdmin() {
  * DODO Payments Webhook Handler
  * Processes payment confirmations and updates user subscriptions
  */
-export default async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
    // Set CORS headers immediately
    res.setHeader('Access-Control-Allow-Origin', '*')
    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -169,7 +169,7 @@ export default async function handler(req, res) {
       console.log('📝 Raw webhook payload:', JSON.stringify(req.body, null, 2))
 
       // Verify webhook signature if available
-      const signature = req.headers['x-dodo-signature']
+      const signature = req.headers['x-dodo-signature'] as string
       const webhookSecret = process.env.DODO_WEBHOOK_KEY
 
       console.log('🔐 Webhook security check:', {
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
          timestamp: new Date().toISOString()
       })
 
-   } catch (error) {
+   } catch (error: any) {
       console.error('❌ Webhook processing error:', error.message)
       console.error('❌ Error stack:', error.stack)
       console.error('❌ Error details:', {
@@ -244,7 +244,7 @@ export default async function handler(req, res) {
 /**
  * Handle successful payment
  */
-async function handlePaymentSuccess(paymentData) {
+async function handlePaymentSuccess(paymentData: any) {
    try {
       console.log('✅ Processing successful payment:', JSON.stringify(paymentData, null, 2))
 
@@ -286,7 +286,7 @@ async function handlePaymentSuccess(paymentData) {
       expiryDate.setDate(expiryDate.getDate() + 30)
 
       // Define plan features
-      const planFeatures = {
+      const planFeatures: any = {
          pro: {
             datasetLimit: 'unlimited',
             aiRequestsPerDay: 500,
@@ -368,7 +368,7 @@ async function handlePaymentSuccess(paymentData) {
          expiryDate: expiryDate.toISOString(),
       })
 
-   } catch (error) {
+   } catch (error: any) {
       console.error('❌ Payment success processing error:', error)
       console.error('❌ Error details:', {
          name: error.name,
@@ -383,7 +383,7 @@ async function handlePaymentSuccess(paymentData) {
 /**
  * Handle failed payment
  */
-async function handlePaymentFailed(paymentData) {
+async function handlePaymentFailed(paymentData: any) {
    try {
       console.log('❌ Processing failed payment:', JSON.stringify(paymentData, null, 2))
 
@@ -449,7 +449,7 @@ async function handlePaymentFailed(paymentData) {
          indianTime,
       })
 
-   } catch (error) {
+   } catch (error: any) {
       console.error('❌ Payment failure processing error:', error)
       console.error('❌ Error details:', {
          name: error.name,
