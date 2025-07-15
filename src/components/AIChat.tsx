@@ -114,7 +114,9 @@ Once you have data loaded, feel free to ask questions like:
          
          // Increment usage counter on successful request
          if (user) {
+            console.log('🔢 Incrementing AI usage for user:', user.id)
             await userSubscriptionService.incrementAIUsage(user.id)
+            console.log('✅ AI usage incremented successfully')
          }         // Create AI message with enhanced data
          const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),

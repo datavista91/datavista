@@ -1,40 +1,21 @@
-import { useEffect, useState } from 'react'
-import { Crown, Zap, AlertCircle, Check } from 'lucide-react'
+import { useEffect } from 'react'
+import { Crown, Zap, AlertCircle, Check, RefreshCw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import userSubscriptionService, { UserSubscription, UserUsage } from '../services/userSubscriptionService'
+import { useSubscription } from '../hooks/useSubscription'
+import { useUsage } from '../hooks/useUsage'
+import userSubscriptionService from '../services/userSubscriptionService'
 
 const SubscriptionStatus = () => {
    const { user } = useAuth()
    const navigate = useNavigate()
-   const [subscription, setSubscription] = useState<UserSubscription | null>(null)
-   const [usage, setUsage] = useState<UserUsage | null>(null)
-   const [loading, setLoading] = useState(true)
+   const { subscription } = useSubscription()
+   const { usage, loading, refreshUsage } = useUsage()
 
    useEffect(() => {
-      if (user) {
-         loadSubscriptionData()
-      }
+      // Component is now using hooks, no need for manual data loading
    }, [user])
-
-   const loadSubscriptionData = async () => {
-      if (!user) return
-      
-      try {
-         const [subData, usageData] = await Promise.all([
-            userSubscriptionService.getUserSubscription(user.id),
-            userSubscriptionService.getUserUsage(user.id)
-         ])
-         
-         setSubscription(subData)
-         setUsage(usageData)
-      } catch (error) {
-         console.error('❌ Error loading subscription data:', error)
-      } finally {
-         setLoading(false)
-      }
-   }
 
    const getPlanIcon = (plan: string) => {
       switch (plan) {
@@ -126,9 +107,18 @@ const SubscriptionStatus = () => {
             <div>
                <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-medium text-gray-700">Daily AI Requests</span>
-                  <span className="text-sm text-gray-500">
-                     {usage.aiRequestsToday} / {dailyLimit === 'unlimited' ? '∞' : dailyLimit}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                     <span className="text-sm text-gray-500">
+                        {usage.aiRequestsToday} / {dailyLimit === 'unlimited' ? '∞' : dailyLimit}
+                     </span>
+                     <button
+                        onClick={refreshUsage}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Refresh usage data"
+                     >
+                        <RefreshCw size={14} />
+                     </button>
+                  </div>
                </div>
                {dailyLimit !== 'unlimited' && (
                   <div className="w-full bg-gray-200 rounded-full h-2">

@@ -1,6 +1,7 @@
-import { Bell, LogOut, Menu, Search, User } from 'lucide-react'
+import { Bell, LogOut, Menu, Search, User, Crown, Zap, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useSubscription } from '../hooks/useSubscription'
 
 interface HeaderProps {
    toggleSidebar: () => void
@@ -8,7 +9,36 @@ interface HeaderProps {
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
    const { user, logout } = useAuth()
+   const { isPro, isEnterprise } = useSubscription()
    const [showUserMenu, setShowUserMenu] = useState(false)
+
+   // Get plan display info
+   const getPlanInfo = () => {
+      if (isEnterprise) {
+         return {
+            name: 'Enterprise',
+            icon: <Crown size={14} />,
+            bgColor: 'bg-gradient-to-r from-amber-500 to-orange-500',
+            textColor: 'text-white'
+         }
+      }
+      if (isPro) {
+         return {
+            name: 'Pro',
+            icon: <Zap size={14} />,
+            bgColor: 'bg-gradient-to-r from-purple-500 to-indigo-500',
+            textColor: 'text-white'
+         }
+      }
+      return {
+         name: 'Free',
+         icon: <Star size={14} />,
+         bgColor: 'bg-gray-100',
+         textColor: 'text-gray-600'
+      }
+   }
+
+   const planInfo = getPlanInfo()
 
    useEffect(() => {
       const link = document.createElement('link')
@@ -70,11 +100,17 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                   </button>
 
                   {showUserMenu && (
-                     <div className='absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10'>
+                     <div className='absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10'>
                         <div className='py-1'>
                            <div className='px-4 py-2 text-sm text-gray-700 border-b border-gray-100'>
                               <div className='font-medium'>{user?.name}</div>
-                              <div className='text-gray-500'>{user?.email}</div>
+                              <div className='text-gray-500 text-xs'>{user?.email}</div>
+                              
+                              {/* Plan Indicator in Menu */}
+                              <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}>
+                                 {planInfo.icon}
+                                 <span>{planInfo.name} Plan</span>
+                              </div>
                            </div>
                            <button
                               onClick={logout}

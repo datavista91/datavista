@@ -139,14 +139,18 @@ class UserSubscriptionService {
     */
    async incrementAIUsage(userId: string): Promise<void> {
       try {
+         console.log('🔢 Starting AI usage increment for user:', userId)
          const userRef = doc(db, 'users', userId)
          
          // Check if we need to reset daily counters
          const usage = await this.getUserUsage(userId)
+         console.log('📊 Current usage before increment:', usage)
+         
          const today = new Date().toDateString()
          const lastResetDate = new Date(usage.lastResetDate).toDateString()
          
          if (today !== lastResetDate) {
+            console.log('🔄 Resetting daily counter for new day')
             // Reset daily counter
             await updateDoc(userRef, {
                'usage.aiRequestsToday': 1,
@@ -154,12 +158,15 @@ class UserSubscriptionService {
                'usage.lastResetDate': new Date().toISOString()
             })
          } else {
+            console.log('➕ Incrementing daily counter')
             // Increment counters
             await updateDoc(userRef, {
                'usage.aiRequestsToday': increment(1),
                'usage.aiRequestsThisMonth': increment(1)
             })
          }
+         
+         console.log('✅ AI usage incremented successfully')
          
       } catch (error) {
          console.error('❌ Error incrementing AI usage:', error)
