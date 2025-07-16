@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { useSubscription } from '../hooks/useSubscription'
 import { useNavigate } from 'react-router-dom'
 
 const plans = [
@@ -81,6 +82,7 @@ const PricingPage = () => {
    const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
    const [processingPlan, setProcessingPlan] = useState<string | null>(null)
    const { user } = useAuth()
+   const { subscription, loading: subLoading, isFree, isPro, isEnterprise } = useSubscription()
    const navigate = useNavigate()
 
    const handleUpgrade = async (planId: string) => {
@@ -144,6 +146,37 @@ const PricingPage = () => {
       }
    }
 
+   // Filter plans based on subscription
+   let visiblePlans = plans
+   if (subLoading) {
+      // Show loader while subscription is loading
+      return (
+         <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 via-gray-400 to-gray-300'>
+            <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500'></div>
+            <span className='ml-4 text-lg text-gray-700'>Loading your subscription...</span>
+         </div>
+      )
+   } else if (isFree) {
+      visiblePlans = plans
+   } else if (isPro) {
+      visiblePlans = plans.filter(p => p.id !== 'free')
+   } else if (isEnterprise) {
+      visiblePlans = plans.filter(p => p.id === 'enterprise')
+   }
+
+   // Mark current plan, add disabled property for TS
+   type PlanWithDisabled = typeof plans[0] & { disabled: boolean }
+   const mappedPlans: PlanWithDisabled[] = visiblePlans.map(p => {
+      let buttonText = p.buttonText
+      let disabled = false
+      if ((isFree && p.id === 'free') || (isPro && p.id === 'pro') || (isEnterprise && p.id === 'enterprise')) {
+         buttonText = 'Current Plan'
+         disabled = true
+      }
+      return { ...p, buttonText, disabled }
+   })
+   visiblePlans = mappedPlans
+
    return (
       <div className='min-h-screen bg-gradient-to-br from-gray-200 via-gray-400 to-gray-300'>
          {/* Header */}
@@ -180,7 +213,7 @@ const PricingPage = () => {
                   </h2>
                   <p className='mt-4 text-lg text-gray-600'>Choose the perfect plan for your data needs</p>
 
-                  <div className='mt-8 flex justify-center'>
+                  {/* <div className='mt-8 flex justify-center'>
                      <div className='relative bg-white/25 p-1 rounded-full flex'>
                         <button
                            onClick={() => setBillingPeriod('monthly')}
@@ -209,10 +242,10 @@ const PricingPage = () => {
                            }}
                         />
                      </div>
-                  </div>
+                  </div> */}
                </motion.div>{' '}
                <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-                  {plans.map((plan, index) => (
+                  {(visiblePlans as PlanWithDisabled[]).map((plan, index) => (
                      <motion.div
                         key={plan.name}
                         custom={index}
@@ -268,9 +301,9 @@ const PricingPage = () => {
                                     : plan.mostPopular
                                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
                                     : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700'
-                              } ${processingPlan === plan.id ? 'opacity-75 cursor-not-allowed' : ''}`}
+                              } ${processingPlan === plan.id || plan.disabled ? 'opacity-75 cursor-not-allowed' : ''}`}
                               onClick={() => handleUpgrade(plan.id)}
-                              disabled={plan.id === 'free' || processingPlan === plan.id}
+                              disabled={plan.disabled || processingPlan === plan.id}
                            >
                               {processingPlan === plan.id ? (
                                  <>
