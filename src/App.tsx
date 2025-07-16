@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
+import './featureAnimations.css'
 import Dashboard from './components/Dashboard'
 import SideNav from './components/SideNav'
 import Header from './components/Header'

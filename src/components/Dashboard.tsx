@@ -46,7 +46,7 @@ const Dashboard = () => {
                      <button className='px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50'>
                         Download PDF
                      </button>
-                     <button className='px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md text-sm font-medium text-white hover:from-purple-700 hover:to-indigo-700'>
+                     <button className='px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-md text-sm font-medium text-white hover:from-blue-700 hover:to-indigo-700'>
                         Create Presentation
                      </button>
                   </div> */}
@@ -64,7 +64,7 @@ const Dashboard = () => {
                      </div>
                      <div className='w-full bg-gray-200 rounded-full h-2'>
                         <motion.div
-                           className='bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full'
+                           className='bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full'
                            style={{ width: `${analysisData.progress}%` }}
                            transition={{ duration: 0.3 }}
                         />
@@ -92,7 +92,7 @@ const Dashboard = () => {
                                  onClick={() => setActiveSection('data')}
                                  className={`px-4 py-3 text-sm font-medium ${
                                     activeSection === 'data'
-                                       ? 'border-b-2 border-purple-600 text-purple-600'
+                                       ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'
                                  }`}
                               >
@@ -102,7 +102,7 @@ const Dashboard = () => {
                                  onClick={() => setActiveSection('upload')}
                                  className={`px-4 py-3 text-sm font-medium ${
                                     activeSection === 'upload'
-                                       ? 'border-b-2 border-purple-600 text-purple-600'
+                                       ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'
                                  }`}
                               >
@@ -112,7 +112,7 @@ const Dashboard = () => {
                                  onClick={() => setActiveSection('chat')}
                                  className={`px-4 py-3 text-sm font-medium ${
                                     activeSection === 'chat'
-                                       ? 'border-b-2 border-purple-600 text-purple-600'
+                                       ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'
                                  }`}
                               >

@@ -1,12 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { db } from '../firebase'
+import { collection, addDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const LandingPage = () => {
-   const { user } = useAuth()
+   const { user, isLoading } = useAuth()
    const navigate = useNavigate()
    const [currentFeature, setCurrentFeature] = useState(0)
+   const [featureAnimKey, setFeatureAnimKey] = useState(0)
+   const prevFeature = useRef(0)
    const [isNavOpen, setIsNavOpen] = useState(false)
+   // const [loading, setLoading] = useState(true)
+
+   // Contact form state
+   const [contactForm, setContactForm] = useState({
+      firstName: '',
+      lastName: '',
+      email: '',
+      subject: '',
+      message: '',
+   })
+   const [contactLoading, setContactLoading] = useState(false)
+   const [contactSuccess, setContactSuccess] = useState(false)
+   const [contactError, setContactError] = useState('')
 
    const features = [
       {
@@ -66,9 +83,9 @@ const LandingPage = () => {
    ]
 
    useEffect(() => {
-      if (user) {
-         navigate('/dashboard', { replace: true })
-      }
+      // if (user) {
+      //    navigate('/dashboard', { replace: true })
+      // }
 
       // Load professional fonts
       const link = document.createElement('link')
@@ -94,7 +111,12 @@ const LandingPage = () => {
             if (rect.top <= 0 && rect.bottom >= viewportHeight) {
                const scrollProgress = Math.abs(rect.top) / (sectionHeight - viewportHeight)
                const featureIndex = Math.floor(scrollProgress * features.length)
-               setCurrentFeature(Math.max(0, Math.min(features.length - 1, featureIndex)))
+               const newFeature = Math.max(0, Math.min(features.length - 1, featureIndex))
+               if (newFeature !== prevFeature.current) {
+                  setFeatureAnimKey((k) => k + 1)
+                  prevFeature.current = newFeature
+               }
+               setCurrentFeature(newFeature)
             }
          }
       }
@@ -109,6 +131,28 @@ const LandingPage = () => {
          element.scrollIntoView({ behavior: 'smooth' })
       }
       setIsNavOpen(false)
+   }
+
+   // Handle contact form input
+   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target
+      setContactForm((prev) => ({ ...prev, [name]: value }))
+   }
+
+   // Submit contact form to Firestore
+   const handleContactSubmit = async (e: React.FormEvent) => {
+      e.preventDefault()
+      setContactLoading(true)
+      setContactSuccess(false)
+      setContactError('')
+      try {
+         await addDoc(collection(db, 'contact'), contactForm)
+         setContactSuccess(true)
+         setContactForm({ firstName: '', lastName: '', email: '', subject: '', message: '' })
+      } catch (err: any) {
+         setContactError('Failed to send. Please try again.')
+      }
+      setContactLoading(false)
    }
 
    return (
@@ -184,13 +228,25 @@ const LandingPage = () => {
                      >
                         Contact
                      </button>
-                     <button
-                        onClick={() => navigate('/login')}
-                        className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Sign In
-                     </button>
+                     {isLoading ? (
+                        <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
+                     ) : user ? (
+                        <button
+                           onClick={() => navigate('/dashboard')}
+                           className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Dashboard
+                        </button>
+                     ) : (
+                        <button
+                           onClick={() => navigate('/login')}
+                           className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Sign In
+                        </button>
+                     )}
                   </div>
 
                   {/* Mobile menu button */}
@@ -311,13 +367,25 @@ const LandingPage = () => {
 
                {/* CTA Buttons */}
                <div className='flex flex-col sm:flex-row gap-6 justify-center items-center mb-8'>
-                  <button
-                     onClick={() => navigate('/login')}
-                     className='bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
-                     Start Now
-                  </button>
+                  {isLoading ? (
+                     <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
+                  ) : user ? (
+                     <button
+                        onClick={() => navigate('/login')}
+                        className='bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Dashboard
+                     </button>
+                  ) : (
+                     <button
+                        onClick={() => navigate('/login')}
+                        className='bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Start Now
+                     </button>
+                  )}
                   <button
                      onClick={() => scrollToSection('features')}
                      className='border-2 border-gray-600 text-gray-300 px-12 py-4 rounded-lg text-lg font-semibold hover:border-blue-600 hover:text-blue-400 transition-all duration-300'
@@ -337,7 +405,7 @@ const LandingPage = () => {
          >
             <div className='sticky top-0 h-screen flex items-center justify-center py-8'>
                <div className='max-w-7xl mx-auto px-6 lg:px-8 w-full'>
-                  <div className='text-center my-12'>
+                  <div className='text-center mb-16 mt-8'>
                      <h2
                         className='text-4xl md:text-6xl font-bold text-white'
                         style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
@@ -348,7 +416,10 @@ const LandingPage = () => {
                   <div className='grid lg:grid-cols-2 gap-20 items-center h-full'>
                      {/* Content Side */}
                      {/* <div className='space-y-12'> */}
-                     <div className='bg-gray-900/90 backdrop-blur-sm p-10 rounded-3xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500 h-96'>
+                     <div
+                        key={featureAnimKey}
+                        className='bg-gray-900/90 backdrop-blur-sm p-10 rounded-3xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500 h-96 animate-fade-slide-up'
+                     >
                         <h2
                            className='text-4xl md:text-6xl font-bold mb-10 text-white'
                            style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
@@ -363,39 +434,17 @@ const LandingPage = () => {
                         </p>
                      </div>
 
-                     {/* Feature Navigation */}
-                     {/* <div className='space-y-4'>
-                           {features.map((feature, index) => (
-                              <button
-                                 key={index}
-                                 onClick={() => setCurrentFeature(index)}
-                                 className={`w-full text-left p-6 rounded-xl transition-all duration-300 ${
-                                    index === currentFeature
-                                       ? 'bg-blue-600 text-white shadow-lg scale-105'
-                                       : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-gray-300 hover:scale-102'
-                                 }`}
-                              >
-                                 <span
-                                    className='font-medium text-lg'
-                                    style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                                 >
-                                    {feature.title}
-                                 </span>
-                              </button>
-                           ))}
-                        </div> */}
-                     {/* </div> */}
-
                      {/* Image Side */}
-                     <div className='relative'>
-                        <div className='bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm p-10 rounded-3xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500'>
-                           <img
-                              src={features[currentFeature].image}
-                              alt={features[currentFeature].title}
-                              className='w-full h-96 object-cover rounded-2xl shadow-2xl transition-all duration-500'
-                              loading='lazy'
-                           />
-                        </div>
+                     <div
+                        key={featureAnimKey + '-img'}
+                        className='relative animate-fade-slide-up'
+                     >
+                        <img
+                           src={features[currentFeature].image}
+                           alt={features[currentFeature].title}
+                           className='w-full h-96 object-cover rounded-2xl shadow-2xl transition-all duration-500'
+                           loading='lazy'
+                        />
                      </div>
                   </div>
                </div>
@@ -833,7 +882,7 @@ const LandingPage = () => {
                            </div>
                            <div>
                               <p className='font-semibold text-white text-xl font-sans'>Developer</p>
-                              <p className='text-gray-400 text-lg font-sans'>Dattu Datta Kumar</p>
+                              <p className='text-gray-400 text-lg font-sans'>Dattu Goud</p>
                               <p className='text-blue-400 text-sm font-sans'>dattudattakumar369@gmail.com</p>
                            </div>
                         </div>
@@ -864,34 +913,44 @@ const LandingPage = () => {
                   </div>
 
                   {/* Contact Form */}
-                  <div className='bg-gray-900/50 backdrop-blur-sm p-10 rounded-3xl border border-gray-700'>
-                     <form className='space-y-6'>
+                  <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-3xl border border-gray-700'>
+                     <form
+                        className='space-y-4'
+                        onSubmit={handleContactSubmit}
+                     >
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                            <div>
                               <label
                                  htmlFor='firstName'
-                                 className='block text-sm font-medium text-gray-300 mb-3 font-sans'
+                                 className='block text-sm font-medium text-gray-300 mb-2 font-sans'
                               >
                                  First Name
                               </label>
                               <input
                                  type='text'
                                  id='firstName'
-                                 className='w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
+                                 name='firstName'
+                                 value={contactForm.firstName}
+                                 onChange={handleContactChange}
+                                 className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
                                  placeholder='John'
+                                 required
                               />
                            </div>
                            <div>
                               <label
                                  htmlFor='lastName'
-                                 className='block text-sm font-medium text-gray-300 mb-3 font-sans'
+                                 className='block text-sm font-medium text-gray-300 mb-2 font-sans'
                               >
                                  Last Name
                               </label>
                               <input
                                  type='text'
                                  id='lastName'
-                                 className='w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
+                                 name='lastName'
+                                 value={contactForm.lastName}
+                                 onChange={handleContactChange}
+                                 className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
                                  placeholder='Doe'
                               />
                            </div>
@@ -899,51 +958,66 @@ const LandingPage = () => {
                         <div>
                            <label
                               htmlFor='email'
-                              className='block text-sm font-medium text-gray-300 mb-3 font-sans'
+                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
                            >
                               Email
                            </label>
                            <input
                               type='email'
                               id='email'
-                              className='w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
+                              name='email'
+                              value={contactForm.email}
+                              onChange={handleContactChange}
+                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
                               placeholder='john@example.com'
+                              required
                            />
                         </div>
                         <div>
                            <label
                               htmlFor='subject'
-                              className='block text-sm font-medium text-gray-300 mb-3 font-sans'
+                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
                            >
                               Subject
                            </label>
                            <input
                               type='text'
                               id='subject'
-                              className='w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
+                              name='subject'
+                              value={contactForm.subject}
+                              onChange={handleContactChange}
+                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
                               placeholder='How can we help?'
+                              required
                            />
                         </div>
                         <div>
                            <label
                               htmlFor='message'
-                              className='block text-sm font-medium text-gray-300 mb-3 font-sans'
+                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
                            >
                               Message
                            </label>
                            <textarea
                               id='message'
+                              name='message'
                               rows={5}
-                              className='w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none font-sans'
+                              value={contactForm.message}
+                              onChange={handleContactChange}
+                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none font-sans'
                               placeholder='Tell us more about your needs...'
+                              required
                            ></textarea>
                         </div>
                         <button
                            type='submit'
                            className='w-full bg-blue-600 text-white py-4 rounded-xl hover:bg-blue-700 transition-colors font-medium text-lg font-sans'
+                           disabled={contactLoading}
                         >
-                           Send Message
+                           {contactLoading ? 'Sending...' : 'Send Message'}
                         </button>
+                        {contactSuccess && <p className='text-green-400 mt-2'>Message sent successfully!</p>}
+                        {contactError && <p className='text-red-400 mt-2'>{contactError}</p>}
                      </form>
                   </div>
                </div>

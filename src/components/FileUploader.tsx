@@ -78,21 +78,17 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
             <div
                {...getRootProps()}
                className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
-            ${
-               isDragActive
-                  ? 'border-purple-400 bg-purple-50'
-                  : 'border-gray-300 hover:border-purple-400 hover:bg-purple-50'
-            }`}
+            ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'}`}
             >
                <input {...getInputProps()} />
                <CloudUpload className='mx-auto h-8 w-8 text-gray-400' />
                <p className='mt-2 text-sm text-gray-600'>
-                  Drag & drop a CSV file, or <span className='text-purple-600 font-medium'>browse</span>
+                  Drag & drop a CSV file, or <span className='text-blue-600 font-medium'>browse</span>
                </p>
             </div>{' '}
             {uploadStatus === 'loading' && (
                <div className='mt-4 flex items-center justify-center'>
-                  <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600 mr-2'></div>
+                  <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
                   <span className='text-sm text-gray-600'>Processing {fileName}...</span>
                </div>
             )}
@@ -131,18 +127,14 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
          <div
             {...getRootProps()}
             className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors 
-          ${
-             isDragActive
-                ? 'border-purple-400 bg-purple-50'
-                : 'border-gray-300 hover:border-purple-400 hover:bg-purple-50'
-          }`}
+          ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'}`}
          >
             <input {...getInputProps()} />
             {uploadStatus === 'idle' && (
                <>
                   <CloudUpload className='mx-auto h-12 w-12 text-gray-400' />
                   <p className='mt-4 text-gray-600'>
-                     Drag & drop your CSV file here, or <span className='text-purple-600 font-medium'>browse</span>
+                     Drag & drop your CSV file here, or <span className='text-blue-600 font-medium'>browse</span>
                   </p>
                   <p className='mt-2 text-sm text-gray-500'>Supports CSV, XLS, XLSX (max 50MB)</p>
                </>
@@ -150,7 +142,7 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
             {uploadStatus === 'loading' && (
                <>
                   <div className='mx-auto h-12 w-12 flex items-center justify-center'>
-                     <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600'></div>
+                     <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600'></div>
                   </div>
                   <p className='mt-4 text-gray-600'>Processing your file...</p>
                   <p className='mt-2 text-sm text-gray-500'>Parsing CSV data</p>
@@ -201,7 +193,7 @@ const FileUploader = ({ compact = false }: FileUploaderProps) => {
 
          <div className='mt-8 grid grid-cols-1 md:grid-cols-3 gap-4'>
             <div className='border border-gray-200 rounded-lg p-4 text-center'>
-               <FileText className='mx-auto h-8 w-8 text-purple-600 mb-2' />
+               <FileText className='mx-auto h-8 w-8 text-blue-600 mb-2' />
                <h3 className='font-medium'>Smart Reports</h3>
                <p className='text-sm text-gray-500'>Generate insights and recommendations</p>
             </div>
