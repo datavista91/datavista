@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { userService } from '../services/userService';
 
 type User = {
   id: string;
@@ -26,14 +27,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Listen for Firebase Auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
+        const userData = {
           id: firebaseUser.uid,
           name: firebaseUser.displayName || '',
           email: firebaseUser.email || '',
           photoURL: firebaseUser.photoURL || '', // Add photoURL
-        });
+        };
+        
+        setUser(userData);
+        
+        // Create or update user document in Firestore
+        if (userData.email) {
+          try {
+            await userService.createOrUpdateUser(userData.id, userData.email);
+          } catch (error) {
+            console.warn('Failed to update user document, but login succeeded:', error);
+          }
+        }
       } else {
         setUser(null);
       }

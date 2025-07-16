@@ -7,7 +7,9 @@ import {
   query, 
   limit,
   onSnapshot,
-  Timestamp
+  Timestamp,
+  setDoc,
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AnalysisHistoryItem } from '../context/AnalysisContext';
@@ -65,12 +67,64 @@ class AnalysisHistoryService {
     return collection(db, 'users', userId, 'analysisHistory');
   }
 
+  // Get reference to user document
+  private getUserDocument(userId: string) {
+    return doc(db, 'users', userId);
+  }
+
+  // Update or create user document with email
+  async updateUserEmail(userId: string, email: string): Promise<void> {
+    try {
+      const userDocRef = this.getUserDocument(userId);
+      
+      // Get existing user document to preserve other fields
+      const userDoc = await getDoc(userDocRef);
+      const existingData = userDoc.exists() ? userDoc.data() : {};
+      
+      // Update the document with email while preserving existing fields
+      await setDoc(userDocRef, {
+        ...existingData,
+        email: email,
+        lastUpdated: Timestamp.now()
+      }, { merge: true });
+      
+      console.log('User email updated successfully:', email);
+    } catch (error) {
+      console.error('Error updating user email:', error);
+      throw error;
+    }
+  }
+
+  // Get user email from document
+  async getUserEmail(userId: string): Promise<string | null> {
+    try {
+      const userDocRef = this.getUserDocument(userId);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return userData.email || null;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting user email:', error);
+      return null;
+    }
+  }
+
   // Save analysis to Firebase as subcollection under user
   async saveAnalysisToFirebase(
     userId: string, 
-    analysisItem: Omit<AnalysisHistoryItem, 'id'>
+    analysisItem: Omit<AnalysisHistoryItem, 'id'>,
+    userEmail?: string
   ): Promise<string> {
     try {
+      // Update user email if provided
+      if (userEmail) {
+        await this.updateUserEmail(userId, userEmail);
+      }
+
       // Sanitize the analysis data to avoid nested array issues
       const sanitizedData = {
         fileName: analysisItem.fileName,

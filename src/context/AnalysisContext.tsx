@@ -14,7 +14,7 @@ interface AnalysisHistoryItem {
 // LocalStorage utility functions
 const STORAGE_KEY = 'datavista_analysis_history'
 
-const saveAnalysisToHistory = async (historyItem: AnalysisHistoryItem, userId?: string) => {
+const saveAnalysisToHistory = async (historyItem: AnalysisHistoryItem, userId?: string, userEmail?: string) => {
    try {
       // Always save to localStorage first (guaranteed to work)
       const existingHistory = getAnalysisHistory()
@@ -30,7 +30,7 @@ const saveAnalysisToHistory = async (historyItem: AnalysisHistoryItem, userId?: 
                uploadDate: historyItem.uploadDate,
                fileSize: historyItem.fileSize,
                analysisData: historyItem.analysisData,
-            })
+            }, userEmail)
             console.log('Analysis saved to Firebase successfully')
          } catch (firebaseError) {
             console.warn('Failed to save to Firebase, but local storage succeeded:', firebaseError)
@@ -345,7 +345,7 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
             fileSize: analysisData.fileSize,
             analysisData: analysisData,
          }
-         saveAnalysisToHistory(historyItem, user?.id)
+         saveAnalysisToHistory(historyItem, user?.id, user?.email)
          console.log('Analysis saved to history:', historyItem)
          console.log('Current history length:', getAnalysisHistory().length)
       }
