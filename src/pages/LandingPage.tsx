@@ -781,13 +781,14 @@ const LandingPage = () => {
                      className='mt-2 text-gray-400'
                      style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
                   >
-                     Contact our sales team for a tailored package that meets your specific requirements.
+                     Contact us for a tailored package that meets your specific requirements.
                   </p>
                   <button
                      className='mt-4 inline-flex items-center px-6 py-2.5 border border-gray-700 text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900 transition-colors'
                      style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     onClick={() => scrollToSection('contact')}
                   >
-                     Contact Sales
+                     Contact Us
                   </button>
                </div>
             </div>
