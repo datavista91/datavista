@@ -10,13 +10,13 @@ const LandingPage = () => {
 
    const features = [
       {
-         title: 'Smart Insights',
+         title: 'Smart Reports',
          description:
             'Discover hidden patterns in your data with AI-powered analytics that reveal actionable insights automatically.',
          image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
       },
       {
-         title: 'Accurate Predictions',
+         title: 'Useful Insights',
          description:
             'Make data-driven decisions with machine learning models that provide precise forecasts and trend analysis.',
          image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80',
@@ -148,7 +148,7 @@ const LandingPage = () => {
                   </div>
 
                   {/* Desktop Navigation */}
-                  <div className='hidden md:flex items-center space-x-10'>
+                  <div className='hidden md:flex items-center sm:space-x-5 lg:space-x-10'>
                      <button
                         onClick={() => scrollToSection('hero')}
                         className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
@@ -288,7 +288,8 @@ const LandingPage = () => {
                <div className='mb-10 relative max-w-6xl mx-auto'>
                   <div className='bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-3xl shadow-2xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500'>
                      <img
-                        src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                        // src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                        src='/dashboard2.avif'
                         alt='DataVista Dashboard Preview'
                         className='w-full h-auto rounded-2xl shadow-lg'
                         loading='eager'
@@ -322,7 +323,7 @@ const LandingPage = () => {
                      className='border-2 border-gray-600 text-gray-300 px-12 py-4 rounded-lg text-lg font-semibold hover:border-blue-600 hover:text-blue-400 transition-all duration-300'
                      style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
                   >
-                     Learn More
+                     Watch Demo
                   </button>
                </div>
             </div>
@@ -495,205 +496,250 @@ const LandingPage = () => {
                </div>
 
                <div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
-                  {/* Starter Plan */}
+                  {/* Free Plan */}
                   <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-gray-600 transition-all duration-300'>
-                     <h3 className='text-2xl font-bold mb-6 text-white font-sans'>Starter</h3>
+                     <h3
+                        className='text-2xl font-bold mb-6 text-white'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Free
+                     </h3>
                      <div className='mb-8'>
-                        <span className='text-4xl font-bold text-white font-sans'>$29</span>
-                        <span className='text-gray-400 font-sans'>/month</span>
+                        <span
+                           className='text-4xl font-bold text-white'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           $0
+                        </span>
+                        <span
+                           className='text-gray-400'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           /month
+                        </span>
                      </div>
                      <ul className='space-y-4 mb-8'>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Up to 5 datasets
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Upload up to 5 datasets
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Basic analytics
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Basic visualizations
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Email support
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Export as PDF
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Community support
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           10 AI requests/day
                         </li>
                      </ul>
-                     <button className='w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-sans font-medium'>
-                        Get Started
+                     <button
+                        className='w-full bg-gray-700 text-white py-3 rounded-lg font-medium'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        disabled
+                     >
+                        Current Plan
                      </button>
                   </div>
 
-                  {/* Professional Plan - Highlighted */}
+                  {/* Pro Plan - Highlighted */}
                   <div className='bg-blue-600/10 backdrop-blur-sm p-8 rounded-2xl border-2 border-blue-600 relative transform scale-105'>
                      <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
-                        <span className='bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium font-sans'>
+                        <span
+                           className='bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
                            Most Popular
                         </span>
                      </div>
-                     <h3 className='text-2xl font-bold mb-6 text-white font-sans'>Professional</h3>
+                     <h3
+                        className='text-2xl font-bold mb-6 text-white'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Pro
+                     </h3>
                      <div className='mb-8'>
-                        <span className='text-4xl font-bold text-white font-sans'>$99</span>
-                        <span className='text-gray-400 font-sans'>/month</span>
+                        <span
+                           className='text-4xl font-bold text-white'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           $49
+                        </span>
+                        <span
+                           className='text-gray-400'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           /month
+                        </span>
                      </div>
                      <ul className='space-y-4 mb-8'>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Unlimited datasets
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Everything in Free
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Advanced AI insights
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Upload unlimited datasets
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Priority support
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Advanced AI insights (500 requests/day)
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Custom presentations
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Custom charts and dashboards
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Priority email support
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Team collaboration (up to 3 users)
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Advanced data export options
                         </li>
                      </ul>
-                     <button className='w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-sans font-medium'>
-                        Start Free Trial
+                     <button
+                        className='w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Upgrade to Pro
                      </button>
                   </div>
 
                   {/* Enterprise Plan */}
                   <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-gray-600 transition-all duration-300'>
-                     <h3 className='text-2xl font-bold mb-6 text-white font-sans'>Enterprise</h3>
+                     <h3
+                        className='text-2xl font-bold mb-6 text-white'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Enterprise
+                     </h3>
                      <div className='mb-8'>
-                        <span className='text-4xl font-bold text-white font-sans'>Custom</span>
+                        <span
+                           className='text-4xl font-bold text-white'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           $199
+                        </span>
+                        <span
+                           className='text-gray-400'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           /month
+                        </span>
                      </div>
                      <ul className='space-y-4 mb-8'>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Everything in Professional
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Everything in Pro
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           Dedicated support
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Unlimited AI requests
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Dedicated success manager
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
                            Custom integrations
                         </li>
-                        <li className='flex items-center text-gray-300 font-sans'>
-                           <svg
-                              className='w-5 h-5 text-blue-400 mr-3'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
-                           >
-                              <path
-                                 fillRule='evenodd'
-                                 d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                 clipRule='evenodd'
-                              />
-                           </svg>
-                           On-premise deployment
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Advanced security features
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Team collaboration (unlimited)
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           Training and onboarding
+                        </li>
+                        <li
+                           className='flex items-center text-gray-300'
+                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        >
+                           SLA guarantees
                         </li>
                      </ul>
-                     <button className='w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-sans font-medium'>
-                        Contact Sales
+                     <button
+                        className='w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-medium'
+                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     >
+                        Upgrade to Enterprise
                      </button>
                   </div>
+               </div>
+               <div className='mt-16 text-center'>
+                  <h3
+                     className='text-lg font-medium text-white'
+                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                  >
+                     Need a custom solution?
+                  </h3>
+                  <p
+                     className='mt-2 text-gray-400'
+                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                  >
+                     Contact our sales team for a tailored package that meets your specific requirements.
+                  </p>
+                  <button
+                     className='mt-4 inline-flex items-center px-6 py-2.5 border border-gray-700 text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900 transition-colors'
+                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                  >
+                     Contact Sales
+                  </button>
                </div>
             </div>
          </section>
@@ -735,55 +781,83 @@ const LandingPage = () => {
                                     strokeLinecap='round'
                                     strokeLinejoin='round'
                                     strokeWidth={2}
+                                    d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z'
+                                 />
+                              </svg>
+                           </div>
+                           <div>
+                              <p className='font-semibold text-white text-xl font-sans'>CEO</p>
+                              <p className='text-gray-400 text-lg font-sans'>RamaKrushna Mohapatra</p>
+                              <p className='text-blue-400 text-sm font-sans'>itsramakrushna@gmail.com</p>
+                           </div>
+                        </div>
+
+                        <div className='flex items-center space-x-6'>
+                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
+                              <svg
+                                 className='w-8 h-8 text-blue-400'
+                                 fill='none'
+                                 stroke='currentColor'
+                                 viewBox='0 0 24 24'
+                              >
+                                 <path
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    strokeWidth={2}
+                                    d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
+                                 />
+                              </svg>
+                           </div>
+                           <div>
+                              <p className='font-semibold text-white text-xl font-sans'>Developer</p>
+                              <p className='text-gray-400 text-lg font-sans'>Nakul Srivastava</p>
+                              <p className='text-blue-400 text-sm font-sans'>imnakul44@gmail.com</p>
+                           </div>
+                        </div>
+
+                        <div className='flex items-center space-x-6'>
+                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
+                              <svg
+                                 className='w-8 h-8 text-blue-400'
+                                 fill='none'
+                                 stroke='currentColor'
+                                 viewBox='0 0 24 24'
+                              >
+                                 <path
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    strokeWidth={2}
+                                    d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
+                                 />
+                              </svg>
+                           </div>
+                           <div>
+                              <p className='font-semibold text-white text-xl font-sans'>Developer</p>
+                              <p className='text-gray-400 text-lg font-sans'>Dattu Datta Kumar</p>
+                              <p className='text-blue-400 text-sm font-sans'>dattudattakumar369@gmail.com</p>
+                           </div>
+                        </div>
+
+                        <div className='flex items-center space-x-6'>
+                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
+                              <svg
+                                 className='w-8 h-8 text-blue-400'
+                                 fill='none'
+                                 stroke='currentColor'
+                                 viewBox='0 0 24 24'
+                              >
+                                 <path
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    strokeWidth={2}
                                     d='M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
                                  />
                               </svg>
                            </div>
                            <div>
-                              <p className='font-semibold text-white text-xl font-sans'>Email</p>
-                              <p className='text-gray-400 text-lg font-sans'>datavista91@gmail.com</p>
-                           </div>
-                        </div>
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>Support</p>
-                              <p className='text-gray-400 text-lg font-sans'>support@datavista.com</p>
-                           </div>
-                        </div>
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>Sales</p>
-                              <p className='text-gray-400 text-lg font-sans'>sales@datavista.com</p>
+                              <p className='font-semibold text-white text-xl font-sans'>General Inquiries</p>
+                              <p className='text-gray-400 text-lg font-sans'>DataVista Team</p>
+                              <p className='text-blue-400 text-sm font-sans'>datavista91@gmail.com</p>
                            </div>
                         </div>
                      </div>

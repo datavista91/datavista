@@ -19,7 +19,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             name: 'Enterprise',
             icon: <Crown size={14} />,
             bgColor: 'bg-gradient-to-r from-amber-500 to-orange-500',
-            textColor: 'text-white'
+            textColor: 'text-white',
          }
       }
       if (isPro) {
@@ -27,14 +27,14 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             name: 'Pro',
             icon: <Zap size={14} />,
             bgColor: 'bg-gradient-to-r from-purple-500 to-indigo-500',
-            textColor: 'text-white'
+            textColor: 'text-white',
          }
       }
       return {
          name: 'Free',
          icon: <Star size={14} />,
          bgColor: 'bg-gray-100',
-         textColor: 'text-gray-600'
+         textColor: 'text-gray-600',
       }
    }
 
@@ -70,7 +70,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                      <input
                         type='text'
                         placeholder='Search...'
-                        className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600 transition duration-150 ease-in-out sm:text-sm'
+                        className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition duration-150 ease-in-out sm:text-sm'
                      />
                   </div>
                </div>
@@ -84,7 +84,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                <div className='relative'>
                   <button
                      onClick={() => setShowUserMenu(!showUserMenu)}
-                     className='h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center text-white overflow-hidden'
+                     className='h-8 w-8 rounded-full border-2 border-blue-600 flex items-center justify-center text-white overflow-hidden'
                   >
                      {user?.photoURL ? (
                         <img
@@ -105,9 +105,11 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                            <div className='px-4 py-2 text-sm text-gray-700 border-b border-gray-100'>
                               <div className='font-medium'>{user?.name}</div>
                               <div className='text-gray-500 text-xs'>{user?.email}</div>
-                              
+
                               {/* Plan Indicator in Menu */}
-                              <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}>
+                              <div
+                                 className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}
+                              >
                                  {planInfo.icon}
                                  <span>{planInfo.name} Plan</span>
                               </div>
