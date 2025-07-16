@@ -38,7 +38,7 @@ const plans = [
       ],
       mostPopular: true,
       buttonText: 'Upgrade to Pro',
-      color: 'purple',
+      color: 'blue',
       icon: '⚡',
    },
    {
@@ -57,7 +57,7 @@ const plans = [
          'SLA guarantees',
       ],
       mostPopular: false,
-      buttonText: 'Contact Sales',
+      buttonText: 'Upgrade to Enterprise',
       color: 'indigo',
       icon: '👑',
    },
@@ -145,7 +145,7 @@ const PricingPage = () => {
    }
 
    return (
-      <div className='min-h-screen bg-gray-50'>
+      <div className='min-h-screen bg-gradient-to-br from-gray-200 via-gray-400 to-gray-300'>
          {/* Header */}
          {/* <div className='bg-white border-b border-gray-200'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -164,7 +164,7 @@ const PricingPage = () => {
          </div> */}
 
          {/* Pricing Content */}
-         <div className='pb-24 pt-12'>
+         <div className='py-12'>
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -181,11 +181,11 @@ const PricingPage = () => {
                   <p className='mt-4 text-lg text-gray-600'>Choose the perfect plan for your data needs</p>
 
                   <div className='mt-8 flex justify-center'>
-                     <div className='relative bg-gray-100 p-1 rounded-full flex'>
+                     <div className='relative bg-white/25 p-1 rounded-full flex'>
                         <button
                            onClick={() => setBillingPeriod('monthly')}
                            className={`relative py-2 px-6 rounded-full text-sm font-medium ${
-                              billingPeriod === 'monthly' ? 'text-white' : 'text-gray-700 hover:text-gray-900'
+                              billingPeriod === 'monthly' ? 'text-white' : 'text-gray-800 hover:text-gray-900'
                            }`}
                         >
                            Monthly
@@ -193,7 +193,7 @@ const PricingPage = () => {
                         <button
                            onClick={() => setBillingPeriod('annual')}
                            className={`relative py-2 px-6 rounded-full text-sm font-medium ${
-                              billingPeriod === 'annual' ? 'text-white' : 'text-gray-700 hover:text-gray-900'
+                              billingPeriod === 'annual' ? 'text-white' : 'text-gray-800 hover:text-gray-900'
                            }`}
                         >
                            Annual <span className='text-green-600 font-bold'>-20%</span>
@@ -224,7 +224,7 @@ const PricingPage = () => {
                            plan.mostPopular
                               ? 'border-2 border-purple-500 shadow-xl'
                               : 'border border-gray-200 shadow-md'
-                        } bg-white`}
+                        } bg-white/60`}
                      >
                         {plan.mostPopular && (
                            <div className='absolute top-0 right-0 left-0 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-semibold text-center'>
@@ -241,7 +241,7 @@ const PricingPage = () => {
                               <span className='ml-1 text-gray-600'>/month</span>
                            </div>
                            {billingPeriod === 'annual' && (
-                              <div className='mt-1 text-sm text-green-600 font-medium'>Billed annually</div>
+                              <div className='mt-1 text-sm text-green-800 font-medium'>Billed annually</div>
                            )}
                            <p className='mt-2 text-gray-600'>{plan.description}</p>
 
