@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { FileText, Calendar, HardDrive, Trash2, X } from 'lucide-react'
+import { FileText, Calendar, HardDrive, Trash2, X, Play } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import {
    getAnalysisHistory,
    clearAnalysisHistory,
@@ -7,21 +8,42 @@ import {
    formatFileSize,
    AnalysisHistoryItem,
 } from '../context/AnalysisContext'
+import { useAnalysis } from '../context/AnalysisContext'
+import { useAuth } from '../context/AuthContext'
+import { useData } from '../context/DataContext'
 
 const AnalysisHistory = () => {
+   const navigate = useNavigate()
    const [history, setHistory] = useState<AnalysisHistoryItem[]>([])
+   const { user } = useAuth()
+   const { loadAnalysisData, syncWithFirebase } = useAnalysis()
+   const { setData } = useData()
 
    useEffect(() => {
-      const loadHistory = () => {
+      const loadHistory = async () => {
          const currentHistory = getAnalysisHistory()
          setHistory(currentHistory)
+         
+         // Try to sync with Firebase if user is authenticated
+         if (user?.id) {
+            try {
+               await syncWithFirebase()
+               // Reload after sync
+               const syncedHistory = getAnalysisHistory()
+               setHistory(syncedHistory)
+            } catch (error) {
+               console.warn('Firebase sync failed, continuing with local data:', error)
+               // Continue with local data - don't show error to user
+            }
+         }
       }
 
       loadHistory()
 
       // Listen for storage changes (if multiple tabs are open)
       const handleStorageChange = () => {
-         loadHistory()
+         const currentHistory = getAnalysisHistory()
+         setHistory(currentHistory)
       }
 
       window.addEventListener('storage', handleStorageChange)
@@ -33,21 +55,32 @@ const AnalysisHistory = () => {
          window.removeEventListener('storage', handleStorageChange)
          window.removeEventListener('focus', handleStorageChange)
       }
-   }, [])
+   }, [user?.id, syncWithFirebase])
 
-   const handleClearHistory = () => {
+   const handleClearHistory = async () => {
       if (window.confirm('Are you sure you want to clear all analysis history?')) {
-         clearAnalysisHistory()
+         await clearAnalysisHistory(user?.id)
          setHistory([])
       }
    }
 
-   const handleDeleteItem = (id: string, fileName: string) => {
+   const handleDeleteItem = async (id: string, fileName: string) => {
       if (window.confirm(`Are you sure you want to delete the analysis for "${fileName}"?`)) {
-         deleteAnalysisItem(id)
+         await deleteAnalysisItem(id, user?.id)
          // Update local state to reflect the change immediately
          setHistory(prevHistory => prevHistory.filter(item => item.id !== id))
       }
+   }
+
+   const handleLoadAnalysis = (historyItem: AnalysisHistoryItem) => {
+      // Load the analysis data into the context
+      loadAnalysisData(historyItem)
+      
+      // Set the data for chat functionality
+      setData(historyItem.analysisData.sample)
+      
+      // Navigate to dashboard
+      navigate('/dashboard')
    }
 
    const formatDate = (dateString: string) => {
@@ -106,6 +139,14 @@ const AnalysisHistory = () => {
                         </div>
                      </div>
                      <div className='flex items-start space-x-2'>
+                        <button
+                           onClick={() => handleLoadAnalysis(item)}
+                           className='flex-shrink-0 flex items-center space-x-1 px-2 py-1 text-xs text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors'
+                           title={`Load analysis for ${item.fileName}`}
+                        >
+                           <Play className='h-3 w-3' />
+                           <span>Load</span>
+                        </button>
                         <div className='flex-shrink-0 text-right'>
                            {item.analysisData.summary && (
                               <div>

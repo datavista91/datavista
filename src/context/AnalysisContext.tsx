@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
+import { analysisHistoryService } from '../services/analysisHistoryService'
+import { useAuth } from './AuthContext'
 
 // History interfaces
 interface AnalysisHistoryItem {
@@ -12,11 +14,29 @@ interface AnalysisHistoryItem {
 // LocalStorage utility functions
 const STORAGE_KEY = 'datavista_analysis_history'
 
-const saveAnalysisToHistory = (historyItem: AnalysisHistoryItem) => {
+const saveAnalysisToHistory = async (historyItem: AnalysisHistoryItem, userId?: string) => {
    try {
+      // Always save to localStorage first (guaranteed to work)
       const existingHistory = getAnalysisHistory()
       const updatedHistory = [historyItem, ...existingHistory.slice(0, 9)] // Keep only 10 most recent
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
+      console.log('Analysis saved to local storage successfully')
+      
+      // Try to save to Firebase if user is authenticated
+      if (userId) {
+         try {
+            await analysisHistoryService.saveAnalysisToFirebase(userId, {
+               fileName: historyItem.fileName,
+               uploadDate: historyItem.uploadDate,
+               fileSize: historyItem.fileSize,
+               analysisData: historyItem.analysisData,
+            })
+            console.log('Analysis saved to Firebase successfully')
+         } catch (firebaseError) {
+            console.warn('Failed to save to Firebase, but local storage succeeded:', firebaseError)
+            // Don't throw error - local storage save was successful
+         }
+      }
    } catch (error) {
       console.error('Failed to save analysis to history:', error)
    }
@@ -32,22 +52,80 @@ const getAnalysisHistory = (): AnalysisHistoryItem[] => {
    }
 }
 
-const clearAnalysisHistory = () => {
+const clearAnalysisHistory = async (userId?: string) => {
    try {
+      // Always clear localStorage first
       localStorage.removeItem(STORAGE_KEY)
+      console.log('Local storage cleared successfully')
+      
+      // Try to clear Firebase if user is authenticated
+      if (userId) {
+         try {
+            await analysisHistoryService.clearUserAnalysisHistory(userId)
+            console.log('Firebase history cleared successfully')
+         } catch (firebaseError) {
+            console.warn('Failed to clear Firebase history, but local storage cleared:', firebaseError)
+            // Don't throw error - local storage clearing was successful
+         }
+      }
    } catch (error) {
       console.error('Failed to clear analysis history:', error)
    }
 }
 
-const deleteAnalysisItem = (id: string) => {
+const deleteAnalysisItem = async (id: string, userId?: string) => {
    try {
+      // Always delete from localStorage first
       const existingHistory = getAnalysisHistory()
       const updatedHistory = existingHistory.filter(item => item.id !== id)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
+      console.log('Analysis deleted from local storage successfully')
+      
+      // Try to delete from Firebase if user is authenticated
+      if (userId) {
+         try {
+            await analysisHistoryService.deleteAnalysisFromFirebase(userId, id)
+            console.log('Analysis deleted from Firebase successfully')
+         } catch (firebaseError) {
+            console.warn('Failed to delete from Firebase, but local storage succeeded:', firebaseError)
+            // Don't throw error - local storage deletion was successful
+         }
+      }
    } catch (error) {
       console.error('Failed to delete analysis item:', error)
    }
+}
+
+// Sync Firebase history to localStorage
+const syncFirebaseToLocal = async (userId: string) => {
+   try {
+      const firebaseHistory = await analysisHistoryService.getUserAnalysisHistory(userId)
+      const mergedHistory = mergeHistories(getAnalysisHistory(), firebaseHistory)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedHistory.slice(0, 10)))
+      console.log('Successfully synced Firebase to local storage')
+   } catch (error) {
+      console.warn('Failed to sync Firebase to local - falling back to local storage only:', error)
+      // Don't throw error, just continue with local storage
+   }
+}
+
+// Helper function to merge local and Firebase histories without duplicates
+const mergeHistories = (localHistory: AnalysisHistoryItem[], firebaseHistory: AnalysisHistoryItem[]): AnalysisHistoryItem[] => {
+   const merged = [...firebaseHistory]
+   
+   // Add local items that aren't in Firebase (by fileName and uploadDate)
+   localHistory.forEach(localItem => {
+      const exists = firebaseHistory.some(fbItem => 
+         fbItem.fileName === localItem.fileName && 
+         Math.abs(new Date(fbItem.uploadDate).getTime() - new Date(localItem.uploadDate).getTime()) < 1000
+      )
+      if (!exists) {
+         merged.push(localItem)
+      }
+   })
+   
+   // Sort by upload date (most recent first)
+   return merged.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -105,6 +183,8 @@ interface DataSummary {
 interface AnalysisContextType {
    analysisData: AnalysisData
    analyzeData: (csvData: any[], fileName: string, fileSize: number) => Promise<void>
+   loadAnalysisData: (historyItem: AnalysisHistoryItem) => void
+   syncWithFirebase: () => Promise<void>
 }
 
 // Create context
@@ -149,6 +229,7 @@ const processDataMainThread = async (csvData: any[]) => {
 }
 
 export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
+   const { user } = useAuth()
    const [analysisData, setAnalysisData] = useState<AnalysisData>({
       sample: [],
       summary: null,
@@ -157,6 +238,25 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
       fileName: '',
       fileSize: 0,
    })
+
+   // Load analysis data from history item
+   const loadAnalysisData = useCallback((historyItem: AnalysisHistoryItem) => {
+      setAnalysisData({
+         sample: historyItem.analysisData.sample,
+         summary: historyItem.analysisData.summary,
+         isProcessing: false,
+         progress: 100,
+         fileName: historyItem.fileName,
+         fileSize: historyItem.fileSize,
+      })
+   }, [])
+
+   // Sync with Firebase
+   const syncWithFirebase = useCallback(async () => {
+      if (user?.id) {
+         await syncFirebaseToLocal(user.id)
+      }
+   }, [user?.id])
 
    const analyzeData = useCallback(async (csvData: any[], fileName: string, fileSize: number) => {
       setAnalysisData((prev) => ({ ...prev, isProcessing: true, progress: 0, fileName, fileSize }))
@@ -245,15 +345,22 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
             fileSize: analysisData.fileSize,
             analysisData: analysisData,
          }
-         saveAnalysisToHistory(historyItem)
+         saveAnalysisToHistory(historyItem, user?.id)
          console.log('Analysis saved to history:', historyItem)
          console.log('Current history length:', getAnalysisHistory().length)
       }
-   }, [analysisData])
+   }, [analysisData, user?.id])
 
-   return <AnalysisContext.Provider value={{ analysisData, analyzeData }}>{children}</AnalysisContext.Provider>
+   // Sync with Firebase on user login
+   useEffect(() => {
+      if (user?.id) {
+         syncWithFirebase()
+      }
+   }, [user?.id, syncWithFirebase])
+
+   return <AnalysisContext.Provider value={{ analysisData, analyzeData, loadAnalysisData, syncWithFirebase }}>{children}</AnalysisContext.Provider>
 }
 
 // Export utility functions for use in other components
-export { getAnalysisHistory, clearAnalysisHistory, formatFileSize, deleteAnalysisItem }
+export { getAnalysisHistory, clearAnalysisHistory, formatFileSize, deleteAnalysisItem, syncFirebaseToLocal }
 export type { AnalysisHistoryItem }
