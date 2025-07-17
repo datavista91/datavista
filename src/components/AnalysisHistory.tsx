@@ -143,11 +143,19 @@ const AnalysisHistory = () => {
                      <div className='flex items-start space-x-2'>
                         <button
                            onClick={() => handleLoadAnalysis(item)}
-                           className='flex-shrink-0 flex items-center space-x-1 px-2 py-1 text-xs text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors'
+                           className='flex-shrink-0 flex items-center space-x-1 pr-2 py-1 rounded text-sm text-green-600 hover:text-green-600 hover:bg-green-100  transition-colors'
                            title={`Load analysis for ${item.fileName}`}
                         >
                            <Play className='h-3 w-3' />
                            <span>Load</span>
+                        </button>
+                        <button
+                           onClick={() => handleDeleteItem(item.id, item.fileName)}
+                           className='flex-shrink-0 flex items-center space-x-1 pr-2 py-1 text-sm text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
+                           title={`Delete analysis for ${item.fileName}`}
+                        >
+                           <X className='h-4 w-4' />
+                           <span>Delete</span>
                         </button>
                         <div className='flex-shrink-0 text-right'>
                            {item.analysisData.summary && (
@@ -161,13 +169,6 @@ const AnalysisHistory = () => {
                               </div>
                            )}
                         </div>
-                        <button
-                           onClick={() => handleDeleteItem(item.id, item.fileName)}
-                           className='flex-shrink-0 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors'
-                           title={`Delete analysis for ${item.fileName}`}
-                        >
-                           <X className='h-4 w-4' />
-                        </button>
                      </div>
                   </div>
                   {/* Analysis Summary Preview */}
