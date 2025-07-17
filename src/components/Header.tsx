@@ -1,7 +1,8 @@
-import { Bell, LogOut, Menu, Search, User } from 'lucide-react'
+import { Bell, LogOut, Menu, Search, User, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocation } from 'react-router-dom'
+import { getFirestore, collection, getDocs } from 'firebase/firestore'
 
 interface HeaderProps {
    toggleSidebar: () => void
@@ -26,6 +27,47 @@ const mapActiveSectionDescription = {
 const Header = ({ toggleSidebar }: HeaderProps) => {
    const { user, logout } = useAuth()
    const [showUserMenu, setShowUserMenu] = useState(false)
+   const [showNotificationPanel, setShowNotificationPanel] = useState(false)
+   const [notifications, setNotifications] = useState<any[]>([])
+   const [unreadCount, setUnreadCount] = useState(0)
+   const [selectedNotification, setSelectedNotification] = useState<any>(null)
+   // Fetch notifications from Firebase Feedback collection and sync with localStorage
+   useEffect(() => {
+      const fetchNotifications = async () => {
+         const db = getFirestore()
+         const feedbackRef = collection(db, 'feedbacks')
+         const snapshot = await getDocs(feedbackRef)
+         const fetched = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+         // Get read status from localStorage
+         const userKey = `notifications_${user?.email}`
+         const local = JSON.parse(localStorage.getItem(userKey) || '{}')
+         const merged = fetched.map((n) => ({ ...n, read: local[n.id]?.read || false }))
+         setNotifications(merged)
+         setUnreadCount(merged.filter((n) => !n.read).length)
+      }
+      if (user?.email) fetchNotifications()
+   }, [user?.email])
+
+   // Save read status to localStorage
+   const markAsRead = (id: string) => {
+      const userKey = `notifications_${user?.email}`
+      const local = JSON.parse(localStorage.getItem(userKey) || '{}')
+      local[id] = { read: true }
+      localStorage.setItem(userKey, JSON.stringify(local))
+      setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)))
+      setUnreadCount(notifications.filter((n) => !n.read && n.id !== id).length)
+   }
+
+   const markAllAsRead = () => {
+      const userKey = `notifications_${user?.email}`
+      const local: { [key: string]: { read: boolean } } = {}
+      notifications.forEach((n) => {
+         local[n.id] = { read: true }
+      })
+      localStorage.setItem(userKey, JSON.stringify(local))
+      setNotifications(notifications.map((n) => ({ ...n, read: true })))
+      setUnreadCount(0)
+   }
    const [activeSectionHeader, setActiveSectionHeader] = useState('Dashboard')
    const [activeSectionDescription, setActiveSectionDescription] = useState('AI Powered Analytics Dashboard')
    const location = useLocation()
@@ -53,10 +95,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
       )
    }, [window.location.pathname])
 
-   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Handle search input change
-      console.log('Search:', e.target.value)
-   }
+   // ...existing code...
 
    return (
       <header className='bg-white border-b border-gray-200 shadow-sm'>
@@ -88,9 +127,97 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             )} */}
 
             <div className='flex items-center space-x-4'>
-               <button className='text-gray-500 hover:text-gray-700 focus:outline-none'>
-                  <Bell size={20} />
+               <button
+                  className='relative text-gray-500 hover:text-gray-700 focus:outline-none'
+                  onClick={() => setShowNotificationPanel(!showNotificationPanel)}
+               >
+                  <Bell size={24} />
+                  {unreadCount > 0 && (
+                     <span className='absolute -top-1 right-0 block h-3 w-3 rounded-full bg-blue-500 border-2 border-white'></span>
+                  )}
                </button>
+
+               {/* Notification Panel */}
+               {showNotificationPanel && (
+                  <div className='absolute right-16 top-14 w-96 max-h-[60vh] overflow-y-auto rounded-lg shadow-lg bg-white border border-blue-100 z-20'>
+                     <div className='flex justify-between items-center px-4 py-2 border-b bg-blue-50'>
+                        <span className='font-semibold text-blue-700'>Notifications</span>
+                        <button
+                           className='text-xs text-blue-600 hover:underline'
+                           onClick={markAllAsRead}
+                        >
+                           Read All
+                        </button>
+                     </div>
+                     {notifications.length === 0 ? (
+                        <div className='p-4 text-gray-500 text-sm'>No notifications</div>
+                     ) : (
+                        notifications.map((n) => (
+                           <div
+                              key={n.id}
+                              className={`flex items-start px-4 py-3 border-b last:border-b-0 cursor-pointer ${
+                                 n.read ? 'bg-white' : 'bg-blue-50'
+                              }`}
+                              onClick={() => {
+                                 setSelectedNotification(n)
+                                 markAsRead(n.id)
+                              }}
+                           >
+                              <div className='flex-1'>
+                                 <div className='font-medium text-gray-900'>{n.title || 'Notification'}</div>
+                                 <div className='text-gray-600 text-xs'>{n.message || n.content}</div>
+                                 <div className='text-gray-400 text-xs mt-1'>
+                                    {n.date
+                                       ? new Date(n.date.seconds ? n.date.seconds * 1000 : n.date).toLocaleString()
+                                       : ''}
+                                 </div>
+                              </div>
+                              {!n.read && (
+                                 <span className='ml-2 mt-1'>
+                                    <CheckCircle
+                                       size={16}
+                                       className='text-blue-400'
+                                    />
+                                 </span>
+                              )}
+                           </div>
+                        ))
+                     )}
+                  </div>
+               )}
+
+               {/* Custom Notification Modal */}
+               {selectedNotification && (
+                  <div className='fixed inset-0 z-50 flex items-center justify-center '>
+                  <div
+                     className='fixed inset-0 bg-black bg-opacity-30 '
+                     onClick={() => setSelectedNotification(null)}
+                  ></div>
+                     <div className='bg-white rounded-lg shadow-lg p-6 w-full max-w-md border border-blue-200 relative z-10'>
+                        <h2 className='text-lg font-bold text-blue-700 mb-2'>
+                           {selectedNotification.title || 'Notification'}
+                        </h2>
+                        <p className='text-gray-700 mb-4'>
+                           {selectedNotification.message || selectedNotification.content}
+                        </p>
+                        <div className='text-xs text-gray-400 mb-4'>
+                           {selectedNotification.date
+                              ? new Date(
+                                   selectedNotification.date.seconds
+                                      ? selectedNotification.date.seconds * 1000
+                                      : selectedNotification.date
+                                ).toLocaleString()
+                              : ''}
+                        </div>
+                        <button
+                           className='px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
+                           onClick={() => setSelectedNotification(null)}
+                        >
+                           Close
+                        </button>
+                     </div>
+                  </div>
+               )}
 
                <div className='relative'>
                   <button
@@ -101,7 +228,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                         <img
                            src={user.photoURL}
                            alt={user.name || 'User'}
-                           className='h-8 w-8 rounded-full object-cover'
+                           className='h-10 w-10 rounded-full object-cover'
                         />
                      ) : user?.name ? (
                         <span className='text-sm font-medium'>{user.name.charAt(0)}</span>
