@@ -1,12 +1,8 @@
-import { Bell, LogOut, Menu, Search, User, CheckCircle } from 'lucide-react'
+import { Bell, LogOut, User, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocation } from 'react-router-dom'
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
-
-interface HeaderProps {
-   toggleSidebar: () => void
-}
 
 const mapActiveSectionHeader = {
    dashboard: 'Dashboard',
@@ -24,7 +20,7 @@ const mapActiveSectionDescription = {
    history: 'Analytics history and saved results',
 }
 
-const Header = ({ toggleSidebar }: HeaderProps) => {
+const Header = () => {
    const { user, logout } = useAuth()
    const [showUserMenu, setShowUserMenu] = useState(false)
    const [showNotificationPanel, setShowNotificationPanel] = useState(false)
@@ -189,10 +185,10 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                {/* Custom Notification Modal */}
                {selectedNotification && (
                   <div className='fixed inset-0 z-50 flex items-center justify-center '>
-                  <div
-                     className='fixed inset-0 bg-black bg-opacity-30 '
-                     onClick={() => setSelectedNotification(null)}
-                  ></div>
+                     <div
+                        className='fixed inset-0 bg-black bg-opacity-30 '
+                        onClick={() => setSelectedNotification(null)}
+                     ></div>
                      <div className='bg-white rounded-lg shadow-lg p-6 w-full max-w-md border border-blue-200 relative z-10'>
                         <h2 className='text-lg font-bold text-blue-700 mb-2'>
                            {selectedNotification.title || 'Notification'}

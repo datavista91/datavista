@@ -1,15 +1,15 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { House, X, Clock, Sparkles, BarChart3, TrendingUp, Presentation, Database } from 'lucide-react'
+import { House, Clock, Sparkles, BarChart3, TrendingUp, Presentation, Database } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useData } from '../context/DataContext'
 import { useAnalysis } from '../context/AnalysisContext'
 
-interface SideNavProps {
-   isOpen: boolean
-   setIsOpen: (open: boolean) => void
-}
+// interface SideNavProps {
+//    isOpen: boolean
+//    setIsOpen: (open: boolean) => void
+// }
 
-const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
+const SideNav = () => {
    const navigate = useNavigate()
    const location = useLocation()
    const { hasData } = useData()
@@ -67,9 +67,9 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
 
    return (
       <div
-         className={`${
-            isOpen ? 'translate-x-0' : '-translate-x-full'
-         } md:translate-x-0 fixed md:relative inset-y-0 left-0 z-30 w-72 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out flex flex-col`}
+         className={`
+         -translate-x-full
+          md:translate-x-0 fixed md:relative inset-y-0 left-0 z-30 w-72 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out flex flex-col`}
       >
          {' '}
          {/* Header */}
@@ -91,12 +91,12 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                   <p className='text-xs text-gray-500'>AI Analytics</p>
                </div>
             </Link>
-            <button
+            {/* <button
                onClick={() => setIsOpen(false)}
                className='md:hidden p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors'
             >
                <X size={16} />
-            </button>
+            </button> */}
          </div>{' '}
          {/* Navigation */}
          <nav className='flex-1 px-3 py-4 space-y-1 overflow-y-hidden'>

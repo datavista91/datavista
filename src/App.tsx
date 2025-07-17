@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import Dashboard from './components/Dashboard'
@@ -20,19 +19,16 @@ import EnhancedPresentations from './components/EnhancedPresentations'
 
 // Dashboard layout component
 const DashboardLayout = () => {
-   const [sidebarOpen, setSidebarOpen] = useState(true)
+   // const [sidebarOpen, setSidebarOpen] = useState(true)
 
    return (
       <div
          className='flex h-screen bg-light-bg overflow-hidden'
          style={{ fontFamily: 'Inter, sans-serif' }}
       >
-         <SideNav
-            isOpen={sidebarOpen}
-            setIsOpen={setSidebarOpen}
-         />
+         <SideNav />
          <div className='flex flex-col flex-1 overflow-hidden'>
-            <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+            <Header />
             <main className='flex-1 overflow-y-auto p-4 md:p-6'>
                <Routes>
                   <Route
@@ -42,14 +38,16 @@ const DashboardLayout = () => {
                   <Route
                      path='/visualizations'
                      element={<ChartPanel />}
-                  />{' '}                  <Route
+                  />{' '}
+                  <Route
                      path='/reports'
                      element={<SmartReports />}
                   />
                   <Route
                      path='/history'
                      element={<AnalysisHistory />}
-                  />                  <Route
+                  />{' '}
+                  <Route
                      path='/share'
                      element={<EnhancedPresentations />}
                   />
@@ -79,31 +77,36 @@ const DashboardLayout = () => {
 
 export function App() {
    return (
-      <BrowserRouter>         <AuthProvider>
-            <DataProvider>               <AnalysisProvider>
+      <BrowserRouter>
+         {' '}
+         <AuthProvider>
+            <DataProvider>
+               {' '}
+               <AnalysisProvider>
                   <AIResponseProvider>
                      <ChatProvider>
-                  <Routes>
-                     <Route
-                        path='/'
-                        element={<LandingPage />}
-                     />
-                     <Route
-                        path='/login'
-                        element={<GoogleSignInPage />}
-                     />
-                     <Route
-                        path='/signup'
-                        element={<GoogleSignInPage />}
-                     />
-                     <Route
-                        path='/*'
-                        element={
-                           <ProtectedRoute>
-                              <DashboardLayout />
-                           </ProtectedRoute>
-                        }
-                     />                  </Routes>
+                        <Routes>
+                           <Route
+                              path='/'
+                              element={<LandingPage />}
+                           />
+                           <Route
+                              path='/login'
+                              element={<GoogleSignInPage />}
+                           />
+                           <Route
+                              path='/signup'
+                              element={<GoogleSignInPage />}
+                           />
+                           <Route
+                              path='/*'
+                              element={
+                                 <ProtectedRoute>
+                                    <DashboardLayout />
+                                 </ProtectedRoute>
+                              }
+                           />{' '}
+                        </Routes>
                      </ChatProvider>
                   </AIResponseProvider>
                </AnalysisProvider>
