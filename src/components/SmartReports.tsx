@@ -56,12 +56,12 @@ const SmartReports = () => {
    if (aiInsights.length === 0 && generalResponses.length === 0) {
       return (
          <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+            {/* <div className='flex items-center justify-between'>
                <div>
                   <h1 className='text-2xl font-bold text-gray-900'>Smart Reports</h1>
                   <p className='text-gray-600'>AI-powered insights and analysis</p>
                </div>
-            </div>
+            </div> */}
 
             <div className='flex flex-col items-center justify-center h-96 text-center bg-white rounded-lg border border-gray-200'>
                <Sparkles className='w-16 h-16 text-purple-400 mb-4' />
@@ -106,10 +106,10 @@ const SmartReports = () => {
    return (
       <div className='space-y-6 h-full overflow-y-auto custom-scrollbar'>
          <div className='flex items-center justify-between'>
-            <div>
+            {/* <div>
                <h1 className='text-2xl font-bold text-gray-900'>Smart Reports</h1>
                <p className='text-gray-600'>AI-powered insights and analysis</p>
-            </div>
+            </div> */}
             <div className='flex items-center space-x-2 text-sm text-gray-600'>
                <Sparkles className='w-4 h-4' />
                <span>{aiInsights.length + generalResponses.length} AI responses</span>

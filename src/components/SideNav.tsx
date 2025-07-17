@@ -70,8 +70,10 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
          className={`${
             isOpen ? 'translate-x-0' : '-translate-x-full'
          } md:translate-x-0 fixed md:relative inset-y-0 left-0 z-30 w-72 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out flex flex-col`}
-      >         {/* Header */}
-         <div className='flex items-center justify-between p-4 border-b border-gray-200 bg-white'>
+      >
+         {' '}
+         {/* Header */}
+         <div className='flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white'>
             <Link
                to='/'
                className='flex items-center space-x-2 group'
@@ -95,8 +97,11 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
             >
                <X size={16} />
             </button>
-         </div>         {/* Navigation */}
-         <nav className='flex-1 px-3 py-4 space-y-1 overflow-y-hidden'>            <div className='mb-4'>
+         </div>{' '}
+         {/* Navigation */}
+         <nav className='flex-1 px-3 py-4 space-y-1 overflow-y-hidden'>
+            {' '}
+            <div className='mb-4'>
                {navItems.map((item) => {
                   const isActive = location.pathname === item.path
                   return (
@@ -133,12 +138,15 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                      </motion.div>
                   )
                })}
-            </div>            {/* Data Status */}
-            <div className={`px-4 py-4 rounded-lg border ${
-               hasData 
-                  ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
-                  : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
-            }`}>
+            </div>{' '}
+            {/* Data Status */}
+            <div
+               className={`px-4 py-4 rounded-lg border ${
+                  hasData
+                     ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
+                     : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
+               }`}
+            >
                <div className='flex items-center space-x-2 mb-2'>
                   <Database className={`w-4 h-4 ${hasData ? 'text-emerald-600' : 'text-gray-500'}`} />
                   <span className={`text-sm font-medium ${hasData ? 'text-emerald-900' : 'text-gray-700'}`}>
@@ -146,21 +154,18 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                   </span>
                </div>
                <p className={`text-xs mb-3 ${hasData ? 'text-emerald-700' : 'text-gray-600'}`}>
-                  {hasData ? (
-                     analysisData?.fileName ? 
-                        `${analysisData.fileName} - Ready for analysis` : 
-                        'Data uploaded - Ready for analysis'
-                  ) : (
-                     'No data uploaded yet'
-                  )}
+                  {hasData
+                     ? analysisData?.fileName
+                        ? `${analysisData.fileName} - Ready for analysis`
+                        : 'Data uploaded - Ready for analysis'
+                     : 'No data uploaded yet'}
                </p>
                <div className={`w-full rounded-full h-1.5 ${hasData ? 'bg-emerald-200' : 'bg-gray-200'}`}>
-                  <div className={`h-1.5 rounded-full ${
-                     hasData ? 'bg-emerald-500 w-full' : 'bg-gray-400 w-0'
-                  }`}></div>
+                  <div className={`h-1.5 rounded-full ${hasData ? 'bg-emerald-500 w-full' : 'bg-gray-400 w-0'}`}></div>
                </div>
             </div>
-         </nav>         {/* Bottom Section */}
+         </nav>{' '}
+         {/* Bottom Section */}
          <div className='border-t border-gray-200 bg-white p-4 space-y-3'>
             {bottomNavItems.map((item) => {
                const isActive = location.pathname === item.path
@@ -176,7 +181,8 @@ const SideNav = ({ isOpen, setIsOpen }: SideNavProps) => {
                      <span>{item.name}</span>
                   </Link>
                )
-            })}            {/* Upgrade Section - Compact */}
+            })}{' '}
+            {/* Upgrade Section - Compact */}
             <div className='pt-2 mt-2 border-t border-gray-100'>
                <div className='p-3 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 rounded-lg text-white shadow-lg'>
                   <div className='flex items-center space-x-2 mb-2'>

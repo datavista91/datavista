@@ -23,7 +23,7 @@ const AnalysisHistory = () => {
       const loadHistory = async () => {
          const currentHistory = getAnalysisHistory()
          setHistory(currentHistory)
-         
+
          // Try to sync with Firebase if user is authenticated
          if (user?.id) {
             try {
@@ -68,17 +68,17 @@ const AnalysisHistory = () => {
       if (window.confirm(`Are you sure you want to delete the analysis for "${fileName}"?`)) {
          await deleteAnalysisItem(id, user?.id)
          // Update local state to reflect the change immediately
-         setHistory(prevHistory => prevHistory.filter(item => item.id !== id))
+         setHistory((prevHistory) => prevHistory.filter((item) => item.id !== id))
       }
    }
 
    const handleLoadAnalysis = (historyItem: AnalysisHistoryItem) => {
       // Load the analysis data into the context
       loadAnalysisData(historyItem)
-      
+
       // Set the data for chat functionality
       setData(historyItem.analysisData.sample)
-      
+
       // Navigate to dashboard
       navigate('/dashboard')
    }
@@ -119,7 +119,9 @@ const AnalysisHistory = () => {
                <div
                   key={item.id}
                   className='border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors'
-               >                  <div className='flex items-start justify-between'>
+               >
+                  {' '}
+                  <div className='flex items-start justify-between'>
                      <div className='flex items-start space-x-3'>
                         <div className='flex-shrink-0'>
                            <FileText className='h-5 w-5 text-purple-600' />
@@ -168,7 +170,6 @@ const AnalysisHistory = () => {
                         </button>
                      </div>
                   </div>
-
                   {/* Analysis Summary Preview */}
                   {item.analysisData.summary && (
                      <div className='mt-3 pt-3 border-t border-gray-100'>

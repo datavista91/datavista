@@ -32,7 +32,7 @@ const Dashboard = () => {
             >
                {' '}
                <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
-                  <div>
+                  {/* <div>
                      <h1
                         className='text-2xl font-bold text-gray-900'
                         style={{ fontFamily: 'Poppins, sans-serif' }}
@@ -40,7 +40,7 @@ const Dashboard = () => {
                         Dashboard
                      </h1>
                      <p className='text-gray-600'>Your AI-powered analytics and insights</p>
-                  </div>
+                  </div> */}
                   {/* <div className='mt-4 md:mt-0 flex space-x-3'>
                      <button className='px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50'>
                         Download PDF

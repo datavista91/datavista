@@ -83,12 +83,12 @@ const ChartPanel = () => {
    if (!hasData) {
       return (
          <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+            {/* <div className='flex items-center justify-between'>
                <div>
                   <h1 className='text-2xl font-bold text-gray-900'>Visualizations</h1>
                   <p className='text-gray-600'>Data visualizations and charts</p>
                </div>
-            </div>
+            </div> */}
 
             <div className='flex flex-col items-center justify-center h-96 text-center'>
                <ChartBar className='w-16 h-16 text-gray-400 mb-4' />
@@ -105,12 +105,12 @@ const ChartPanel = () => {
    if (aiVisualizations.length === 0) {
       return (
          <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+            {/* <div className='flex items-center justify-between'>
                <div>
                   <h1 className='text-2xl font-bold text-gray-900'>Visualizations</h1>
                   <p className='text-gray-600'>AI-generated charts and visualizations</p>
-               </div>{' '}
-            </div>
+               </div>
+            </div> */}
 
             <div className='flex flex-col items-center justify-center h-96 text-center'>
                <Sparkles className='w-16 h-16 text-purple-400 mb-4' />
@@ -136,10 +136,10 @@ const ChartPanel = () => {
       <div className='space-y-6 h-full overflow-y-auto custom-scrollbar'>
          {/* Header */}
          <div className='flex items-center justify-between'>
-            <div>
+            {/* <div>
                <h1 className='text-2xl font-bold text-gray-900'>Visualizations</h1>
                <p className='text-gray-600'>AI-powered data visualizations and charts</p>
-            </div>
+            </div> */}
             {aiVisualizations.length > 0 && (
                <div className='flex items-center space-x-2 text-sm text-gray-600'>
                   <Sparkles className='w-4 h-4' />

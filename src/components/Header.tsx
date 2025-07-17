@@ -1,14 +1,34 @@
 import { Bell, LogOut, Menu, Search, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useLocation } from 'react-router-dom'
 
 interface HeaderProps {
    toggleSidebar: () => void
 }
 
+const mapActiveSectionHeader = {
+   dashboard: 'Dashboard',
+   visualizations: 'Visualizations',
+   reports: 'Smart Reports',
+   share: 'Presentations',
+   history: 'Analysis History',
+}
+
+const mapActiveSectionDescription = {
+   dashboard: 'AI Powered Analytics Dashboard',
+   visualizations: 'Data visualizations and charts',
+   reports: 'AI-powered insights and analysis',
+   share: 'AI-generated presentations and reports',
+   history: 'Analytics history and saved results',
+}
+
 const Header = ({ toggleSidebar }: HeaderProps) => {
    const { user, logout } = useAuth()
    const [showUserMenu, setShowUserMenu] = useState(false)
+   const [activeSectionHeader, setActiveSectionHeader] = useState('Dashboard')
+   const [activeSectionDescription, setActiveSectionDescription] = useState('AI Powered Analytics Dashboard')
+   const location = useLocation()
 
    useEffect(() => {
       const link = document.createElement('link')
@@ -22,16 +42,36 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
       }
    }, [])
 
+   useEffect(() => {
+      // Set active section based on current path
+      const path = location.pathname.split('/')[1] || 'dashboard'
+
+      setActiveSectionHeader(mapActiveSectionHeader[path as keyof typeof mapActiveSectionHeader] || 'Dashboard')
+      setActiveSectionDescription(
+         mapActiveSectionDescription[path as keyof typeof mapActiveSectionDescription] ||
+            'AI Powered Analytics Dashboard'
+      )
+   }, [window.location.pathname])
+
+   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Handle search input change
+      console.log('Search:', e.target.value)
+   }
+
    return (
       <header className='bg-white border-b border-gray-200 shadow-sm'>
-         <div className='px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between'>
-            <div className='flex items-center'>
-               <button
-                  onClick={toggleSidebar}
-                  className='text-gray-600 focus:outline-none lg:hidden'
+         <div className='px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between '>
+            <div>
+               <h1
+                  className='text-lg font-bold text-gray-900'
+                  style={{ fontFamily: 'Poppins, sans-serif' }}
                >
-                  <Menu size={20} />
-               </button>
+                  {activeSectionHeader.charAt(0).toUpperCase() + activeSectionHeader.slice(1)}
+               </h1>
+               <p className='text-gray-600 text-xs'>{activeSectionDescription}</p>
+            </div>
+
+            {/* {location.pathname.split('/')[1] === 'history' && (
                <div className='hidden md:flex ml-4 md:ml-0'>
                   <div className='relative'>
                      <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -41,10 +81,11 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                         type='text'
                         placeholder='Search...'
                         className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600 transition duration-150 ease-in-out sm:text-sm'
+                        onChange={handleSearchChange}
                      />
                   </div>
                </div>
-            </div>
+            )} */}
 
             <div className='flex items-center space-x-4'>
                <button className='text-gray-500 hover:text-gray-700 focus:outline-none'>
