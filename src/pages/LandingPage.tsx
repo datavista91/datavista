@@ -3,6 +3,7 @@ import { db } from '../firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
 const LandingPage = () => {
    const { user, isLoading } = useAuth()
@@ -649,7 +650,7 @@ const LandingPage = () => {
                            className='text-blue-700 font-semibold tracking-wide flex items-center gap-1'
                            style={{
                               fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                              fontSize: '14px',
+                              fontSize: 'clamp(11px, 2.5vw, 14px)',
                               letterSpacing: '0.5px',
                            }}
                         >
@@ -704,7 +705,7 @@ const LandingPage = () => {
 
                   {/* CTA Buttons */}
                   <div
-                     className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fadeInUp'
+                     className='flex flex-row gap-3 justify-center items-center mb-12 animate-fadeInUp'
                      style={{ animationDelay: '0.8s' }}
                   >
                      {isLoading ? (
@@ -712,10 +713,10 @@ const LandingPage = () => {
                      ) : user ? (
                         <button
                            onClick={() => navigate('/dashboard')}
-                           className='bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                           className='bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-1 sm:flex-initial'
                            style={{
                               fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                              fontSize: '16px',
+                              fontSize: '15px',
                               lineHeight: '1.4',
                            }}
                         >
@@ -724,10 +725,10 @@ const LandingPage = () => {
                      ) : (
                         <button
                            onClick={() => navigate('/login')}
-                           className='bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                           className='bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-1 sm:flex-initial'
                            style={{
                               fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                              fontSize: '16px',
+                              fontSize: '15px',
                               lineHeight: '1.4',
                            }}
                         >
@@ -736,10 +737,10 @@ const LandingPage = () => {
                      )}
                      <button
                         onClick={() => scrollToSection('features')}
-                        className='border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-medium hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300'
+                        className='border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 flex-1 sm:flex-initial'
                         style={{
                            fontFamily: '"Inter", system-ui, sans-serif',
-                           fontSize: '16px',
+                           fontSize: '15px',
                            lineHeight: '1.4',
                         }}
                      >
@@ -794,6 +795,66 @@ const LandingPage = () => {
                      DataVista is the next-generation data analytics platform that combines artificial intelligence with
                      intuitive design to help businesses of all sizes make sense of their data. From automated insights
                      to beautiful visualizations, we make data analysis accessible to everyone.
+                  </p>
+               </div>
+            </div>
+         </section>
+
+         {/* How DataVista Works Section */}
+         <section
+            className='py-20 relative'
+            style={{
+               background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            }}
+         >
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
+               <div className='text-center mb-12 animate-fadeInUp'>
+                  <h2
+                     className='font-bold text-gray-900 mb-6 tracking-tight'
+                     style={{
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                        fontSize: '42px',
+                        lineHeight: '1.2',
+                     }}
+                  >
+                     HOW DATAVISTA WORKS
+                  </h2>
+                  <p
+                     className='text-gray-600 max-w-3xl mx-auto font-normal mb-12'
+                     style={{ fontSize: '18px', lineHeight: '1.5' }}
+                  >
+                     From data input to intelligent insights – here's how DataVista works for you
+                  </p>
+               </div>
+
+               {/* Lottie Animation Container */}
+               <div
+                  className='flex justify-center mb-8 animate-fadeInUp'
+                  style={{ animationDelay: '0.2s' }}
+               >
+                  <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-2xl w-full hover:shadow-xl transition-shadow duration-300'>
+                     <div className='aspect-video w-full'>
+                        <DotLottieReact
+                           src='https://lottie.host/7064c314-1c76-4d6d-994b-4110a11e8a8d/8qAAGMSEzb.lottie'
+                           loop
+                           autoplay
+                           style={{ width: '100%', height: '100%' }}
+                        />
+                     </div>
+                  </div>
+               </div>
+
+               {/* Supporting Text */}
+               <div
+                  className='text-center max-w-4xl mx-auto animate-fadeInUp'
+                  style={{ animationDelay: '0.4s' }}
+               >
+                  <p
+                     className='text-gray-600 leading-relaxed font-normal'
+                     style={{ fontSize: '16px', lineHeight: '1.6' }}
+                  >
+                     Upload your data, let our AI analyze patterns, and receive actionable insights through beautiful
+                     visualizations and smart reports – all in minutes, not hours.
                   </p>
                </div>
             </div>
