@@ -79,10 +79,9 @@ const cardVariants = {
 }
 
 const PricingPage = () => {
-   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
    const [processingPlan, setProcessingPlan] = useState<string | null>(null)
    const { user } = useAuth()
-   const { subscription, loading: subLoading, isFree, isPro, isEnterprise } = useSubscription()
+   const { loading: subLoading, isFree, isPro, isEnterprise } = useSubscription()
    const navigate = useNavigate()
 
    const handleUpgrade = async (planId: string) => {
@@ -269,13 +268,10 @@ const PricingPage = () => {
                            <h3 className='text-xl font-semibold text-gray-900'>{plan.name}</h3>
                            <div className='mt-4 flex items-baseline'>
                               <span className='text-4xl font-bold text-gray-900'>
-                                 ${billingPeriod === 'annual' ? (parseInt(plan.price) * 0.8).toFixed(0) : plan.price}
+                                 ${plan.price}
                               </span>
                               <span className='ml-1 text-gray-600'>/month</span>
                            </div>
-                           {billingPeriod === 'annual' && (
-                              <div className='mt-1 text-sm text-green-800 font-medium'>Billed annually</div>
-                           )}
                            <p className='mt-2 text-gray-600'>{plan.description}</p>
 
                            <ul className='mt-6 space-y-3'>

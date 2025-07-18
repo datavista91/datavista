@@ -146,9 +146,77 @@ const LandingPage = () => {
       avenirLink.rel = 'stylesheet'
       document.head.appendChild(avenirLink)
 
+      // Add custom animations
+      const style = document.createElement('style')
+      style.textContent = `
+         @keyframes fadeInUp {
+            from {
+               opacity: 0;
+               transform: translateY(30px);
+            }
+            to {
+               opacity: 1;
+               transform: translateY(0);
+            }
+         }
+         
+         @keyframes slideInFromLeft {
+            from {
+               opacity: 0;
+               transform: translateX(-30px);
+            }
+            to {
+               opacity: 1;
+               transform: translateX(0);
+            }
+         }
+         
+         @keyframes slideInFromRight {
+            from {
+               opacity: 0;
+               transform: translateX(30px);
+            }
+            to {
+               opacity: 1;
+               transform: translateX(0);
+            }
+         }
+         
+         .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+         }
+         
+         .animate-slideInFromLeft {
+            animation: slideInFromLeft 0.8s ease-out forwards;
+            opacity: 0;
+         }
+         
+         .animate-slideInFromRight {
+            animation: slideInFromRight 0.8s ease-out forwards;
+            opacity: 0;
+         }
+         
+         /* Smooth transitions for better performance */
+         * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+         }
+         
+         /* Hardware acceleration for animations */
+         .animate-fadeInUp,
+         .animate-slideInFromLeft,
+         .animate-slideInFromRight {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+         }
+      `
+      document.head.appendChild(style)
+
       return () => {
          document.head.removeChild(link)
          document.head.removeChild(avenirLink)
+         document.head.removeChild(style)
       }
    }, [user, navigate])
 
@@ -568,10 +636,10 @@ const LandingPage = () => {
             }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-12'>
+               <div className='text-center mb-12 animate-fadeInUp'>
                   {/* Value Proposition Pill */}
-                  <div className='mb-6'>
-                     <div className='inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3'>
+                  <div className='mb-6 animate-fadeInUp' style={{ animationDelay: '0.2s' }}>
+                     <div className='inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3 hover:scale-105 transition-transform duration-300 ease-out'>
                         <div className='w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse'></div>
                         <span
                            className='text-blue-700 font-semibold tracking-wide'
@@ -587,12 +655,13 @@ const LandingPage = () => {
                   </div>
 
                   <h1
-                     className='font-bold text-gray-900 mb-6 leading-tight tracking-tight'
+                     className='font-bold text-gray-900 mb-6 leading-tight tracking-tight animate-fadeInUp'
                      style={{
                         fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
                         letterSpacing: '-0.02em',
                         fontSize: 'clamp(2rem, 5vw, 5rem)',
                         lineHeight: '1.1',
+                        animationDelay: '0.4s',
                      }}
                   >
                      TRANSFORM YOUR DATA INTO
@@ -600,15 +669,19 @@ const LandingPage = () => {
                   </h1>
 
                   <p
-                     className='text-gray-600 max-w-4xl mx-auto font-normal mb-8'
-                     style={{ lineHeight: '1.6', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                     className='text-gray-600 max-w-4xl mx-auto font-normal mb-8 animate-fadeInUp'
+                     style={{ 
+                        lineHeight: '1.6', 
+                        fontSize: 'clamp(16px, 2.5vw, 20px)',
+                        animationDelay: '0.6s',
+                     }}
                   >
                      Unlock the full potential of your data with AI-powered analytics, stunning visualizations, and
                      automated insights that drive smarter business decisions.
                   </p>
 
                   {/* CTA Buttons */}
-                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
+                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fadeInUp' style={{ animationDelay: '0.8s' }}>
                      {isLoading ? (
                         <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600'></div>
                      ) : user ? (
@@ -651,10 +724,10 @@ const LandingPage = () => {
                </div>
 
                {/* Dashboard Preview Image */}
-               <div className='max-w-5xl mx-auto'>
+               <div className='max-w-5xl mx-auto animate-fadeInUp' style={{ animationDelay: '1s' }}>
                   {/* Tablet Mockup Container */}
                   <div
-                     className='relative mx-auto'
+                     className='relative mx-auto hover:scale-105 transition-transform duration-700 ease-out'
                      style={{ maxWidth: '800px' }}
                   >
                      {/* Tablet Frame */}
@@ -682,7 +755,7 @@ const LandingPage = () => {
                </div>
 
                {/* About DataVista */}
-               <div className='mt-20 max-w-4xl mx-auto text-center'>
+               <div className='mt-20 max-w-4xl mx-auto text-center animate-fadeInUp' style={{ animationDelay: '1.2s' }}>
                   <p
                      className='text-xl text-gray-600 leading-relaxed font-normal'
                      style={{ lineHeight: '1.6' }}
@@ -700,12 +773,11 @@ const LandingPage = () => {
             id='features'
             className='py-20 relative'
             style={{
-               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23cbd5e1' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+               background: 'linear-gradient(135deg, #fafbfc 0%, #f6f8fa 100%)',
             }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16'>
+               <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6 tracking-tight'
                      style={{
@@ -728,13 +800,14 @@ const LandingPage = () => {
                   {features.map((feature, index) => (
                      <div
                         key={index}
-                        className='bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg transition-shadow duration-300'
+                        className='bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out animate-fadeInUp group'
+                        style={{ animationDelay: `${0.2 + index * 0.1}s` }}
                      >
                         <div className='mb-6'>
                            <img
                               src={feature.image}
                               alt={feature.title}
-                              className='w-full h-48 object-cover rounded-lg'
+                              className='w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300 ease-out'
                               loading='lazy'
                            />
                         </div>
@@ -763,10 +836,13 @@ const LandingPage = () => {
          {/* Testimonials Section */}
          <section
             id='testimonials'
-            className='py-20 bg-white'
+            className='py-20 relative'
+            style={{
+               background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+            }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16'>
+               <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
@@ -789,7 +865,8 @@ const LandingPage = () => {
                   {testimonials.map((testimonial, index) => (
                      <div
                         key={index}
-                        className='bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-shadow duration-300'
+                        className='bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out animate-fadeInUp'
+                        style={{ animationDelay: `${0.2 + index * 0.15}s` }}
                      >
                         <div className='flex items-center mb-6'>
                            <img
@@ -822,16 +899,14 @@ const LandingPage = () => {
          </section>
 
          {/* CTA Section */}
-         <section className='py-20 bg-white relative overflow-hidden'>
-            {/* Background Pattern */}
-            <div
-               className='absolute inset-0 opacity-30'
-               style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='10' cy='30' r='1'/%3E%3Ccircle cx='50' cy='30' r='1'/%3E%3Ccircle cx='30' cy='10' r='1'/%3E%3Ccircle cx='30' cy='50' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-               }}
-            />
+         <section 
+            className='py-20 relative overflow-hidden'
+            style={{
+               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+            }}
+         >
             <div className='container mx-auto px-6 text-center relative z-10'>
-               <div className='max-w-4xl mx-auto'>
+               <div className='max-w-4xl mx-auto animate-fadeInUp'>
                   <h2
                      className='text-4xl md:text-5xl font-bold mb-6 leading-tight'
                      style={{
@@ -853,13 +928,17 @@ const LandingPage = () => {
                      ?
                   </h2>
                   <p
-                     className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto'
-                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", lineHeight: '1.6' }}
+                     className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto animate-fadeInUp'
+                     style={{ 
+                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+                        lineHeight: '1.6',
+                        animationDelay: '0.2s',
+                     }}
                   >
                      Join thousands of professionals who trust DataVista for their data analysis needs. Start your
                      journey with intelligent insights today.
                   </p>
-                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
+                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp' style={{ animationDelay: '0.4s' }}>
                      <button
                         onClick={() => navigate('/dashboard')}
                         className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 min-h-[48px] w-full sm:w-auto'
@@ -884,12 +963,11 @@ const LandingPage = () => {
             id='pricing'
             className='py-20 relative'
             style={{
-               background: 'linear-gradient(135deg, #fafbfc 0%, #f6f8fb 100%)',
-               backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.08'%3E%3Cpath d='M0 0h40v40H0zM40 40h40v40H40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+               background: 'linear-gradient(135deg, #f8fafb 0%, #f4f6f8 100%)',
             }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16'>
+               <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
@@ -912,9 +990,10 @@ const LandingPage = () => {
                   {pricingPlans.map((plan, index) => (
                      <div
                         key={index}
-                        className={`bg-white rounded-lg p-8 hover:shadow-lg transition-shadow duration-300 relative ${
-                           plan.isPopular ? 'border-2 border-blue-600 shadow-lg' : 'border border-gray-200'
+                        className={`bg-white rounded-lg p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out relative animate-fadeInUp ${
+                           plan.isPopular ? 'border-2 border-blue-600 shadow-lg scale-105' : 'border border-gray-200'
                         }`}
+                        style={{ animationDelay: `${0.2 + index * 0.1}s` }}
                      >
                         {plan.isPopular && (
                            <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
