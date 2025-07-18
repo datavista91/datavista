@@ -255,7 +255,8 @@ const LandingPage = () => {
          className='bg-white text-gray-900 min-h-screen'
          style={{
             fontFamily: 'Inter, system-ui, sans-serif',
-            lineHeight: '1.5',
+            fontSize: '17px', // +1px for better readability
+            lineHeight: '1.6', // improved line height
          }}
       >
          {/* Contact Modal */}
@@ -406,7 +407,7 @@ const LandingPage = () => {
                                        name='firstName'
                                        value={contactForm.firstName}
                                        onChange={handleContactChange}
-                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base'
                                        placeholder='John'
                                        required
                                     />
@@ -424,7 +425,7 @@ const LandingPage = () => {
                                        name='lastName'
                                        value={contactForm.lastName}
                                        onChange={handleContactChange}
-                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base'
                                        placeholder='Doe'
                                     />
                                  </div>
@@ -442,7 +443,7 @@ const LandingPage = () => {
                                     name='email'
                                     value={contactForm.email}
                                     onChange={handleContactChange}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base'
                                     placeholder='john@example.com'
                                     required
                                  />
@@ -460,7 +461,7 @@ const LandingPage = () => {
                                     name='subject'
                                     value={contactForm.subject}
                                     onChange={handleContactChange}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base'
                                     placeholder='How can we help?'
                                     required
                                  />
@@ -478,7 +479,7 @@ const LandingPage = () => {
                                     rows={4}
                                     value={contactForm.message}
                                     onChange={handleContactChange}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none'
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base'
                                     placeholder='Tell us more about your needs...'
                                     required
                                  ></textarea>
@@ -502,7 +503,7 @@ const LandingPage = () => {
 
          {/* Navigation */}
          <nav className='bg-white border-b border-gray-200 sticky top-0 z-40'>
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='flex justify-between items-center h-16'>
                   {/* Brand */}
                   <div className='flex items-center'>
@@ -635,7 +636,7 @@ const LandingPage = () => {
                backgroundSize: '40px 40px',
             }}
          >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-12 animate-fadeInUp'>
                   {/* Value Proposition Pill */}
                   <div
@@ -645,7 +646,7 @@ const LandingPage = () => {
                      <div className='inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3 hover:scale-105 transition-transform duration-300 ease-out'>
                         <div className='w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse'></div>
                         <span
-                           className='text-blue-700 font-semibold tracking-wide'
+                           className='text-blue-700 font-semibold tracking-wide flex items-center gap-1'
                            style={{
                               fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
                               fontSize: '14px',
@@ -653,6 +654,24 @@ const LandingPage = () => {
                            }}
                         >
                            🚀 NO-CODE ANALYTICS POWERED BY AI
+                           <span className='ml-0.5 mb-0.5'>
+                              <svg
+                                 xmlns='http://www.w3.org/2000/svg'
+                                 width='18'
+                                 height='18'
+                                 viewBox='0 0 24 24'
+                              >
+                                 <path
+                                    fill='none'
+                                    stroke='currentColor'
+                                    stroke-linecap='round'
+                                    stroke-linejoin='round'
+                                    stroke-width='1.5'
+                                    d='M7 4.5a3 3 0 0 0-2.567 4.554a3.001 3.001 0 0 0 0 5.893M7 4.5a2.5 2.5 0 0 1 5 0v15a2.5 2.5 0 0 1-5 0a3 3 0 0 1-2.567-4.553M7 4.5c0 .818.393 1.544 1 2m-3.567 8.447A3 3 0 0 1 6 13.67m11 5.83a3 3 0 0 0 2.567-4.553a3.001 3.001 0 0 0 0-5.893M17 19.5a2.5 2.5 0 0 1-5 0v-15a2.5 2.5 0 0 1 5 0a3 3 0 0 1 2.567 4.554M17 19.5c0-.818-.393-1.544-1-2m3.567-8.446A3 3 0 0 1 18 10.329'
+                                    color='currentColor'
+                                 />
+                              </svg>
+                           </span>
                         </span>
                      </div>
                   </div>
@@ -788,13 +807,13 @@ const LandingPage = () => {
                background: 'linear-gradient(135deg, #fafbfc 0%, #f6f8fa 100%)',
             }}
          >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6 tracking-tight'
                      style={{
                         fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                        fontSize: '40px',
+                        fontSize: '42px',
                         lineHeight: '1.2',
                      }}
                   >
@@ -812,8 +831,7 @@ const LandingPage = () => {
                   {features.map((feature, index) => (
                      <div
                         key={index}
-                        className='bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out animate-fadeInUp group'
-                        style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                        className='bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out group'
                      >
                         <div className='mb-6'>
                            <img
@@ -853,13 +871,13 @@ const LandingPage = () => {
                background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
             }}
          >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
                         fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                        fontSize: '40px',
+                        fontSize: '42px',
                         lineHeight: '1.2',
                      }}
                   >
@@ -877,8 +895,7 @@ const LandingPage = () => {
                   {testimonials.map((testimonial, index) => (
                      <div
                         key={index}
-                        className='bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out animate-fadeInUp'
-                        style={{ animationDelay: `${0.2 + index * 0.15}s` }}
+                        className='bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out'
                      >
                         <div className='flex items-center mb-6'>
                            <img
@@ -917,7 +934,7 @@ const LandingPage = () => {
                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
             }}
          >
-            <div className='container mx-auto px-6 text-center relative z-10'>
+            <div className='max-w-5xl mx-auto px-6 text-center relative z-10'>
                <div className='max-w-4xl mx-auto animate-fadeInUp'>
                   <h2
                      className='text-4xl md:text-5xl font-bold mb-6 leading-tight'
@@ -981,13 +998,13 @@ const LandingPage = () => {
                background: 'linear-gradient(135deg, #f8fafb 0%, #f4f6f8 100%)',
             }}
          >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
                         fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                        fontSize: '40px',
+                        fontSize: '42px',
                         lineHeight: '1.2',
                      }}
                   >
@@ -1005,10 +1022,9 @@ const LandingPage = () => {
                   {pricingPlans.map((plan, index) => (
                      <div
                         key={index}
-                        className={`bg-white rounded-lg p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out relative animate-fadeInUp ${
+                        className={`bg-white rounded-lg p-8 hover:shadow-lg hover:-translate-y-2 transition-all duration-300 ease-out relative ${
                            plan.isPopular ? 'border-2 border-blue-600 shadow-lg scale-105' : 'border border-gray-200'
                         }`}
-                        style={{ animationDelay: `${0.2 + index * 0.1}s` }}
                      >
                         {plan.isPopular && (
                            <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
@@ -1124,8 +1140,8 @@ const LandingPage = () => {
          </section>
 
          {/* Footer */}
-         <footer className='py-8 border-t border-gray-200 bg-white'>
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+         <footer className='py-8 border-t-2 border-gray-200 bg-white'>
+            <div className='max-w-5xl mx-auto px-6 lg:px-8'>
                <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
                   <div className='flex items-center space-x-2'>
                      <div
