@@ -134,21 +134,21 @@ const LandingPage = () => {
    ]
 
    useEffect(() => {
-      // Load professional fonts - Gilroy ExtraBold for headings, Inter for body
+      // Load professional fonts - Avenir Next Bold for headings, Inter for body
       const link = document.createElement('link')
-      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
       link.rel = 'stylesheet'
       document.head.appendChild(link)
 
-      // Load Gilroy font for headings
-      const gilroyLink = document.createElement('link')
-      gilroyLink.href = 'https://fonts.cdnfonts.com/css/gilroy-bold'
-      gilroyLink.rel = 'stylesheet'
-      document.head.appendChild(gilroyLink)
+      // Load Avenir Next font for headings (fallback to system fonts)
+      const avenirLink = document.createElement('link')
+      avenirLink.href = 'https://fonts.cdnfonts.com/css/avenir-next'
+      avenirLink.rel = 'stylesheet'
+      document.head.appendChild(avenirLink)
 
       return () => {
          document.head.removeChild(link)
-         document.head.removeChild(gilroyLink)
+         document.head.removeChild(avenirLink)
       }
    }, [user, navigate])
 
@@ -197,10 +197,11 @@ const LandingPage = () => {
                   <div className='p-6 border-b border-gray-200'>
                      <div className='flex justify-between items-center'>
                         <h2
-                           className='text-2xl font-bold text-gray-900 tracking-tight'
+                           className='font-bold text-gray-900'
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '24px',
+                              lineHeight: '1.3',
                            }}
                         >
                            GET IN TOUCH
@@ -437,12 +438,17 @@ const LandingPage = () => {
                <div className='flex justify-between items-center h-16'>
                   {/* Brand */}
                   <div className='flex items-center'>
-                     <span
-                        className='text-2xl font-bold text-gray-900 tracking-tight'
-                        style={{ fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif' }}
+                     <div
+                        className='text-gray-900 font-black tracking-tight'
+                        style={{
+                           fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                           fontSize: '24px',
+                           letterSpacing: '-0.5px',
+                           fontWeight: '900',
+                        }}
                      >
-                        DataVista
-                     </span>
+                        Data<span className='text-blue-600'>Vista</span>
+                     </div>
                   </div>
 
                   {/* Desktop Navigation */}
@@ -554,37 +560,65 @@ const LandingPage = () => {
          {/* Hero Section */}
          <section
             id='hero'
-            className='py-20 bg-white'
+            className='py-20 relative'
+            style={{
+               background: 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)',
+               backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23e2e8f0' stroke-width='1' stroke-opacity='0.3'%3E%3Cpath d='M0 40L40 0M40 40L0 0'/%3E%3C/g%3E%3Cg stroke='%23f1f5f9' stroke-width='1' stroke-opacity='0.5'%3E%3Cpath d='M0 0h40M0 40h40M0 0v40M40 0v40'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+               backgroundSize: '40px 40px',
+            }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16'>
+               <div className='text-center mb-12'>
+                  {/* Value Proposition Pill */}
+                  <div className='mb-6'>
+                     <div className='inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3'>
+                        <div className='w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse'></div>
+                        <span
+                           className='text-blue-700 font-semibold tracking-wide'
+                           style={{
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '14px',
+                              letterSpacing: '0.5px',
+                           }}
+                        >
+                           🚀 NO-CODE ANALYTICS POWERED BY AI
+                        </span>
+                     </div>
+                  </div>
+
                   <h1
-                     className='text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight'
+                     className='font-bold text-gray-900 mb-6 leading-tight tracking-tight'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
                         letterSpacing: '-0.02em',
+                        fontSize: 'clamp(2rem, 5vw, 5rem)',
+                        lineHeight: '1.1',
                      }}
                   >
                      TRANSFORM YOUR DATA INTO
                      <span className='text-blue-600 block mt-2'>POWERFUL INSIGHTS</span>
                   </h1>
 
-                  <p className='text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed font-normal'>
+                  <p
+                     className='text-gray-600 max-w-4xl mx-auto font-normal mb-8'
+                     style={{ lineHeight: '1.6', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                  >
                      Unlock the full potential of your data with AI-powered analytics, stunning visualizations, and
                      automated insights that drive smarter business decisions.
                   </p>
 
                   {/* CTA Buttons */}
-                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
+                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
                      {isLoading ? (
                         <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600'></div>
                      ) : user ? (
                         <button
                            onClick={() => navigate('/dashboard')}
-                           className='bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-md'
+                           className='bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '16px',
+                              lineHeight: '1.4',
                            }}
                         >
                            GO TO DASHBOARD
@@ -592,10 +626,11 @@ const LandingPage = () => {
                      ) : (
                         <button
                            onClick={() => navigate('/login')}
-                           className='bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-md'
+                           className='bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '16px',
+                              lineHeight: '1.4',
                            }}
                         >
                            GET STARTED
@@ -603,10 +638,11 @@ const LandingPage = () => {
                      )}
                      <button
                         onClick={() => scrollToSection('features')}
-                        className='border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-bold hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors'
+                        className='border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-medium hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300'
                         style={{
-                           fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                           letterSpacing: '-0.01em',
+                           fontFamily: '"Inter", system-ui, sans-serif',
+                           fontSize: '16px',
+                           lineHeight: '1.4',
                         }}
                      >
                         DEMO
@@ -616,24 +652,32 @@ const LandingPage = () => {
 
                {/* Dashboard Preview Image */}
                <div className='max-w-5xl mx-auto'>
-                  <div className='relative bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200'>
-                     {/* Tab-style top border */}
-                     <div className='bg-gray-100 px-6 py-3 border-b border-gray-200 flex items-center space-x-2'>
-                        <div className='flex space-x-2'>
-                           <div className='w-3 h-3 rounded-full bg-red-400'></div>
-                           <div className='w-3 h-3 rounded-full bg-yellow-400'></div>
-                           <div className='w-3 h-3 rounded-full bg-green-400'></div>
-                        </div>
-                        <div className='flex-1 text-center'>
-                           <span className='text-sm text-gray-600 font-medium'>DataVista Dashboard</span>
+                  {/* Tablet Mockup Container */}
+                  <div
+                     className='relative mx-auto'
+                     style={{ maxWidth: '800px' }}
+                  >
+                     {/* Tablet Frame */}
+                     {/* <div className='relative bg-gray-800 rounded-[2.5rem] p-6 shadow-2xl'> */}
+                     {/* Tablet Screen Bezel */}
+                     <div className='bg-gray-200/80 rounded-[2rem] p-4'>
+                        {/* Actual Screen */}
+                        <div className='bg-white rounded-[1.5rem] overflow-hidden relative'>
+                           {/* Screen Reflection Effect */}
+                           <div className='absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white/5 pointer-events-none z-10'></div>
+
+                           {/* Dashboard Image */}
+                           <img
+                              src='/dashboard2.avif'
+                              alt='DataVista Dashboard Preview'
+                              className='w-full h-auto block'
+                              loading='eager'
+                           />
                         </div>
                      </div>
-                     <img
-                        src='/dashboard2.avif'
-                        alt='DataVista Dashboard Preview'
-                        className='w-full h-auto'
-                        loading='eager'
-                     />
+
+                     {/* Tablet Shadow */}
+                     <div className='absolute inset-0 bg-gray-900/20 rounded-[2.5rem] transform translate-y-4 scale-95 -z-10'></div>
                   </div>
                </div>
 
@@ -654,20 +698,28 @@ const LandingPage = () => {
          {/* Features Section */}
          <section
             id='features'
-            className='py-20 bg-gray-50'
+            className='py-20 relative'
+            style={{
+               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23cbd5e1' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16'>
                   <h2
-                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     className='font-bold text-gray-900 mb-6 tracking-tight'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                        letterSpacing: '-0.02em',
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                        fontSize: '40px',
+                        lineHeight: '1.2',
                      }}
                   >
                      WHY CHOOSE DATAVISTA?
                   </h2>
-                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
+                  <p
+                     className='text-gray-600 max-w-3xl mx-auto font-normal'
+                     style={{ fontSize: '18px', lineHeight: '1.5' }}
+                  >
                      Powerful features designed to transform your data into actionable insights
                   </p>
                </div>
@@ -687,17 +739,18 @@ const LandingPage = () => {
                            />
                         </div>
                         <h3
-                           className='text-xl font-bold text-gray-900 mb-4 tracking-tight'
+                           className='font-bold text-gray-900 mb-4'
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '22px',
+                              lineHeight: '1.3',
                            }}
                         >
                            {feature.title}
                         </h3>
                         <p
-                           className='text-gray-600 leading-relaxed font-normal'
-                           style={{ lineHeight: '1.6' }}
+                           className='text-gray-600 font-normal'
+                           style={{ fontSize: '16px', lineHeight: '1.6' }}
                         >
                            {feature.description}
                         </p>
@@ -715,15 +768,19 @@ const LandingPage = () => {
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16'>
                   <h2
-                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     className='font-bold text-gray-900 mb-6'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                        letterSpacing: '-0.02em',
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                        fontSize: '40px',
+                        lineHeight: '1.2',
                      }}
                   >
                      WHAT OUR USERS SAY
                   </h2>
-                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
+                  <p
+                     className='text-gray-600 max-w-3xl mx-auto font-normal'
+                     style={{ fontSize: '18px', lineHeight: '1.5' }}
+                  >
                      See how DataVista is transforming businesses worldwide
                   </p>
                </div>
@@ -764,23 +821,89 @@ const LandingPage = () => {
             </div>
          </section>
 
+         {/* CTA Section */}
+         <section className='py-20 bg-white relative overflow-hidden'>
+            {/* Background Pattern */}
+            <div
+               className='absolute inset-0 opacity-30'
+               style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230ea5e9' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='10' cy='30' r='1'/%3E%3Ccircle cx='50' cy='30' r='1'/%3E%3Ccircle cx='30' cy='10' r='1'/%3E%3Ccircle cx='30' cy='50' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+               }}
+            />
+            <div className='container mx-auto px-6 text-center relative z-10'>
+               <div className='max-w-4xl mx-auto'>
+                  <h2
+                     className='text-4xl md:text-5xl font-bold mb-6 leading-tight'
+                     style={{
+                        fontFamily: "'Avenir Next', -apple-system, BlinkMacSystemFont, sans-serif",
+                        fontWeight: '700',
+                     }}
+                  >
+                     Ready to explore{' '}
+                     <span
+                        style={{
+                           background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                           WebkitBackgroundClip: 'text',
+                           WebkitTextFillColor: 'transparent',
+                           backgroundClip: 'text',
+                        }}
+                     >
+                        DataVista
+                     </span>
+                     ?
+                  </h2>
+                  <p
+                     className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto'
+                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", lineHeight: '1.6' }}
+                  >
+                     Join thousands of professionals who trust DataVista for their data analysis needs. Start your
+                     journey with intelligent insights today.
+                  </p>
+                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
+                     <button
+                        onClick={() => navigate('/dashboard')}
+                        className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 min-h-[48px] w-full sm:w-auto'
+                        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                     >
+                        Get Started Free
+                     </button>
+                     <button
+                        onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                        className='border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all duration-300 min-h-[48px] w-full sm:w-auto'
+                        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                     >
+                        View Pricing
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </section>
+
          {/* Pricing Section */}
          <section
             id='pricing'
-            className='py-20 bg-gray-50'
+            className='py-20 relative'
+            style={{
+               background: 'linear-gradient(135deg, #fafbfc 0%, #f6f8fb 100%)',
+               backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.08'%3E%3Cpath d='M0 0h40v40H0zM40 40h40v40H40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-16'>
                   <h2
-                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     className='font-bold text-gray-900 mb-6'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                        letterSpacing: '-0.02em',
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                        fontSize: '40px',
+                        lineHeight: '1.2',
                      }}
                   >
                      SIMPLE PRICING
                   </h2>
-                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
+                  <p
+                     className='text-gray-600 max-w-3xl mx-auto font-normal'
+                     style={{ fontSize: '18px', lineHeight: '1.5' }}
+                  >
                      Choose the plan that's right for your business
                   </p>
                </div>
@@ -802,10 +925,11 @@ const LandingPage = () => {
                         )}
 
                         <h3
-                           className='text-2xl font-bold mb-6 text-gray-900 tracking-tight'
+                           className='font-bold text-gray-900 mb-6'
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '24px',
+                              lineHeight: '1.3',
                            }}
                         >
                            {plan.name.toUpperCase()}
@@ -813,14 +937,20 @@ const LandingPage = () => {
 
                         <div className='mb-8'>
                            <span
-                              className='text-4xl font-bold text-gray-900'
+                              className='font-bold text-gray-900'
                               style={{
-                                 fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                                 fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                                 fontSize: '36px',
                               }}
                            >
                               ${plan.price}
                            </span>
-                           <span className='text-gray-600 font-normal'>{plan.period}</span>
+                           <span
+                              className='text-gray-600 font-normal'
+                              style={{ fontSize: '16px' }}
+                           >
+                              {plan.period}
+                           </span>
                         </div>
 
                         <ul className='space-y-4 mb-8'>
@@ -847,16 +977,17 @@ const LandingPage = () => {
                         </ul>
 
                         <button
-                           className={`w-full py-4 rounded-lg font-bold transition-colors tracking-tight ${
+                           className={`w-full py-4 rounded-lg font-bold transition-all duration-300 min-h-[48px] ${
                               plan.buttonStyle === 'primary'
-                                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'
+                                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                                  : plan.buttonStyle === 'secondary'
-                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                 ? 'border-2 border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
                                  : 'bg-gray-100 text-gray-500 cursor-not-allowed'
                            }`}
                            style={{
-                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                              letterSpacing: '-0.01em',
+                              fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                              fontSize: '16px',
+                              lineHeight: '1.4',
                            }}
                            disabled={plan.disabled}
                         >
@@ -868,22 +999,27 @@ const LandingPage = () => {
 
                <div className='mt-20 text-center'>
                   <h3
-                     className='text-xl font-bold text-gray-900 mb-3 tracking-tight'
+                     className='font-bold text-gray-900 mb-3'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                        letterSpacing: '-0.01em',
+                        fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                        fontSize: '22px',
+                        lineHeight: '1.3',
                      }}
                   >
                      NEED A CUSTOM SOLUTION?
                   </h3>
-                  <p className='text-gray-600 mb-6 font-normal leading-relaxed max-w-2xl mx-auto'>
+                  <p
+                     className='text-gray-600 mb-6 font-normal max-w-2xl mx-auto'
+                     style={{ fontSize: '16px', lineHeight: '1.5' }}
+                  >
                      Contact us for a tailored package that meets your specific requirements.
                   </p>
                   <button
-                     className='inline-flex items-center px-8 py-3 border-2 border-gray-300 text-sm font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-600 hover:text-blue-600 transition-colors tracking-tight'
+                     className='inline-flex items-center px-8 py-3 border-2 border-gray-300 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-600 hover:text-blue-600 transition-all duration-300'
                      style={{
-                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
-                        letterSpacing: '-0.01em',
+                        fontFamily: '"Inter", system-ui, sans-serif',
+                        fontSize: '16px',
+                        lineHeight: '1.4',
                      }}
                      onClick={() => setIsContactModalOpen(true)}
                   >
@@ -898,12 +1034,17 @@ const LandingPage = () => {
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
                   <div className='flex items-center space-x-2'>
-                     <span
-                        className='text-xl font-bold text-gray-900 tracking-tight'
-                        style={{ fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif' }}
+                     <div
+                        className='text-gray-900 font-black tracking-tight'
+                        style={{
+                           fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                           fontSize: '20px',
+                           letterSpacing: '-0.5px',
+                           fontWeight: '900',
+                        }}
                      >
-                        DataVista
-                     </span>
+                        Data<span className='text-blue-600'>Vista</span>
+                     </div>
                   </div>
 
                   <p className='text-gray-600 text-sm'>© 2025 DataVista. All rights reserved.</p>
