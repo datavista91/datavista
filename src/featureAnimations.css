@@ -1,0 +1,15 @@
+@keyframes fadeSlideUp {
+   0% {
+      opacity: 0;
+      transform: translateY(20px); /* Less distance = smoother */
+   }
+   100% {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.animate-fade-slide-up {
+   animation: fadeSlideUp 0.9s ease-out; /* Slightly longer and smoother easing */
+   /* Keeps the final state after animation ends */
+}

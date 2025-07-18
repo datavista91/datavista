@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
+import './featureAnimations.css'
 import Dashboard from './components/Dashboard'
 import SideNav from './components/SideNav'
 import Header from './components/Header'
@@ -11,6 +12,7 @@ import { ChatProvider } from './context/ChatContext'
 import LandingPage from './pages/LandingPage'
 import GoogleSignInPage from './pages/GoogleSignInPage'
 import PricingPage from './pages/PricingPage'
+import PaymentSuccess from './pages/PaymentSuccess'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChartPanel from './components/ChartPanel'
 import AnalysisHistory from './components/AnalysisHistory'
@@ -97,6 +99,10 @@ export function App() {
                            <Route
                               path='/signup'
                               element={<GoogleSignInPage />}
+                           />
+                           <Route
+                              path='/payment-success'
+                              element={<PaymentSuccess />}
                            />
                            <Route
                               path='/*'

@@ -3,6 +3,7 @@ import { House, Clock, Sparkles, BarChart3, TrendingUp, Presentation, Database }
 import { motion } from 'framer-motion'
 import { useData } from '../context/DataContext'
 import { useAnalysis } from '../context/AnalysisContext'
+import { useSubscription } from '../hooks/useSubscription'
 
 // interface SideNavProps {
 //    isOpen: boolean
@@ -14,6 +15,7 @@ const SideNav = () => {
    const location = useLocation()
    const { hasData } = useData()
    const { analysisData } = useAnalysis()
+   const { isProOrEnterprise } = useSubscription()
 
    const navItems = [
       {
@@ -78,12 +80,19 @@ const SideNav = () => {
                to='/'
                className='flex items-center space-x-2 group'
             >
-               <div className='flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow'>
+               {/* <div className='flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow'>
                   <Sparkles className='w-4 h-4 text-white' />
+               </div> */}
+               <div className='flex items-center space-x-2 bg-black/5 p-1.5 rounded-lg shadow-sm'>
+                  <img
+                     src='/logo2.png'
+                     alt='Logo'
+                     className='w-7 h-7'
+                  />
                </div>
                <div>
                   <h1
-                     className='text-base font-bold text-gray-900'
+                     className='text-base font-semibold text-gray-900'
                      style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
                      DataVista
@@ -182,24 +191,26 @@ const SideNav = () => {
                   </Link>
                )
             })}{' '}
-            {/* Upgrade Section - Compact */}
-            <div className='pt-2 mt-2 border-t border-gray-100'>
-               <div className='p-3 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 rounded-lg text-white shadow-lg'>
-                  <div className='flex items-center space-x-2 mb-2'>
-                     <Sparkles className='w-4 h-4 text-yellow-300' />
-                     <h4 className='font-semibold text-sm'>Upgrade to Pro</h4>
+            {/* Upgrade Section - Only show for free users */}
+            {!isProOrEnterprise && (
+               <div className='pt-2 mt-2 border-t border-gray-100'>
+                  <div className='p-3 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 rounded-lg text-white shadow-lg'>
+                     <div className='flex items-center space-x-2 mb-2'>
+                        <Sparkles className='w-4 h-4 text-yellow-300' />
+                        <h4 className='font-semibold text-sm'>Upgrade to Pro</h4>
+                     </div>
+                     <p className='text-xs text-purple-200 mb-3 leading-relaxed'>
+                        Unlock advanced analytics & premium features
+                     </p>
+                     <button
+                        onClick={() => navigate('/pricing')}
+                        className='w-full px-3 py-2 bg-white text-purple-700 rounded-md text-xs font-medium hover:bg-purple-50 transition-all duration-200 shadow-sm'
+                     >
+                        ✨ Upgrade Now
+                     </button>
                   </div>
-                  <p className='text-xs text-purple-200 mb-3 leading-relaxed'>
-                     Unlock advanced analytics & premium features
-                  </p>
-                  <button
-                     onClick={() => navigate('/pricing')}
-                     className='w-full px-3 py-2 bg-white text-purple-700 rounded-md text-xs font-medium hover:bg-purple-50 transition-all duration-200 shadow-sm'
-                  >
-                     ✨ Upgrade Now
-                  </button>
                </div>
-            </div>
+            )}
          </div>
       </div>
    )

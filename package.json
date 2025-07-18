@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@lottiefiles/dotlottie-react": "^0.14.3",
     "@vercel/node": "^5.3.3",
     "docxtemplater": "^3.65.0",
     "firebase": "^11.8.1",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.11.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",

@@ -5,13 +5,16 @@ import { useNavigate } from 'react-router-dom'
 import { useAnalysis } from '../context/AnalysisContext'
 import { useAIResponses } from '../context/AIResponseContext'
 import { useChat, ChatMessage } from '../context/ChatContext'
+import { useAuth } from '../context/AuthContext'
 import { getGeminiClient, GeminiResponse } from '../utils/geminiClient'
+import userSubscriptionService from '../services/userSubscriptionService'
 import MarkdownRenderer from './MarkdownRenderer'
 
 function AIChat() {
    const { analysisData } = useAnalysis()
    const { addResponse } = useAIResponses()
    const { messages, addMessage } = useChat()
+   const { user } = useAuth()
    const navigate = useNavigate()
    const [input, setInput] = useState('')
    const [isTyping, setIsTyping] = useState(false)
@@ -49,6 +52,22 @@ function AIChat() {
 
    const handleSendMessage = async () => {
       if (!input.trim()) return
+
+      // Check subscription limits
+      if (user) {
+         const canMakeRequest = await userSubscriptionService.canMakeAIRequest(user.id)
+         if (!canMakeRequest.allowed) {
+            const limitMessage: ChatMessage = {
+               id: Date.now().toString(),
+               type: 'ai',
+               content: `⚠️ **Request Limit Reached**\n\n${canMakeRequest.message}\n\n[Upgrade your plan](/pricing) to get more AI requests and unlock advanced features.`,
+               timestamp: new Date(),
+            }
+            addMessage(limitMessage)
+            setError(canMakeRequest.message || 'Request limit reached')
+            return
+         }
+      }
 
       const userMessage: ChatMessage = {
          id: Date.now().toString(),
@@ -91,7 +110,14 @@ Once you have data loaded, feel free to ask questions like:
             setIsTyping(false)
             return
          }         // Call Gemini API with analysis context
-         const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)         // Create AI message with enhanced data
+         const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)
+         
+         // Increment usage counter on successful request
+         if (user) {
+            console.log('🔢 Incrementing AI usage for user:', user.id)
+            await userSubscriptionService.incrementAIUsage(user.id)
+            console.log('✅ AI usage incremented successfully')
+         }         // Create AI message with enhanced data
          const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
