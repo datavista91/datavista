@@ -261,7 +261,7 @@ const LandingPage = () => {
          {/* Contact Modal */}
          {isContactModalOpen && (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4'>
-               <div className='bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto'>
+               <div className='bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
                   <div className='p-6 border-b border-gray-200'>
                      <div className='flex justify-between items-center'>
                         <h2
@@ -296,7 +296,7 @@ const LandingPage = () => {
                   </div>
 
                   <div className='p-6'>
-                     <div className='grid md:grid-cols-2 gap-8'>
+                     <div className='grid md:grid-cols-[1fr_2fr] gap-8'>
                         {/* Contact Information */}
                         <div className='space-y-6'>
                            <h3 className='text-lg font-medium text-gray-900 mb-4'>Our Team</h3>
@@ -638,7 +638,10 @@ const LandingPage = () => {
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='text-center mb-12 animate-fadeInUp'>
                   {/* Value Proposition Pill */}
-                  <div className='mb-6 animate-fadeInUp' style={{ animationDelay: '0.2s' }}>
+                  <div
+                     className='mb-6 animate-fadeInUp'
+                     style={{ animationDelay: '0.2s' }}
+                  >
                      <div className='inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3 hover:scale-105 transition-transform duration-300 ease-out'>
                         <div className='w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse'></div>
                         <span
@@ -670,8 +673,8 @@ const LandingPage = () => {
 
                   <p
                      className='text-gray-600 max-w-4xl mx-auto font-normal mb-8 animate-fadeInUp'
-                     style={{ 
-                        lineHeight: '1.6', 
+                     style={{
+                        lineHeight: '1.6',
                         fontSize: 'clamp(16px, 2.5vw, 20px)',
                         animationDelay: '0.6s',
                      }}
@@ -681,7 +684,10 @@ const LandingPage = () => {
                   </p>
 
                   {/* CTA Buttons */}
-                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fadeInUp' style={{ animationDelay: '0.8s' }}>
+                  <div
+                     className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fadeInUp'
+                     style={{ animationDelay: '0.8s' }}
+                  >
                      {isLoading ? (
                         <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600'></div>
                      ) : user ? (
@@ -724,7 +730,10 @@ const LandingPage = () => {
                </div>
 
                {/* Dashboard Preview Image */}
-               <div className='max-w-5xl mx-auto animate-fadeInUp' style={{ animationDelay: '1s' }}>
+               <div
+                  className='max-w-5xl mx-auto animate-fadeInUp'
+                  style={{ animationDelay: '1s' }}
+               >
                   {/* Tablet Mockup Container */}
                   <div
                      className='relative mx-auto hover:scale-105 transition-transform duration-700 ease-out'
@@ -755,7 +764,10 @@ const LandingPage = () => {
                </div>
 
                {/* About DataVista */}
-               <div className='mt-20 max-w-4xl mx-auto text-center animate-fadeInUp' style={{ animationDelay: '1.2s' }}>
+               <div
+                  className='mt-20 max-w-4xl mx-auto text-center animate-fadeInUp'
+                  style={{ animationDelay: '1.2s' }}
+               >
                   <p
                      className='text-xl text-gray-600 leading-relaxed font-normal'
                      style={{ lineHeight: '1.6' }}
@@ -899,7 +911,7 @@ const LandingPage = () => {
          </section>
 
          {/* CTA Section */}
-         <section 
+         <section
             className='py-20 relative overflow-hidden'
             style={{
                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
@@ -929,8 +941,8 @@ const LandingPage = () => {
                   </h2>
                   <p
                      className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto animate-fadeInUp'
-                     style={{ 
-                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+                     style={{
+                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
                         lineHeight: '1.6',
                         animationDelay: '0.2s',
                      }}
@@ -938,7 +950,10 @@ const LandingPage = () => {
                      Join thousands of professionals who trust DataVista for their data analysis needs. Start your
                      journey with intelligent insights today.
                   </p>
-                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp' style={{ animationDelay: '0.4s' }}>
+                  <div
+                     className='flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp'
+                     style={{ animationDelay: '0.4s' }}
+                  >
                      <button
                         onClick={() => navigate('/dashboard')}
                         className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 min-h-[48px] w-full sm:w-auto'
