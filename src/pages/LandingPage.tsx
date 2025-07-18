@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { db } from '../firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
@@ -7,11 +7,8 @@ import { useAuth } from '../context/AuthContext'
 const LandingPage = () => {
    const { user, isLoading } = useAuth()
    const navigate = useNavigate()
-   const [currentFeature, setCurrentFeature] = useState(0)
-   const [featureAnimKey, setFeatureAnimKey] = useState(0)
-   const prevFeature = useRef(0)
    const [isNavOpen, setIsNavOpen] = useState(false)
-   // const [loading, setLoading] = useState(true)
+   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
    // Contact form state
    const [contactForm, setContactForm] = useState({
@@ -82,48 +79,78 @@ const LandingPage = () => {
       },
    ]
 
-   useEffect(() => {
-      // if (user) {
-      //    navigate('/dashboard', { replace: true })
-      // }
+   const pricingPlans = [
+      {
+         name: 'Free',
+         price: 0,
+         period: '/month',
+         isPopular: false,
+         features: [
+            'Upload up to 5 datasets',
+            'Basic visualizations',
+            'Export as PDF',
+            'Community support',
+            '10 AI requests/day',
+         ],
+         buttonText: 'Current Plan',
+         buttonStyle: 'disabled',
+         disabled: true,
+      },
+      {
+         name: 'Standard',
+         price: 49,
+         period: '/month',
+         isPopular: true,
+         features: [
+            'Everything in Free',
+            'Upload unlimited datasets',
+            'Advanced AI insights (500 requests/day)',
+            'Custom charts and dashboards',
+            'Priority email support',
+            'Team collaboration (up to 3 users)',
+            'Advanced data export options',
+         ],
+         buttonText: 'Upgrade to Standard',
+         buttonStyle: 'primary',
+      },
+      {
+         name: 'Enterprise',
+         price: 199,
+         period: '/month',
+         isPopular: false,
+         features: [
+            'Everything in Standard',
+            'Unlimited AI requests',
+            'Dedicated success manager',
+            'Custom integrations',
+            'Advanced security features',
+            'Team collaboration (unlimited)',
+            'Training and onboarding',
+            'SLA guarantees',
+         ],
+         buttonText: 'Contact Sales',
+         buttonStyle: 'secondary',
+      },
+   ]
 
-      // Load professional fonts
+   useEffect(() => {
+      // Load professional fonts - Gilroy ExtraBold for headings, Inter for body
       const link = document.createElement('link')
-      link.href =
-         'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap'
+      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
       link.rel = 'stylesheet'
       document.head.appendChild(link)
 
+      // Load Gilroy font for headings
+      const gilroyLink = document.createElement('link')
+      gilroyLink.href = 'https://fonts.cdnfonts.com/css/gilroy-bold'
+      gilroyLink.rel = 'stylesheet'
+      document.head.appendChild(gilroyLink)
+
       return () => {
          document.head.removeChild(link)
+         document.head.removeChild(gilroyLink)
       }
    }, [user, navigate])
-
-   useEffect(() => {
-      const handleScroll = () => {
-         const featuresSection = document.getElementById('features')
-         if (featuresSection) {
-            const rect = featuresSection.getBoundingClientRect()
-            const sectionHeight = rect.height
-            const viewportHeight = window.innerHeight
-
-            // Improved scroll logic for better feature transitions
-            if (rect.top <= 0 && rect.bottom >= viewportHeight) {
-               const scrollProgress = Math.abs(rect.top) / (sectionHeight - viewportHeight)
-               const featureIndex = Math.floor(scrollProgress * features.length)
-               const newFeature = Math.max(0, Math.min(features.length - 1, featureIndex))
-               if (newFeature !== prevFeature.current) {
-                  setFeatureAnimKey((k) => k + 1)
-                  prevFeature.current = newFeature
-               }
-               setCurrentFeature(newFeature)
-            }
-         }
-      }
-
-      window.addEventListener('scroll', handleScroll)
-      return () => window.removeEventListener('scroll', handleScroll)
-   }, [features.length])
 
    const scrollToSection = (sectionId: string) => {
       const element = document.getElementById(sectionId)
@@ -157,92 +184,306 @@ const LandingPage = () => {
 
    return (
       <div
-         className='bg-black text-white'
-         style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+         className='bg-white text-gray-900 min-h-screen'
+         style={{
+            fontFamily: 'Inter, system-ui, sans-serif',
+            lineHeight: '1.5',
+         }}
       >
+         {/* Contact Modal */}
+         {isContactModalOpen && (
+            <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4'>
+               <div className='bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto'>
+                  <div className='p-6 border-b border-gray-200'>
+                     <div className='flex justify-between items-center'>
+                        <h2
+                           className='text-2xl font-bold text-gray-900 tracking-tight'
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
+                        >
+                           GET IN TOUCH
+                        </h2>
+                        <button
+                           onClick={() => setIsContactModalOpen(false)}
+                           className='text-gray-400 hover:text-gray-600 transition-colors'
+                        >
+                           <svg
+                              className='w-6 h-6'
+                              fill='none'
+                              stroke='currentColor'
+                              viewBox='0 0 24 24'
+                           >
+                              <path
+                                 strokeLinecap='round'
+                                 strokeLinejoin='round'
+                                 strokeWidth={2}
+                                 d='M6 18L18 6M6 6l12 12'
+                              />
+                           </svg>
+                        </button>
+                     </div>
+                  </div>
+
+                  <div className='p-6'>
+                     <div className='grid md:grid-cols-2 gap-8'>
+                        {/* Contact Information */}
+                        <div className='space-y-6'>
+                           <h3 className='text-lg font-medium text-gray-900 mb-4'>Our Team</h3>
+
+                           <div className='space-y-4'>
+                              <div className='flex items-start space-x-3'>
+                                 <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                                    <svg
+                                       className='w-4 h-4 text-blue-600'
+                                       fill='currentColor'
+                                       viewBox='0 0 20 20'
+                                    >
+                                       <path
+                                          fillRule='evenodd'
+                                          d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z'
+                                          clipRule='evenodd'
+                                       />
+                                    </svg>
+                                 </div>
+                                 <div>
+                                    <p className='font-medium text-gray-900'>RamaKrushna Mohapatra</p>
+                                    <p className='text-sm text-gray-600'>CEO</p>
+                                    <p className='text-sm text-blue-600'>itsramakrushna@gmail.com</p>
+                                 </div>
+                              </div>
+
+                              <div className='flex items-start space-x-3'>
+                                 <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                                    <svg
+                                       className='w-4 h-4 text-blue-600'
+                                       fill='currentColor'
+                                       viewBox='0 0 20 20'
+                                    >
+                                       <path
+                                          fillRule='evenodd'
+                                          d='M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z'
+                                          clipRule='evenodd'
+                                       />
+                                    </svg>
+                                 </div>
+                                 <div>
+                                    <p className='font-medium text-gray-900'>Nakul Srivastava</p>
+                                    <p className='text-sm text-gray-600'>Developer</p>
+                                    <p className='text-sm text-blue-600'>imnakul44@gmail.com</p>
+                                 </div>
+                              </div>
+
+                              <div className='flex items-start space-x-3'>
+                                 <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                                    <svg
+                                       className='w-4 h-4 text-blue-600'
+                                       fill='currentColor'
+                                       viewBox='0 0 20 20'
+                                    >
+                                       <path
+                                          fillRule='evenodd'
+                                          d='M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z'
+                                          clipRule='evenodd'
+                                       />
+                                    </svg>
+                                 </div>
+                                 <div>
+                                    <p className='font-medium text-gray-900'>Dattu Goud</p>
+                                    <p className='text-sm text-gray-600'>Developer</p>
+                                    <p className='text-sm text-blue-600'>dattudattakumar369@gmail.com</p>
+                                 </div>
+                              </div>
+
+                              <div className='flex items-start space-x-3'>
+                                 <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                                    <svg
+                                       className='w-4 h-4 text-blue-600'
+                                       fill='currentColor'
+                                       viewBox='0 0 20 20'
+                                    >
+                                       <path d='M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z' />
+                                       <path d='M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z' />
+                                    </svg>
+                                 </div>
+                                 <div>
+                                    <p className='font-medium text-gray-900'>General Inquiries</p>
+                                    <p className='text-sm text-gray-600'>DataVista Team</p>
+                                    <p className='text-sm text-blue-600'>datavista91@gmail.com</p>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Contact Form */}
+                        <div>
+                           <h3 className='text-lg font-medium text-gray-900 mb-4'>Send us a message</h3>
+                           <form
+                              className='space-y-4'
+                              onSubmit={handleContactSubmit}
+                           >
+                              <div className='grid grid-cols-2 gap-4'>
+                                 <div>
+                                    <label
+                                       htmlFor='firstName'
+                                       className='block text-sm font-medium text-gray-700 mb-1'
+                                    >
+                                       First Name
+                                    </label>
+                                    <input
+                                       type='text'
+                                       id='firstName'
+                                       name='firstName'
+                                       value={contactForm.firstName}
+                                       onChange={handleContactChange}
+                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                       placeholder='John'
+                                       required
+                                    />
+                                 </div>
+                                 <div>
+                                    <label
+                                       htmlFor='lastName'
+                                       className='block text-sm font-medium text-gray-700 mb-1'
+                                    >
+                                       Last Name
+                                    </label>
+                                    <input
+                                       type='text'
+                                       id='lastName'
+                                       name='lastName'
+                                       value={contactForm.lastName}
+                                       onChange={handleContactChange}
+                                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                       placeholder='Doe'
+                                    />
+                                 </div>
+                              </div>
+                              <div>
+                                 <label
+                                    htmlFor='email'
+                                    className='block text-sm font-medium text-gray-700 mb-1'
+                                 >
+                                    Email
+                                 </label>
+                                 <input
+                                    type='email'
+                                    id='email'
+                                    name='email'
+                                    value={contactForm.email}
+                                    onChange={handleContactChange}
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                    placeholder='john@example.com'
+                                    required
+                                 />
+                              </div>
+                              <div>
+                                 <label
+                                    htmlFor='subject'
+                                    className='block text-sm font-medium text-gray-700 mb-1'
+                                 >
+                                    Subject
+                                 </label>
+                                 <input
+                                    type='text'
+                                    id='subject'
+                                    name='subject'
+                                    value={contactForm.subject}
+                                    onChange={handleContactChange}
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                    placeholder='How can we help?'
+                                    required
+                                 />
+                              </div>
+                              <div>
+                                 <label
+                                    htmlFor='message'
+                                    className='block text-sm font-medium text-gray-700 mb-1'
+                                 >
+                                    Message
+                                 </label>
+                                 <textarea
+                                    id='message'
+                                    name='message'
+                                    rows={4}
+                                    value={contactForm.message}
+                                    onChange={handleContactChange}
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none'
+                                    placeholder='Tell us more about your needs...'
+                                    required
+                                 ></textarea>
+                              </div>
+                              <button
+                                 type='submit'
+                                 className='w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium'
+                                 disabled={contactLoading}
+                              >
+                                 {contactLoading ? 'Sending...' : 'Send Message'}
+                              </button>
+                              {contactSuccess && <p className='text-green-600 text-sm'>Message sent successfully!</p>}
+                              {contactError && <p className='text-red-600 text-sm'>{contactError}</p>}
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         )}
+
          {/* Navigation */}
-         <nav className='fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-gray-800'>
+         <nav className='bg-white border-b border-gray-200 sticky top-0 z-40'>
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
                <div className='flex justify-between items-center h-16'>
-                  {/* Logo */}
-                  <div className='flex items-center space-x-2'>
-                     {/* <div className='w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center'>
-                        <svg
-                           width='20'
-                           height='20'
-                           viewBox='0 0 24 24'
-                           fill='white'
-                        >
-                           <path d='M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z' />
-                        </svg>
-                     </div> */}
-
-                     <img
-                        src='/logo2.svg'
-                        alt='DataVista Logo'
-                        className='w-8 h-8'
-                     />
-
+                  {/* Brand */}
+                  <div className='flex items-center'>
                      <span
-                        className='text-2xl font-semibold text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-2xl font-bold text-gray-900 tracking-tight'
+                        style={{ fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif' }}
                      >
                         DataVista
                      </span>
                   </div>
 
                   {/* Desktop Navigation */}
-                  <div className='hidden md:flex items-center sm:space-x-5 lg:space-x-10'>
+                  <div className='hidden md:flex items-center space-x-8'>
                      <button
                         onClick={() => scrollToSection('hero')}
-                        className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-gray-700 hover:text-blue-600 transition-colors font-medium'
                      >
                         Home
                      </button>
                      <button
                         onClick={() => scrollToSection('features')}
-                        className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-gray-700 hover:text-blue-600 transition-colors font-medium'
                      >
                         Features
                      </button>
                      <button
                         onClick={() => scrollToSection('testimonials')}
-                        className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-gray-700 hover:text-blue-600 transition-colors font-medium'
                      >
                         Testimonials
                      </button>
                      <button
                         onClick={() => scrollToSection('pricing')}
-                        className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-gray-700 hover:text-blue-600 transition-colors font-medium'
                      >
                         Pricing
                      </button>
-                     <button
-                        onClick={() => scrollToSection('contact')}
-                        className='text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Contact
-                     </button>
                      {isLoading ? (
-                        <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
+                        <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600'></div>
                      ) : user ? (
                         <button
                            onClick={() => navigate('/dashboard')}
-                           className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                           className='bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium'
                         >
                            Dashboard
                         </button>
                      ) : (
                         <button
                            onClick={() => navigate('/login')}
-                           className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                           className='bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium'
                         >
                            Sign In
                         </button>
@@ -252,7 +493,7 @@ const LandingPage = () => {
                   {/* Mobile menu button */}
                   <button
                      onClick={() => setIsNavOpen(!isNavOpen)}
-                     className='md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors'
+                     className='md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors'
                   >
                      <svg
                         className='w-6 h-6'
@@ -272,41 +513,35 @@ const LandingPage = () => {
 
                {/* Mobile Navigation */}
                {isNavOpen && (
-                  <div className='md:hidden py-6 border-t border-gray-800'>
-                     <div className='flex flex-col space-y-4'>
+                  <div className='md:hidden py-4 border-t border-gray-200'>
+                     <div className='flex flex-col space-y-3'>
                         <button
                            onClick={() => scrollToSection('hero')}
-                           className='text-left text-gray-300 hover:text-blue-400 transition-colors font-medium'
+                           className='text-left text-gray-700 hover:text-blue-600 transition-colors font-medium py-2'
                         >
                            Home
                         </button>
                         <button
                            onClick={() => scrollToSection('features')}
-                           className='text-left text-gray-300 hover:text-blue-400 transition-colors font-medium'
+                           className='text-left text-gray-700 hover:text-blue-600 transition-colors font-medium py-2'
                         >
                            Features
                         </button>
                         <button
                            onClick={() => scrollToSection('testimonials')}
-                           className='text-left text-gray-300 hover:text-blue-400 transition-colors font-medium'
+                           className='text-left text-gray-700 hover:text-blue-600 transition-colors font-medium py-2'
                         >
                            Testimonials
                         </button>
                         <button
                            onClick={() => scrollToSection('pricing')}
-                           className='text-left text-gray-300 hover:text-blue-400 transition-colors font-medium'
+                           className='text-left text-gray-700 hover:text-blue-600 transition-colors font-medium py-2'
                         >
                            Pricing
                         </button>
                         <button
-                           onClick={() => scrollToSection('contact')}
-                           className='text-left text-gray-300 hover:text-blue-400 transition-colors font-medium'
-                        >
-                           Contact
-                        </button>
-                        <button
                            onClick={() => navigate('/login')}
-                           className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium w-fit'
+                           className='bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium w-fit'
                         >
                            Sign In
                         </button>
@@ -319,134 +554,155 @@ const LandingPage = () => {
          {/* Hero Section */}
          <section
             id='hero'
-            className='min-h-screen flex items-center justify-center pt-32 pb-8 bg-gradient-to-br from-black via-gray-900 to-black'
+            className='py-20 bg-white'
          >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
-               <div className='mb-16'>
+            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+               <div className='text-center mb-16'>
                   <h1
-                     className='text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-10 leading-tight'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     className='text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.02em',
+                     }}
                   >
-                     Transform Your Data Into
-                     <span className='text-blue-400 block mt-6'>Powerful Insights</span>
+                     TRANSFORM YOUR DATA INTO
+                     <span className='text-blue-600 block mt-2'>POWERFUL INSIGHTS</span>
                   </h1>
 
-                  <p
-                     className='text-xl md:text-2xl text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
+                  <p className='text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed font-normal'>
                      Unlock the full potential of your data with AI-powered analytics, stunning visualizations, and
                      automated insights that drive smarter business decisions.
                   </p>
+
+                  {/* CTA Buttons */}
+                  <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
+                     {isLoading ? (
+                        <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600'></div>
+                     ) : user ? (
+                        <button
+                           onClick={() => navigate('/dashboard')}
+                           className='bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-md'
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
+                        >
+                           GO TO DASHBOARD
+                        </button>
+                     ) : (
+                        <button
+                           onClick={() => navigate('/login')}
+                           className='bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-md'
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
+                        >
+                           GET STARTED
+                        </button>
+                     )}
+                     <button
+                        onClick={() => scrollToSection('features')}
+                        className='border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-bold hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors'
+                        style={{
+                           fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                           letterSpacing: '-0.01em',
+                        }}
+                     >
+                        DEMO
+                     </button>
+                  </div>
                </div>
 
                {/* Dashboard Preview Image */}
-               <div className='mb-10 relative max-w-6xl mx-auto'>
-                  <div className='bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-3xl shadow-2xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500'>
+               <div className='max-w-5xl mx-auto'>
+                  <div className='relative bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200'>
+                     {/* Tab-style top border */}
+                     <div className='bg-gray-100 px-6 py-3 border-b border-gray-200 flex items-center space-x-2'>
+                        <div className='flex space-x-2'>
+                           <div className='w-3 h-3 rounded-full bg-red-400'></div>
+                           <div className='w-3 h-3 rounded-full bg-yellow-400'></div>
+                           <div className='w-3 h-3 rounded-full bg-green-400'></div>
+                        </div>
+                        <div className='flex-1 text-center'>
+                           <span className='text-sm text-gray-600 font-medium'>DataVista Dashboard</span>
+                        </div>
+                     </div>
                      <img
-                        // src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
                         src='/dashboard2.avif'
                         alt='DataVista Dashboard Preview'
-                        className='w-full h-auto rounded-2xl shadow-lg'
+                        className='w-full h-auto'
                         loading='eager'
                      />
                   </div>
                </div>
 
                {/* About DataVista */}
-               <div className='mb-8 max-w-5xl mx-auto'>
+               <div className='mt-20 max-w-4xl mx-auto text-center'>
                   <p
-                     className='text-lg text-gray-400 mb-10 leading-relaxed'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     className='text-xl text-gray-600 leading-relaxed font-normal'
+                     style={{ lineHeight: '1.6' }}
                   >
                      DataVista is the next-generation data analytics platform that combines artificial intelligence with
                      intuitive design to help businesses of all sizes make sense of their data. From automated insights
                      to beautiful visualizations, we make data analysis accessible to everyone.
                   </p>
                </div>
-
-               {/* CTA Buttons */}
-               <div className='flex flex-col sm:flex-row gap-6 justify-center items-center mb-8'>
-                  {isLoading ? (
-                     <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2'></div>
-                  ) : user ? (
-                     <button
-                        onClick={() => navigate('/login')}
-                        className='bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Dashboard
-                     </button>
-                  ) : (
-                     <button
-                        onClick={() => navigate('/login')}
-                        className='bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Start Now
-                     </button>
-                  )}
-                  <button
-                     onClick={() => scrollToSection('features')}
-                     className='border-2 border-gray-600 text-gray-300 px-12 py-4 rounded-lg text-lg font-semibold hover:border-blue-600 hover:text-blue-400 transition-all duration-300'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
-                     Watch Demo
-                  </button>
-               </div>
             </div>
          </section>
 
-         {/* Features Section with Fixed Scroll Effect */}
+         {/* Features Section */}
          <section
             id='features'
-            className='pt-24 relative bg-gradient-to-br from-black via-gray-900 to-black'
-            style={{ height: '600vh' }}
+            className='py-20 bg-gray-50'
          >
-            <div className='sticky top-0 h-screen flex items-center justify-center py-8'>
-               <div className='max-w-7xl mx-auto px-6 lg:px-8 w-full'>
-                  <div className='text-center mb-16 mt-8'>
-                     <h2
-                        className='text-4xl md:text-6xl font-bold text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Why Us?
-                     </h2>
-                  </div>
-                  <div className='grid lg:grid-cols-2 gap-20 items-center h-full'>
-                     {/* Content Side */}
-                     {/* <div className='space-y-12'> */}
+            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+               <div className='text-center mb-16'>
+                  <h2
+                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.02em',
+                     }}
+                  >
+                     WHY CHOOSE DATAVISTA?
+                  </h2>
+                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
+                     Powerful features designed to transform your data into actionable insights
+                  </p>
+               </div>
+
+               <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                  {features.map((feature, index) => (
                      <div
-                        key={featureAnimKey}
-                        className='bg-gray-900/90 backdrop-blur-sm p-10 rounded-3xl border border-gray-700 hover:border-blue-600/30 transition-all duration-500 h-96 animate-fade-slide-up'
+                        key={index}
+                        className='bg-white rounded-lg border border-gray-200 p-8 hover:shadow-lg transition-shadow duration-300'
                      >
-                        <h2
-                           className='text-4xl md:text-6xl font-bold mb-10 text-white'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        <div className='mb-6'>
+                           <img
+                              src={feature.image}
+                              alt={feature.title}
+                              className='w-full h-48 object-cover rounded-lg'
+                              loading='lazy'
+                           />
+                        </div>
+                        <h3
+                           className='text-xl font-bold text-gray-900 mb-4 tracking-tight'
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
                         >
-                           {features[currentFeature].title}
-                        </h2>
+                           {feature.title}
+                        </h3>
                         <p
-                           className='text-xl text-gray-300 leading-relaxed'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                           className='text-gray-600 leading-relaxed font-normal'
+                           style={{ lineHeight: '1.6' }}
                         >
-                           {features[currentFeature].description}
+                           {feature.description}
                         </p>
                      </div>
-
-                     {/* Image Side */}
-                     <div
-                        key={featureAnimKey + '-img'}
-                        className='relative animate-fade-slide-up'
-                     >
-                        <img
-                           src={features[currentFeature].image}
-                           alt={features[currentFeature].title}
-                           className='w-full h-96 object-cover rounded-2xl shadow-2xl transition-all duration-500'
-                           loading='lazy'
-                        />
-                     </div>
-                  </div>
+                  ))}
                </div>
             </div>
          </section>
@@ -454,20 +710,20 @@ const LandingPage = () => {
          {/* Testimonials Section */}
          <section
             id='testimonials'
-            className='py-24 bg-gradient-to-br from-black via-gray-900 to-black'
+            className='py-20 bg-white'
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-20'>
+               <div className='text-center mb-16'>
                   <h2
-                     className='text-4xl md:text-6xl font-bold text-white mb-8'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.02em',
+                     }}
                   >
-                     What Our Users Say
+                     WHAT OUR USERS SAY
                   </h2>
-                  <p
-                     className='text-xl text-gray-400 max-w-3xl mx-auto'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
+                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
                      See how DataVista is transforming businesses worldwide
                   </p>
                </div>
@@ -476,41 +732,26 @@ const LandingPage = () => {
                   {testimonials.map((testimonial, index) => (
                      <div
                         key={index}
-                        className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-blue-600/50 transition-all duration-300 hover:scale-105'
+                        className='bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-shadow duration-300'
                      >
                         <div className='flex items-center mb-6'>
                            <img
                               src={testimonial.avatar}
                               alt={testimonial.name}
-                              className='w-14 h-14 rounded-full object-cover mr-4'
+                              className='w-12 h-12 rounded-full object-cover mr-4'
                               loading='lazy'
                            />
                            <div>
-                              <h4
-                                 className='font-semibold text-white'
-                                 style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                              >
-                                 {testimonial.name}
-                              </h4>
-                              <p
-                                 className='text-gray-400 text-sm'
-                                 style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                              >
-                                 {testimonial.role}
-                              </p>
+                              <h4 className='font-semibold text-gray-900'>{testimonial.name}</h4>
+                              <p className='text-gray-600 text-sm'>{testimonial.role}</p>
                            </div>
                         </div>
-                        <p
-                           className='text-gray-300 leading-relaxed'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           {testimonial.content}
-                        </p>
-                        <div className='mt-6 flex text-blue-400'>
+                        <p className='text-gray-700 leading-relaxed mb-4'>{testimonial.content}</p>
+                        <div className='flex text-blue-500'>
                            {[...Array(5)].map((_, i) => (
                               <svg
                                  key={i}
-                                 className='w-5 h-5 fill-current'
+                                 className='w-4 h-4 fill-current'
                                  viewBox='0 0 20 20'
                               >
                                  <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
@@ -526,538 +767,161 @@ const LandingPage = () => {
          {/* Pricing Section */}
          <section
             id='pricing'
-            className='py-24 bg-gradient-to-br from-black via-gray-900 to-black'
+            className='py-20 bg-gray-50'
          >
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-20'>
+               <div className='text-center mb-16'>
                   <h2
-                     className='text-4xl md:text-6xl font-bold text-white mb-8'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     className='text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.02em',
+                     }}
                   >
-                     Simple Pricing
+                     SIMPLE PRICING
                   </h2>
-                  <p
-                     className='text-xl text-gray-400 max-w-3xl mx-auto'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
+                  <p className='text-xl text-gray-600 max-w-3xl mx-auto font-normal leading-relaxed'>
                      Choose the plan that's right for your business
                   </p>
                </div>
 
                <div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
-                  {/* Free Plan */}
-                  <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-gray-600 transition-all duration-300'>
-                     <h3
-                        className='text-2xl font-bold mb-6 text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                  {pricingPlans.map((plan, index) => (
+                     <div
+                        key={index}
+                        className={`bg-white rounded-lg p-8 hover:shadow-lg transition-shadow duration-300 relative ${
+                           plan.isPopular ? 'border-2 border-blue-600 shadow-lg' : 'border border-gray-200'
+                        }`}
                      >
-                        Free
-                     </h3>
-                     <div className='mb-8'>
-                        <span
-                           className='text-4xl font-bold text-white'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           $0
-                        </span>
-                        <span
-                           className='text-gray-400'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           /month
-                        </span>
-                     </div>
-                     <ul className='space-y-4 mb-8'>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Upload up to 5 datasets
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Basic visualizations
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Export as PDF
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Community support
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           10 AI requests/day
-                        </li>
-                     </ul>
-                     <button
-                        className='w-full bg-gray-700 text-white py-3 rounded-lg font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        disabled
-                     >
-                        Current Plan
-                     </button>
-                  </div>
+                        {plan.isPopular && (
+                           <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
+                              <span className='bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium'>
+                                 Most Popular
+                              </span>
+                           </div>
+                        )}
 
-                  {/* Pro Plan - Highlighted */}
-                  <div className='bg-blue-600/10 backdrop-blur-sm p-8 rounded-2xl border-2 border-blue-600 relative transform scale-105'>
-                     <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
-                        <span
-                           className='bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        <h3
+                           className='text-2xl font-bold mb-6 text-gray-900 tracking-tight'
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
                         >
-                           Most Popular
-                        </span>
-                     </div>
-                     <h3
-                        className='text-2xl font-bold mb-6 text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Pro
-                     </h3>
-                     <div className='mb-8'>
-                        <span
-                           className='text-4xl font-bold text-white'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           $49
-                        </span>
-                        <span
-                           className='text-gray-400'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           /month
-                        </span>
-                     </div>
-                     <ul className='space-y-4 mb-8'>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Everything in Free
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Upload unlimited datasets
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Advanced AI insights (500 requests/day)
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Custom charts and dashboards
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Priority email support
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Team collaboration (up to 3 users)
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Advanced data export options
-                        </li>
-                     </ul>
-                     <button
-                        className='w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Upgrade to Pro
-                     </button>
-                  </div>
+                           {plan.name.toUpperCase()}
+                        </h3>
 
-                  {/* Enterprise Plan */}
-                  <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-gray-600 transition-all duration-300'>
-                     <h3
-                        className='text-2xl font-bold mb-6 text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Enterprise
-                     </h3>
-                     <div className='mb-8'>
-                        <span
-                           className='text-4xl font-bold text-white'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        <div className='mb-8'>
+                           <span
+                              className='text-4xl font-bold text-gray-900'
+                              style={{
+                                 fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              }}
+                           >
+                              ${plan.price}
+                           </span>
+                           <span className='text-gray-600 font-normal'>{plan.period}</span>
+                        </div>
+
+                        <ul className='space-y-4 mb-8'>
+                           {plan.features.map((feature, featureIndex) => (
+                              <li
+                                 key={featureIndex}
+                                 className='flex items-center text-gray-700 font-normal'
+                                 style={{ lineHeight: '1.5' }}
+                              >
+                                 <svg
+                                    className='w-5 h-5 text-blue-500 mr-3 flex-shrink-0'
+                                    fill='currentColor'
+                                    viewBox='0 0 20 20'
+                                 >
+                                    <path
+                                       fillRule='evenodd'
+                                       d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                                       clipRule='evenodd'
+                                    />
+                                 </svg>
+                                 {feature}
+                              </li>
+                           ))}
+                        </ul>
+
+                        <button
+                           className={`w-full py-4 rounded-lg font-bold transition-colors tracking-tight ${
+                              plan.buttonStyle === 'primary'
+                                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'
+                                 : plan.buttonStyle === 'secondary'
+                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                 : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                           }`}
+                           style={{
+                              fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                              letterSpacing: '-0.01em',
+                           }}
+                           disabled={plan.disabled}
                         >
-                           $199
-                        </span>
-                        <span
-                           className='text-gray-400'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           /month
-                        </span>
+                           {plan.buttonText.toUpperCase()}
+                        </button>
                      </div>
-                     <ul className='space-y-4 mb-8'>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Everything in Pro
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Unlimited AI requests
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Dedicated success manager
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Custom integrations
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Advanced security features
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Team collaboration (unlimited)
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           Training and onboarding
-                        </li>
-                        <li
-                           className='flex items-center text-gray-300'
-                           style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                        >
-                           SLA guarantees
-                        </li>
-                     </ul>
-                     <button
-                        className='w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-medium'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     >
-                        Upgrade to Enterprise
-                     </button>
-                  </div>
+                  ))}
                </div>
-               <div className='mt-16 text-center'>
+
+               <div className='mt-20 text-center'>
                   <h3
-                     className='text-lg font-medium text-white'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                     className='text-xl font-bold text-gray-900 mb-3 tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.01em',
+                     }}
                   >
-                     Need a custom solution?
+                     NEED A CUSTOM SOLUTION?
                   </h3>
-                  <p
-                     className='mt-2 text-gray-400'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
+                  <p className='text-gray-600 mb-6 font-normal leading-relaxed max-w-2xl mx-auto'>
                      Contact us for a tailored package that meets your specific requirements.
                   </p>
                   <button
-                     className='mt-4 inline-flex items-center px-6 py-2.5 border border-gray-700 text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900 transition-colors'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                     onClick={() => scrollToSection('contact')}
+                     className='inline-flex items-center px-8 py-3 border-2 border-gray-300 text-sm font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-600 hover:text-blue-600 transition-colors tracking-tight'
+                     style={{
+                        fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif',
+                        letterSpacing: '-0.01em',
+                     }}
+                     onClick={() => setIsContactModalOpen(true)}
                   >
-                     Contact Us
+                     CONTACT US
                   </button>
                </div>
             </div>
          </section>
 
-         {/* Contact Section */}
-         <section
-            id='contact'
-            className='py-24 bg-gradient-to-br from-black via-gray-900 to-black'
-         >
-            <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-12'>
-                  <h2
-                     className='text-4xl md:text-6xl font-bold text-white mb-4'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
-                     Get In Touch
-                  </h2>
-                  <p
-                     className='text-xl text-gray-400 max-w-3xl mx-auto'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
-                     Have questions? We'd love to hear from you.
-                  </p>
-               </div>
-
-               <div className='grid lg:grid-cols-2 gap-16 items-center'>
-                  {/* Contact Information */}
-                  <div className='space-y-12'>
-                     <div className='space-y-8'>
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>CEO</p>
-                              <p className='text-gray-400 text-lg font-sans'>RamaKrushna Mohapatra</p>
-                              <p className='text-blue-400 text-sm font-sans'>itsramakrushna@gmail.com</p>
-                           </div>
-                        </div>
-
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>Developer</p>
-                              <p className='text-gray-400 text-lg font-sans'>Nakul Srivastava</p>
-                              <p className='text-blue-400 text-sm font-sans'>imnakul44@gmail.com</p>
-                           </div>
-                        </div>
-
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>Developer</p>
-                              <p className='text-gray-400 text-lg font-sans'>Dattu Goud</p>
-                              <p className='text-blue-400 text-sm font-sans'>dattudattakumar369@gmail.com</p>
-                           </div>
-                        </div>
-
-                        <div className='flex items-center space-x-6'>
-                           <div className='w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center'>
-                              <svg
-                                 className='w-8 h-8 text-blue-400'
-                                 fill='none'
-                                 stroke='currentColor'
-                                 viewBox='0 0 24 24'
-                              >
-                                 <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth={2}
-                                    d='M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
-                                 />
-                              </svg>
-                           </div>
-                           <div>
-                              <p className='font-semibold text-white text-xl font-sans'>General Inquiries</p>
-                              <p className='text-gray-400 text-lg font-sans'>DataVista Team</p>
-                              <p className='text-blue-400 text-sm font-sans'>datavista91@gmail.com</p>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-
-                  {/* Contact Form */}
-                  <div className='bg-gray-900/50 backdrop-blur-sm p-8 rounded-3xl border border-gray-700'>
-                     <form
-                        className='space-y-4'
-                        onSubmit={handleContactSubmit}
-                     >
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                           <div>
-                              <label
-                                 htmlFor='firstName'
-                                 className='block text-sm font-medium text-gray-300 mb-2 font-sans'
-                              >
-                                 First Name
-                              </label>
-                              <input
-                                 type='text'
-                                 id='firstName'
-                                 name='firstName'
-                                 value={contactForm.firstName}
-                                 onChange={handleContactChange}
-                                 className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
-                                 placeholder='John'
-                                 required
-                              />
-                           </div>
-                           <div>
-                              <label
-                                 htmlFor='lastName'
-                                 className='block text-sm font-medium text-gray-300 mb-2 font-sans'
-                              >
-                                 Last Name
-                              </label>
-                              <input
-                                 type='text'
-                                 id='lastName'
-                                 name='lastName'
-                                 value={contactForm.lastName}
-                                 onChange={handleContactChange}
-                                 className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
-                                 placeholder='Doe'
-                              />
-                           </div>
-                        </div>
-                        <div>
-                           <label
-                              htmlFor='email'
-                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
-                           >
-                              Email
-                           </label>
-                           <input
-                              type='email'
-                              id='email'
-                              name='email'
-                              value={contactForm.email}
-                              onChange={handleContactChange}
-                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
-                              placeholder='john@example.com'
-                              required
-                           />
-                        </div>
-                        <div>
-                           <label
-                              htmlFor='subject'
-                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
-                           >
-                              Subject
-                           </label>
-                           <input
-                              type='text'
-                              id='subject'
-                              name='subject'
-                              value={contactForm.subject}
-                              onChange={handleContactChange}
-                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-sans'
-                              placeholder='How can we help?'
-                              required
-                           />
-                        </div>
-                        <div>
-                           <label
-                              htmlFor='message'
-                              className='block text-sm font-medium text-gray-300 mb-2 font-sans'
-                           >
-                              Message
-                           </label>
-                           <textarea
-                              id='message'
-                              name='message'
-                              rows={5}
-                              value={contactForm.message}
-                              onChange={handleContactChange}
-                              className='w-full px-4 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none font-sans'
-                              placeholder='Tell us more about your needs...'
-                              required
-                           ></textarea>
-                        </div>
-                        <button
-                           type='submit'
-                           className='w-full bg-blue-600 text-white py-4 rounded-xl hover:bg-blue-700 transition-colors font-medium text-lg font-sans'
-                           disabled={contactLoading}
-                        >
-                           {contactLoading ? 'Sending...' : 'Send Message'}
-                        </button>
-                        {contactSuccess && <p className='text-green-400 mt-2'>Message sent successfully!</p>}
-                        {contactError && <p className='text-red-400 mt-2'>{contactError}</p>}
-                     </form>
-                  </div>
-               </div>
-            </div>
-         </section>
-
          {/* Footer */}
-         <footer className='py-5 border-t border-gray-800 bg-black'>
+         <footer className='py-8 border-t border-gray-200 bg-white'>
             <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-               <div className='flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0'>
-                  <div className='flex items-center space-x-4'>
-                     <img
-                        src='/logo2.svg'
-                        alt='DataVista Logo'
-                        className='w-10 h-10'
-                     />
+               <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
+                  <div className='flex items-center space-x-2'>
                      <span
-                        className='text-2xl font-bold text-white'
-                        style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
+                        className='text-xl font-bold text-gray-900 tracking-tight'
+                        style={{ fontFamily: '"Gilroy ExtraBold", "Inter", system-ui, sans-serif' }}
                      >
                         DataVista
                      </span>
                   </div>
 
-                  <p
-                     className='text-gray-400 text-sm'
-                     style={{ fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}
-                  >
-                     © 2025 DataVista. All rights reserved.
-                  </p>
+                  <p className='text-gray-600 text-sm'>© 2025 DataVista. All rights reserved.</p>
 
-                  <div className='flex space-x-6'>
+                  <div className='flex items-center space-x-6'>
+                     {/* <button
+                        onClick={() => setIsContactModalOpen(true)}
+                        className='text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium'
+                     >
+                        Contact
+                     </button> */}
                      <a
                         href='https://twitter.com/datavista'
-                        className='text-gray-400 hover:text-blue-400 transition-colors'
+                        className='text-gray-600 hover:text-blue-600 transition-colors'
                         aria-label='Twitter'
                      >
                         <svg
-                           className='w-6 h-6'
+                           className='w-5 h-5'
                            fill='currentColor'
                            viewBox='0 0 24 24'
                         >
@@ -1066,34 +930,17 @@ const LandingPage = () => {
                      </a>
                      <a
                         href='https://linkedin.com/company/datavista'
-                        className='text-gray-400 hover:text-blue-400 transition-colors'
+                        className='text-gray-600 hover:text-blue-600 transition-colors'
                         aria-label='LinkedIn'
                      >
                         <svg
-                           className='w-6 h-6'
+                           className='w-5 h-5'
                            fill='currentColor'
                            viewBox='0 0 24 24'
                         >
                            <path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z' />
                         </svg>
                      </a>
-                     {/* <a
-                        href='https://github.com/datavista'
-                        className='text-gray-400 hover:text-blue-400 transition-colors'
-                        aria-label='GitHub'
-                     >
-                        <svg
-                           className='w-6 h-6'
-                           fill='currentColor'
-                           viewBox='0 0 24 24'
-                        >
-                           <path
-                              fillRule='evenodd'
-                              d='M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z'
-                              clipRule='evenodd'
-                           />
-                        </svg>
-                     </a> */}
                   </div>
                </div>
             </div>
