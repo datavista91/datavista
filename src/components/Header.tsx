@@ -33,7 +33,7 @@ const Header = () => {
    useEffect(() => {
       const fetchNotifications = async () => {
          const db = getFirestore()
-         const feedbackRef = collection(db, 'feedbacks')
+         const feedbackRef = collection(db, 'notifications')
          const snapshot = await getDocs(feedbackRef)
          const fetched = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
          // Get read status from localStorage
