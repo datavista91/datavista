@@ -62,7 +62,7 @@ const LandingPage = () => {
          role: 'Data Analyst at TechCorp',
          content: 'DataVista transformed how we analyze our data. The AI insights saved us weeks of manual work.',
          avatar:
-            'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80',
+            'https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?q=80&w=386&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80',
       },
       {
          name: 'Michael Chen',
@@ -80,11 +80,12 @@ const LandingPage = () => {
       },
    ]
 
+   const [billingPeriod, setBillingPeriod] = useState<'month' | 'annual'>('month')
    const pricingPlans = [
       {
          name: 'Free',
          price: 0,
-         period: '/month',
+         period: '/lifetime',
          isPopular: false,
          features: [
             'Upload up to 5 datasets',
@@ -99,8 +100,10 @@ const LandingPage = () => {
       },
       {
          name: 'Standard',
-         price: 49,
-         period: '/month',
+         price: billingPeriod === 'month' ? 49 : 490, // Annual discounted price
+         originalPrice: billingPeriod === 'annual' ? 588 : null, // Original annual price for strikethrough
+         period: billingPeriod === 'month' ? '/month' : '/year',
+         discount: billingPeriod === 'annual' ? '17% Off' : null,
          isPopular: true,
          features: [
             'Everything in Free',
@@ -115,9 +118,11 @@ const LandingPage = () => {
          buttonStyle: 'primary',
       },
       {
-         name: 'Enterprise',
-         price: 199,
-         period: '/month',
+         name: 'Pro',
+         price: billingPeriod === 'month' ? 199 : 1990, // Annual discounted price
+         originalPrice: billingPeriod === 'annual' ? 2388 : null, // Original annual price for strikethrough
+         period: billingPeriod === 'month' ? '/month' : '/year',
+         discount: billingPeriod === 'annual' ? '17% Off' : null,
          isPopular: false,
          features: [
             'Everything in Standard',
@@ -129,7 +134,7 @@ const LandingPage = () => {
             'Training and onboarding',
             'SLA guarantees',
          ],
-         buttonText: 'Contact Sales',
+         buttonText: 'Upgrade to Pro',
          buttonStyle: 'secondary',
       },
    ]
@@ -1060,7 +1065,7 @@ const LandingPage = () => {
             }}
          >
             <div className='max-w-5xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16 animate-fadeInUp'>
+               <div className='text-center mb-8 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
@@ -1077,6 +1082,44 @@ const LandingPage = () => {
                   >
                      Choose the plan that's right for your business
                   </p>
+               </div>
+
+               {/* Billing Toggle - Symmetric & Professional */}
+               <div className='flex justify-center pb-12'>
+                  <div
+                     className='inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm'
+                     style={{ width: '300px' }}
+                  >
+                     <button
+                        className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all duration-200 ${
+                           billingPeriod === 'month'
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                        onClick={() => setBillingPeriod('month')}
+                        type='button'
+                        aria-pressed={billingPeriod === 'month'}
+                     >
+                        Monthly
+                     </button>
+                     <button
+                        className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all duration-200 relative ${
+                           billingPeriod === 'annual'
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                        onClick={() => setBillingPeriod('annual')}
+                        type='button'
+                        aria-pressed={billingPeriod === 'annual'}
+                     >
+                        Annual
+                        {billingPeriod === 'annual' && (
+                           <span className='absolute -top-4 -right-16 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap font-medium'>
+                              Save 17%
+                           </span>
+                        )}
+                     </button>
+                  </div>
                </div>
 
                <div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
@@ -1107,21 +1150,30 @@ const LandingPage = () => {
                         </h3>
 
                         <div className='mb-8'>
-                           <span
-                              className='font-bold text-gray-900'
-                              style={{
-                                 fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                                 fontSize: '36px',
-                              }}
-                           >
-                              ${plan.price}
-                           </span>
-                           <span
-                              className='text-gray-600 font-normal'
-                              style={{ fontSize: '16px' }}
-                           >
-                              {plan.period}
-                           </span>
+                           <div className='flex items-baseline justify-between'>
+                              <div className='flex items-baseline'>
+                                 <span
+                                    className='font-bold text-gray-900'
+                                    style={{
+                                       fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                                       fontSize: '36px',
+                                    }}
+                                 >
+                                    ${plan.price}
+                                 </span>
+                                 <span
+                                    className='text-gray-600 font-normal ml-1'
+                                    style={{ fontSize: '16px' }}
+                                 >
+                                    {plan.period}
+                                 </span>
+                              </div>
+                              {/* {plan.discount && (
+                                 <span className='bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium'>
+                                    {plan.discount}
+                                 </span>
+                              )} */}
+                           </div>
                         </div>
 
                         <ul className='space-y-4 mb-8'>
