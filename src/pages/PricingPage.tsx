@@ -158,14 +158,14 @@ const PricingPage = () => {
    } else if (isFree) {
       visiblePlans = plans
    } else if (isPro) {
-      visiblePlans = plans.filter(p => p.id !== 'free')
+      visiblePlans = plans.filter((p) => p.id !== 'free')
    } else if (isEnterprise) {
-      visiblePlans = plans.filter(p => p.id === 'enterprise')
+      visiblePlans = plans.filter((p) => p.id === 'enterprise')
    }
 
    // Mark current plan, add disabled property for TS
-   type PlanWithDisabled = typeof plans[0] & { disabled: boolean }
-   const mappedPlans: PlanWithDisabled[] = visiblePlans.map(p => {
+   type PlanWithDisabled = (typeof plans)[0] & { disabled: boolean }
+   const mappedPlans: PlanWithDisabled[] = visiblePlans.map((p) => {
       let buttonText = p.buttonText
       let disabled = false
       if ((isFree && p.id === 'free') || (isPro && p.id === 'pro') || (isEnterprise && p.id === 'enterprise')) {
@@ -177,7 +177,10 @@ const PricingPage = () => {
    visiblePlans = mappedPlans
 
    return (
-      <div className='min-h-screen bg-gradient-to-br from-gray-200 via-gray-400 to-gray-300'>
+      <div
+         className='min-h-screen'
+         style={{ fontFamily: 'Poppins, sans-serif' }}
+      >
          {/* Header */}
          {/* <div className='bg-white border-b border-gray-200'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -196,13 +199,13 @@ const PricingPage = () => {
          </div> */}
 
          {/* Pricing Content */}
-         <div className='py-12'>
+         <div className='py-4'>
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className='text-center max-w-3xl mx-auto mb-16'
+                  className='text-center max-w-3xl mx-auto mb-12'
                >
                   <h2
                      className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'
@@ -267,9 +270,7 @@ const PricingPage = () => {
                         <div className={`px-6 py-8 ${plan.mostPopular ? 'pt-10' : ''}`}>
                            <h3 className='text-xl font-semibold text-gray-900'>{plan.name}</h3>
                            <div className='mt-4 flex items-baseline'>
-                              <span className='text-4xl font-bold text-gray-900'>
-                                 ${plan.price}
-                              </span>
+                              <span className='text-4xl font-bold text-gray-900'>${plan.price}</span>
                               <span className='ml-1 text-gray-600'>/month</span>
                            </div>
                            <p className='mt-2 text-gray-600'>{plan.description}</p>
@@ -317,7 +318,7 @@ const PricingPage = () => {
                      </motion.div>
                   ))}
                </div>{' '}
-               <div className='mt-16 text-center'>
+               <div className='mt-12 text-center'>
                   <h3 className='text-lg font-medium text-gray-900'>Need a custom solution?</h3>
                   <p className='mt-2 text-gray-600'>
                      Contact our sales team for a tailored package that meets your specific requirements.
