@@ -4,6 +4,7 @@ import { collection, addDoc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
+import { FlipWords } from '../components/FlipWords'
 
 const LandingPage = () => {
    const { user, isLoading, login } = useAuth()
@@ -28,36 +29,54 @@ const LandingPage = () => {
    const [contactSuccess, setContactSuccess] = useState(false)
    const [contactError, setContactError] = useState('')
 
+   // Words for the FlipWords animation
+   const heroWords = [
+      'AI-DRIVEN ANALYTICS',
+      'POWERFUL INSIGHTS',
+      'SMART REPORTS',
+      'PRESENTATIONS',
+      'VISUAL ANALYTICS',
+      'ACTIONABLE OUTCOMES',
+   ]
+
    const features = [
       {
-         title: 'Smart Reports',
-         description:
-            'Discover hidden patterns in your data with AI-powered analytics that reveal actionable insights automatically.',
-         image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      },
-      {
-         title: 'Useful Insights',
+         title: 'Powerful Insights',
          description:
             'Make data-driven decisions with machine learning models that provide precise forecasts and trend analysis.',
-         image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80',
+         image: '/features/insights.avif',
       },
       {
          title: 'Chart Visualizations',
          description:
             'Transform complex data into beautiful, interactive charts and graphs that tell compelling stories.',
-         image: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+         image: '/features/charts.avif',
       },
       {
-         title: 'Presentations',
+         title: 'Automated Presentations',
          description:
             'Create stunning presentations from your data analysis with automated slide generation and professional templates.',
-         image: 'https://images.unsplash.com/photo-1553028826-f4804a6dba3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+         image: '/features/presentations.avif',
       },
       {
-         title: 'Chat with AI - Custom Results',
+         title: 'Smart Reports',
          description:
-            'Get instant answers and custom analysis by chatting with our AI assistant about your specific data needs.',
-         image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+            'Discover hidden patterns in your data with AI-powered analytics that reveal actionable insights automatically.',
+         image: '/features/reports.avif',
+      },
+
+      {
+         title: 'AI-Powered Suggestions',
+         description:
+            'Leverage intelligent recommendations as our AI analyzes your data to suggest next steps, optimizations, and key takeaways.',
+         image: '/features/suggestions.avif',
+      },
+
+      {
+         title: 'Intelligent Predictions',
+         description:
+            'Forecast future trends and performance with AI-driven predictive models that help you stay ahead of the curve.',
+         image: '/features/predictions.avif',
       },
    ]
 
@@ -67,7 +86,7 @@ const LandingPage = () => {
          role: 'Data Analyst at TechCorp',
          content: 'DataVista transformed how we analyze our data. The AI insights saved us weeks of manual work.',
          avatar:
-            'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80',
+            'https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?q=80&w=386&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80',
       },
       {
          name: 'Michael Chen',
@@ -85,11 +104,12 @@ const LandingPage = () => {
       },
    ]
 
+   const [billingPeriod, setBillingPeriod] = useState<'month' | 'annual'>('month')
    const pricingPlans = [
       {
          name: 'Free',
          price: 0,
-         period: '/month',
+         period: '/lifetime',
          isPopular: false,
          features: [
             'Upload up to 5 datasets',
@@ -103,9 +123,11 @@ const LandingPage = () => {
          disabled: true,
       },
       {
-         name: 'Standard',
-         price: 49,
-         period: '/month',
+         name: 'Pro',
+         price: billingPeriod === 'month' ? 49 : 490, // Annual discounted price
+         originalPrice: billingPeriod === 'annual' ? 588 : null, // Original annual price for strikethrough
+         period: billingPeriod === 'month' ? '/month' : '/year',
+         discount: billingPeriod === 'annual' ? '17% Off' : null,
          isPopular: true,
          features: [
             'Everything in Free',
@@ -116,13 +138,15 @@ const LandingPage = () => {
             'Team collaboration (up to 3 users)',
             'Advanced data export options',
          ],
-         buttonText: 'Upgrade to Standard',
+         buttonText: 'Upgrade to Pro',
          buttonStyle: 'primary',
       },
       {
          name: 'Enterprise',
-         price: 199,
-         period: '/month',
+         price: billingPeriod === 'month' ? 199 : 1990, // Annual discounted price
+         originalPrice: billingPeriod === 'annual' ? 2388 : null, // Original annual price for strikethrough
+         period: billingPeriod === 'month' ? '/month' : '/year',
+         discount: billingPeriod === 'annual' ? '17% Off' : null,
          isPopular: false,
          features: [
             'Everything in Standard',
@@ -134,7 +158,7 @@ const LandingPage = () => {
             'Training and onboarding',
             'SLA guarantees',
          ],
-         buttonText: 'Contact Sales',
+         buttonText: 'Upgrade to Enterprise',
          buttonStyle: 'secondary',
       },
    ]
@@ -755,7 +779,13 @@ const LandingPage = () => {
                      }}
                   >
                      TRANSFORM YOUR DATA INTO
-                     <span className='text-blue-600 block mt-2'>POWERFUL INSIGHTS</span>
+                     <span className='text-blue-600 block'>
+                        <FlipWords
+                           words={heroWords}
+                           duration={2000}
+                           className='text-blue-600'
+                        />
+                     </span>
                   </h1>
 
                   <p
@@ -1056,67 +1086,69 @@ const LandingPage = () => {
          </section>
 
          {/* CTA Section */}
-         <section
-            className='py-20 relative overflow-hidden'
-            style={{
-               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-            }}
-         >
-            <div className='max-w-5xl mx-auto px-6 text-center relative z-10'>
-               <div className='max-w-4xl mx-auto animate-fadeInUp'>
-                  <h2
-                     className='text-4xl md:text-5xl font-bold mb-6 leading-tight'
-                     style={{
-                        fontFamily: "'Avenir Next', -apple-system, BlinkMacSystemFont, sans-serif",
-                        fontWeight: '700',
-                     }}
-                  >
-                     Ready to explore{' '}
-                     <span
+         {!user && (
+            <section
+               className='py-20 relative overflow-hidden'
+               style={{
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+               }}
+            >
+               <div className='max-w-5xl mx-auto px-6 text-center relative z-10'>
+                  <div className='max-w-4xl mx-auto animate-fadeInUp'>
+                     <h2
+                        className='text-4xl md:text-5xl font-bold mb-6 leading-tight'
                         style={{
-                           background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
-                           WebkitBackgroundClip: 'text',
-                           WebkitTextFillColor: 'transparent',
-                           backgroundClip: 'text',
+                           fontFamily: "'Avenir Next', -apple-system, BlinkMacSystemFont, sans-serif",
+                           fontWeight: '700',
                         }}
                      >
-                        DataVista
-                     </span>
-                     ?
-                  </h2>
-                  <p
-                     className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto animate-fadeInUp'
-                     style={{
-                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-                        lineHeight: '1.6',
-                        animationDelay: '0.2s',
-                     }}
-                  >
-                     Join thousands of professionals who trust DataVista for their data analysis needs. Start your
-                     journey with intelligent insights today.
-                  </p>
-                  <div
-                     className='flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp'
-                     style={{ animationDelay: '0.4s' }}
-                  >
-                     <button
-                        onClick={() => navigate('/dashboard')}
-                        className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 min-h-[48px] w-full sm:w-auto'
-                        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                        Ready to explore{' '}
+                        <span
+                           style={{
+                              background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                              backgroundClip: 'text',
+                           }}
+                        >
+                           DataVista
+                        </span>
+                        ?
+                     </h2>
+                     <p
+                        className='text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto animate-fadeInUp'
+                        style={{
+                           fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                           lineHeight: '1.6',
+                           animationDelay: '0.2s',
+                        }}
                      >
-                        Get Started Free
-                     </button>
-                     <button
-                        onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-                        className='border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all duration-300 min-h-[48px] w-full sm:w-auto'
-                        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                        Join thousands of professionals who trust DataVista for their data analysis needs. Start your
+                        journey with intelligent insights today.
+                     </p>
+                     <div
+                        className='flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp'
+                        style={{ animationDelay: '0.4s' }}
                      >
-                        View Pricing
-                     </button>
+                        <button
+                           onClick={() => navigate('/dashboard')}
+                           className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 min-h-[48px] w-full sm:w-auto'
+                           style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                        >
+                           Get Started Free
+                        </button>
+                        <button
+                           onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                           className='border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all duration-300 min-h-[48px] w-full sm:w-auto'
+                           style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                        >
+                           View Pricing
+                        </button>
+                     </div>
                   </div>
                </div>
-            </div>
-         </section>
+            </section>
+         )}
 
          {/* Pricing Section */}
          <section
@@ -1127,7 +1159,7 @@ const LandingPage = () => {
             }}
          >
             <div className='max-w-5xl mx-auto px-6 lg:px-8'>
-               <div className='text-center mb-16 animate-fadeInUp'>
+               <div className='text-center mb-8 animate-fadeInUp'>
                   <h2
                      className='font-bold text-gray-900 mb-6'
                      style={{
@@ -1144,6 +1176,44 @@ const LandingPage = () => {
                   >
                      Choose the plan that's right for your business
                   </p>
+               </div>
+
+               {/* Billing Toggle - Symmetric & Professional */}
+               <div className='flex justify-center pb-12'>
+                  <div
+                     className='inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm'
+                     style={{ width: '300px' }}
+                  >
+                     <button
+                        className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all duration-200 ${
+                           billingPeriod === 'month'
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                        onClick={() => setBillingPeriod('month')}
+                        type='button'
+                        aria-pressed={billingPeriod === 'month'}
+                     >
+                        Monthly
+                     </button>
+                     <button
+                        className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all duration-200 relative ${
+                           billingPeriod === 'annual'
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                        onClick={() => setBillingPeriod('annual')}
+                        type='button'
+                        aria-pressed={billingPeriod === 'annual'}
+                     >
+                        Annual
+                        {billingPeriod === 'annual' && (
+                           <span className='absolute -top-4 -right-16 transform -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap font-medium'>
+                              Save 17%
+                           </span>
+                        )}
+                     </button>
+                  </div>
                </div>
 
                <div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
@@ -1174,21 +1244,30 @@ const LandingPage = () => {
                         </h3>
 
                         <div className='mb-8'>
-                           <span
-                              className='font-bold text-gray-900'
-                              style={{
-                                 fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
-                                 fontSize: '36px',
-                              }}
-                           >
-                              ${plan.price}
-                           </span>
-                           <span
-                              className='text-gray-600 font-normal'
-                              style={{ fontSize: '16px' }}
-                           >
-                              {plan.period}
-                           </span>
+                           <div className='flex items-baseline justify-between'>
+                              <div className='flex items-baseline'>
+                                 <span
+                                    className='font-bold text-gray-900'
+                                    style={{
+                                       fontFamily: '"Avenir Next Bold", "Inter", system-ui, sans-serif',
+                                       fontSize: '36px',
+                                    }}
+                                 >
+                                    ${plan.price}
+                                 </span>
+                                 <span
+                                    className='text-gray-600 font-normal ml-1'
+                                    style={{ fontSize: '16px' }}
+                                 >
+                                    {plan.period}
+                                 </span>
+                              </div>
+                              {/* {plan.discount && (
+                                 <span className='bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium'>
+                                    {plan.discount}
+                                 </span>
+                              )} */}
+                           </div>
                         </div>
 
                         <ul className='space-y-4 mb-8'>
@@ -1214,7 +1293,7 @@ const LandingPage = () => {
                            ))}
                         </ul>
 
-                        <button
+                        {/* <button
                            className={`w-full py-4 rounded-lg font-bold transition-all duration-300 min-h-[48px] ${
                               plan.buttonStyle === 'primary'
                                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
@@ -1230,7 +1309,7 @@ const LandingPage = () => {
                            disabled={plan.disabled}
                         >
                            {plan.buttonText.toUpperCase()}
-                        </button>
+                        </button> */}
                      </div>
                   ))}
                </div>

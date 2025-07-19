@@ -62,16 +62,16 @@ html {
 ::-webkit-scrollbar {
    width: 8px;
    height: 8px;
-   background: #181c23;
+   background: #808080;
 }
 
 ::-webkit-scrollbar-track {
-   background: #181c23;
+   background: #d8d8d8;
    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-   background: linear-gradient(135deg, #22304a 0%, #1e293b 100%);
+   background: linear-gradient(135deg, #c9ccd1 0%, #b9ceef 100%);
    border-radius: 6px;
    border: 2px solid #181c23;
    transition: background 0.2s ease;
@@ -88,7 +88,7 @@ html {
 /* Firefox scrollbar */
 * {
    scrollbar-width: thin;
-   scrollbar-color: #22304a #181c23;
+   scrollbar-color: #a9abaf #eef0f5;
 }
 
 /* Custom scrollbar for accordion content */
