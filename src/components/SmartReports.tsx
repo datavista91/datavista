@@ -47,7 +47,7 @@ const SmartReports = () => {
       return (
          <div className='flex flex-col items-center justify-center h-96 text-center'>
             <FileText className='w-16 h-16 text-gray-400 mb-4' />
-            <h2 className='text-xl font-semibold text-gray-900 mb-2'>No Data Available</h2>
+            <h2 className='dashboard-heading text-gray-900 mb-2'>No Data Available</h2>
             <p className='text-gray-600 mb-4'>Upload a dataset to start generating smart reports and insights.</p>
          </div>
       )
@@ -142,12 +142,12 @@ const SmartReports = () => {
                                        <Sparkles className='w-4 h-4' />
                                     </div>
                                     <div className='flex-1 min-w-0'>
-                                       <h3 className='font-semibold text-gray-900 truncate'>{insight.title}</h3>
-                                       <div className='flex items-center space-x-2 text-sm text-gray-500'>
+                                       <h3 className='dashboard-section-title text-gray-900 truncate'>{insight.title}</h3>
+                                       <div className='flex items-center space-x-2 dashboard-small-text text-gray-500'>
                                           <Clock className='w-3 h-3' />
                                           <span>{new Date(insight.timestamp).toLocaleString()}</span>
                                           {insight.isNew && (
-                                             <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'>
+                                             <span className='inline-flex items-center px-2 py-1 rounded-full dashboard-small-text font-medium bg-green-100 text-green-700'>
                                                 <CheckCircle className='w-3 h-3 mr-1' />
                                                 New
                                              </span>
@@ -300,7 +300,7 @@ const SmartReports = () => {
                                        <MessageSquare className='w-4 h-4' />
                                     </div>
                                     <div className='flex-1 min-w-0'>
-                                       <h3 className='font-medium text-gray-900 truncate'>{response.title}</h3>
+                                       <h3 className='dashboard-section-title text-gray-900 truncate'>{response.title}</h3>
                                        <div className='flex items-center space-x-2 text-sm text-gray-500'>
                                           <Clock className='w-3 h-3' />
                                           <span>{new Date(response.timestamp).toLocaleString()}</span>

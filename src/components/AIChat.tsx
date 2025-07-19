@@ -220,8 +220,8 @@ ${err.message.includes('API key') ?
                      <Sparkles className='w-4 h-4 text-white' />
                   </div>
                   <div>
-                     <h2 className='text-lg font-semibold text-gray-900'>AI Data Analyst</h2>
-                     <p className='text-sm text-gray-500'>
+                     <h2 className='dashboard-heading text-gray-900'>AI Data Analyst</h2>
+                     <p className='dashboard-body text-gray-500'>
                         {hasData 
                            ? `Analyzing ${analysisData.fileName || 'your dataset'} (${analysisData.summary?.overview?.totalRows?.toLocaleString()} rows)`
                            : 'Upload data to start analysis'
@@ -233,7 +233,7 @@ ${err.message.includes('API key') ?
                {/* Status indicators */}
                <div className='flex items-center space-x-3'>
                   {/* Data status */}
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
+                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium ${
                      hasData 
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-gray-100 text-gray-600'
@@ -244,14 +244,14 @@ ${err.message.includes('API key') ?
                   
                   {/* Request counter for development */}
                   {import.meta.env.DEV && geminiClient && (
-                     <div className='flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700'>
+                     <div className='flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-blue-100 text-blue-700'>
                         <span>{geminiClient.getRemainingRequests()} requests left</span>
                      </div>
                   )}
                   
                   {/* Error indicator */}
                   {error && (
-                     <div className='flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700'>
+                     <div className='flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-red-100 text-red-700'>
                         <AlertTriangle className='w-3 h-3' />
                         <span>API Error</span>
                      </div>
@@ -262,7 +262,7 @@ ${err.message.includes('API key') ?
                <div className='mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg'>
                   <div className='flex items-center space-x-2'>
                      <AlertTriangle className='w-4 h-4 text-blue-600' />
-                     <span className='text-sm text-blue-700'>
+                     <span className='dashboard-body text-blue-700'>
                         Development Mode: AI responses powered by Gemini API (server-side)
                      </span>
                   </div>
@@ -303,7 +303,7 @@ ${err.message.includes('API key') ?
                         }`}
                      >
                         {message.type === 'user' ? (
-                           <p className='text-sm leading-relaxed'>{message.content}</p>
+                           <p className='dashboard-body leading-relaxed'>{message.content}</p>
                         ) : (
                            <MarkdownRenderer content={message.content} />
                         )}
@@ -314,7 +314,7 @@ ${err.message.includes('API key') ?
                               <div className='flex items-center space-x-2'>
                                  <button 
                                     onClick={() => handleActionClick(message.responseType!, message.actionData)}
-                                    className='flex items-center space-x-2 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-xs font-medium transition-colors'
+                                    className='flex items-center space-x-2 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg dashboard-small-text font-medium transition-colors'
                                  >
                                     {getActionIcon(message.responseType!)}
                                     <span>View in {getTabName(message.responseType!)}</span>

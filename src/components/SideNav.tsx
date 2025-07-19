@@ -91,13 +91,10 @@ const SideNav = () => {
                   />
                </div>
                <div>
-                  <h1
-                     className='text-base font-semibold text-gray-900'
-                     style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
+                  <h1 className='dashboard-heading text-gray-900'>
                      DataVista
                   </h1>
-                  <p className='text-xs text-gray-500'>AI Analytics</p>
+                  <p className='dashboard-small-text text-gray-500'>AI Analytics</p>
                </div>
             </Link>
             {/* <button
@@ -121,7 +118,7 @@ const SideNav = () => {
                      >
                         <Link
                            to={item.path}
-                           className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                           className={`flex items-center px-3 py-2.5 rounded-lg dashboard-body font-medium transition-all duration-200 group ${
                               isActive
                                  ? `${item.bgColor} ${item.color} border ${item.borderColor} shadow-sm`
                                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -139,7 +136,7 @@ const SideNav = () => {
                                  <span>{item.name}</span>
                                  {isActive && <div className='w-2 h-2 rounded-full bg-current opacity-60'></div>}
                               </div>
-                              <p className={`text-xs mt-0.5 ${isActive ? 'text-current opacity-70' : 'text-gray-500'}`}>
+                              <p className={`dashboard-small-text mt-0.5 ${isActive ? 'text-current opacity-70' : 'text-gray-500'}`}>
                                  {item.description}
                               </p>
                            </div>
@@ -158,7 +155,7 @@ const SideNav = () => {
             >
                <div className='flex items-center space-x-2 mb-2'>
                   <Database className={`w-4 h-4 ${hasData ? 'text-emerald-600' : 'text-gray-500'}`} />
-                  <span className={`text-sm font-medium ${hasData ? 'text-emerald-900' : 'text-gray-700'}`}>
+                  <span className={`dashboard-body font-medium ${hasData ? 'text-emerald-900' : 'text-gray-700'}`}>
                      Data Status
                   </span>
                </div>
@@ -197,14 +194,14 @@ const SideNav = () => {
                   <div className='p-3 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 rounded-lg text-white shadow-lg'>
                      <div className='flex items-center space-x-2 mb-2'>
                         <Sparkles className='w-4 h-4 text-yellow-300' />
-                        <h4 className='font-semibold text-sm'>Upgrade to Pro</h4>
+                        <h4 className='dashboard-section-title text-white'>Upgrade to Pro</h4>
                      </div>
-                     <p className='text-xs text-purple-200 mb-3 leading-relaxed'>
+                     <p className='dashboard-small-text text-purple-200 mb-3 leading-relaxed'>
                         Unlock advanced analytics & premium features
                      </p>
                      <button
                         onClick={() => navigate('/pricing')}
-                        className='w-full px-3 py-2 bg-white text-purple-700 rounded-md text-xs font-medium hover:bg-purple-50 transition-all duration-200 shadow-sm'
+                        className='w-full px-3 py-2 bg-white text-purple-700 rounded-md dashboard-small-text font-medium hover:bg-purple-50 transition-all duration-200 shadow-sm'
                      >
                         ✨ Upgrade Now
                      </button>

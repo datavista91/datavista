@@ -69,8 +69,8 @@ const PaymentSuccess = () => {
                   className="text-center"
                >
                   <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-spin" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifying Payment</h2>
-                  <p className="text-gray-600">Please wait while we confirm your payment...</p>
+                  <h2 className="dashboard-heading text-gray-900 mb-2">Verifying Payment</h2>
+                  <p className="dashboard-body text-gray-600">Please wait while we confirm your payment...</p>
                </motion.div>
             )
 
@@ -82,13 +82,13 @@ const PaymentSuccess = () => {
                   className="text-center"
                >
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
-                  <p className="text-gray-600 mb-4">
+                  <h2 className="dashboard-heading text-gray-900 mb-2">Payment Successful!</h2>
+                  <p className="dashboard-body text-gray-600 mb-4">
                      Thank you for upgrading to <span className="font-semibold capitalize">{paymentDetails?.planType}</span> plan.
                   </p>
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                     <h3 className="font-semibold text-green-800 mb-2">What's Next?</h3>
-                     <ul className="text-sm text-green-700 space-y-1">
+                     <h3 className="dashboard-section-title text-green-800 mb-2">What's Next?</h3>
+                     <ul className="dashboard-body text-green-700 space-y-1">
                         <li>• Your subscription is now active</li>
                         <li>• Enhanced features are available immediately</li>
                         <li>• Check your email for the receipt</li>
@@ -96,7 +96,7 @@ const PaymentSuccess = () => {
                   </div>
                   <button
                      onClick={handleContinue}
-                     className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                     className="bg-blue-600 text-white px-6 py-3 rounded-lg dashboard-body font-semibold hover:bg-blue-700 transition-colors"
                   >
                      Go to Dashboard
                   </button>
@@ -111,12 +111,12 @@ const PaymentSuccess = () => {
                   className="text-center"
                >
                   <XCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Issue</h2>
-                  <p className="text-gray-600 mb-4">
+                  <h2 className="dashboard-heading text-gray-900 mb-2">Payment Issue</h2>
+                  <p className="dashboard-body text-gray-600 mb-4">
                      We couldn't verify your payment. This might be due to:
                   </p>
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                     <ul className="text-sm text-red-700 space-y-1">
+                     <ul className="dashboard-body text-red-700 space-y-1">
                         <li>• Payment was cancelled</li>
                         <li>• Network connectivity issues</li>
                         <li>• Payment provider issues</li>

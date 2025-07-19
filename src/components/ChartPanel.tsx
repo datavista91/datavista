@@ -174,12 +174,12 @@ const ChartPanel = () => {
                                        <TrendingUp className='w-4 h-4' />
                                     </div>
                                     <div className='flex-1 min-w-0'>
-                                       <h3 className='font-medium text-gray-900 truncate'>{viz.title}</h3>
-                                       <div className='flex items-center space-x-2 text-sm text-gray-500'>
+                                       <h3 className='dashboard-section-title text-gray-900 truncate'>{viz.title}</h3>
+                                       <div className='flex items-center space-x-2 dashboard-small-text text-gray-500'>
                                           <Clock className='w-3 h-3' />
                                           <span>{new Date(viz.timestamp).toLocaleString()}</span>
                                           {viz.isNew && (
-                                             <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'>
+                                             <span className='inline-flex items-center px-2 py-1 rounded-full dashboard-small-text font-medium bg-green-100 text-green-700'>
                                                 New
                                              </span>
                                           )}
@@ -214,7 +214,7 @@ const ChartPanel = () => {
                                  {/* Suggested chart types */}
                                  {viz.data?.suggestedCharts && viz.data.suggestedCharts.length > 0 && (
                                     <div className='mt-4'>
-                                       <h4 className='text-sm font-medium text-gray-900 mb-2'>
+                                       <h4 className='dashboard-body font-medium text-gray-900 mb-2'>
                                           Suggested Chart Types:
                                        </h4>
                                        <div className='flex flex-wrap gap-2'>
@@ -222,7 +222,7 @@ const ChartPanel = () => {
                                              <button
                                                 key={index}
                                                 onClick={() => setChartType(chartSuggestion as ChartType)}
-                                                className='px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-sm'
+                                                className='px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg dashboard-body font-medium transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-sm'
                                              >
                                                 {chartSuggestion.charAt(0).toUpperCase() + chartSuggestion.slice(1)}{' '}
                                                 Chart
@@ -244,7 +244,7 @@ const ChartPanel = () => {
             <div className='flex space-x-2'>
                <button
                   onClick={() => setChartType('bar')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                  className={`px-3 py-1.5 rounded-md dashboard-body font-medium flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 ${
                      chartType === 'bar'
                         ? 'bg-purple-100 text-purple-700 shadow-sm'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -258,7 +258,7 @@ const ChartPanel = () => {
                </button>
                <button
                   onClick={() => setChartType('pie')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                  className={`px-3 py-1.5 rounded-md dashboard-body font-medium flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 ${
                      chartType === 'pie'
                         ? 'bg-purple-100 text-purple-700 shadow-sm'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -292,7 +292,7 @@ const ChartPanel = () => {
          {/* Only show charts if we have data */}
          {(chartData.length > 0 || pieChartData.length > 0) && (
             <div className='bg-white p-4 rounded-lg border border-gray-200 transition-all duration-300 ease-in-out animate-slide-down'>
-               <h3 className='text-lg font-semibold mb-4'>
+               <h3 className='dashboard-heading mb-4'>
                   {chartType === 'bar'
                      ? `Column Analysis (${chartData.length} columns)`
                      : chartType === 'pie'

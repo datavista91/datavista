@@ -79,13 +79,13 @@ const SubscriptionStatus = () => {
             <div className="flex items-center space-x-3">
                {getPlanIcon(subscription.plan)}
                <div>
-                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPlanColor(subscription.plan)}`}>
+                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full dashboard-small-text font-medium ${getPlanColor(subscription.plan)}`}>
                      {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} Plan
                   </div>
                   {isExpired && (
                      <div className="flex items-center mt-1 text-red-600">
                         <AlertCircle className="w-4 h-4 mr-1" />
-                        <span className="text-xs">Expired</span>
+                        <span className="dashboard-small-text">Expired</span>
                      </div>
                   )}
                </div>
@@ -94,7 +94,7 @@ const SubscriptionStatus = () => {
             {subscription.plan === 'free' && (
                <button
                   onClick={() => navigate('/pricing')}
-                  className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors"
+                  className="dashboard-body font-medium text-purple-600 hover:text-purple-700 transition-colors"
                >
                   Upgrade
                </button>
@@ -106,9 +106,9 @@ const SubscriptionStatus = () => {
             {/* Daily AI Requests */}
             <div>
                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">Daily AI Requests</span>
+                  <span className="dashboard-body font-medium text-gray-700">Daily AI Requests</span>
                   <div className="flex items-center space-x-2">
-                     <span className="text-sm text-gray-500">
+                     <span className="dashboard-body text-gray-500">
                         {usage.aiRequestsToday} / {dailyLimit === 'unlimited' ? '∞' : dailyLimit}
                      </span>
                      <button
@@ -133,8 +133,8 @@ const SubscriptionStatus = () => {
             {/* Dataset Uploads */}
             <div>
                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">Datasets Uploaded</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="dashboard-body font-medium text-gray-700">Datasets Uploaded</span>
+                  <span className="dashboard-body text-gray-500">
                      {usage.datasetsUploaded} / {subscription.features.datasetLimit === 'unlimited' ? '∞' : subscription.features.datasetLimit}
                   </span>
                </div>
@@ -145,7 +145,7 @@ const SubscriptionStatus = () => {
                <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center space-x-2">
                      <Check className={`w-4 h-4 ${subscription.features.advancedInsights ? 'text-green-500' : 'text-gray-300'}`} />
-                     <span className="text-xs text-gray-600">Advanced Insights</span>
+                     <span className="dashboard-small-text text-gray-600">Advanced Insights</span>
                   </div>
                   <div className="flex items-center space-x-2">
                      <Check className={`w-4 h-4 ${subscription.features.customCharts ? 'text-green-500' : 'text-gray-300'}`} />

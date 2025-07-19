@@ -9,7 +9,7 @@ const DataPreview = () => {
    const rowsPerPage = 10
 
    if (!data || !data.length) {
-      return <div className='py-8 text-center text-gray-500'>No data available. Please upload a CSV file.</div>
+      return <div className='py-8 text-center dashboard-body text-gray-500'>No data available. Please upload a CSV file.</div>
    }
 
    // Get headers from the first row
@@ -24,43 +24,43 @@ const DataPreview = () => {
          {/* Analysis Insights Section */}
          {analysisData.summary && !analysisData.isProcessing && (
             <div className='bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 border border-purple-200'>
-               <h3 className='text-lg font-semibold text-gray-900 mb-4'>📊 Data Analysis Summary</h3>
+               <h3 className='dashboard-heading text-gray-900 mb-4'>📊 Data Analysis Summary</h3>
 
                <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-4'>
                   <div className='bg-white rounded-lg p-3 shadow-sm'>
                      <div className='text-2xl font-bold text-purple-600'>
                         {analysisData.summary.overview.totalRows.toLocaleString()}
                      </div>
-                     <div className='text-sm text-gray-600'>Total Rows</div>
+                     <div className='dashboard-body text-gray-600'>Total Rows</div>
                   </div>
                   <div className='bg-white rounded-lg p-3 shadow-sm'>
                      <div className='text-2xl font-bold text-indigo-600'>
                         {analysisData.summary.overview.totalColumns}
                      </div>
-                     <div className='text-sm text-gray-600'>Columns</div>
+                     <div className='dashboard-body text-gray-600'>Columns</div>
                   </div>
                   <div className='bg-white rounded-lg p-3 shadow-sm'>
                      <div className='text-2xl font-bold text-green-600'>
                         {analysisData.summary.overview.sampleSize.toLocaleString()}
                      </div>
-                     <div className='text-sm text-gray-600'>Sample Size</div>
+                     <div className='dashboard-body text-gray-600'>Sample Size</div>
                   </div>
                   <div className='bg-white rounded-lg p-3 shadow-sm'>
                      <div className='text-2xl font-bold text-orange-600'>
                         {analysisData.summary.dataQuality.duplicates}
                      </div>
-                     <div className='text-sm text-gray-600'>Duplicates</div>
+                     <div className='dashboard-body text-gray-600'>Duplicates</div>
                   </div>
                </div>
 
                {Object.keys(analysisData.summary.dataQuality.missingValues).length > 0 && (
                   <div className='bg-white rounded-lg p-4 shadow-sm'>
-                     <h4 className='font-medium text-gray-900 mb-2'>Missing Values</h4>
+                     <h4 className='dashboard-section-title text-gray-900 mb-2'>Missing Values</h4>
                      <div className='flex flex-wrap gap-2'>
                         {Object.entries(analysisData.summary.dataQuality.missingValues).map(([column, count]) => (
                            <span
                               key={column}
-                              className='px-2 py-1 bg-red-100 text-red-800 rounded text-xs'
+                              className='px-2 py-1 bg-red-100 text-red-800 rounded dashboard-small-text'
                            >
                               {column}: {count}
                            </span>
@@ -74,7 +74,7 @@ const DataPreview = () => {
          {/* Data Table */}
          <div className='bg-white rounded-lg shadow-sm border border-gray-200'>
             <div className='px-6 py-4 border-b border-gray-200'>
-               <h3 className='text-lg font-medium text-gray-900'>Data Preview</h3>
+               <h3 className='dashboard-heading text-gray-900'>Data Preview</h3>
             </div>{' '}
             <div className='overflow-x-auto'>
                <table className='min-w-full divide-y divide-gray-200'>
@@ -84,7 +84,7 @@ const DataPreview = () => {
                            <th
                               key={index}
                               scope='col'
-                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                              className='px-6 py-3 text-left dashboard-small-text font-medium text-gray-500 uppercase tracking-wider'
                            >
                               {header}
                            </th>
@@ -100,7 +100,7 @@ const DataPreview = () => {
                            {headers.map((header, cellIndex) => (
                               <td
                                  key={cellIndex}
-                                 className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'
+                                 className='px-6 py-4 whitespace-nowrap dashboard-body text-gray-500'
                               >
                                  {String(row[header])}
                               </td>
@@ -117,21 +117,21 @@ const DataPreview = () => {
                      <button
                         onClick={() => setPage(Math.max(1, page - 1))}
                         disabled={page === 1}
-                        className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                        className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 dashboard-body font-medium text-gray-700 hover:bg-gray-50'
                      >
                         Previous
                      </button>
                      <button
                         onClick={() => setPage(Math.min(totalPages, page + 1))}
                         disabled={page === totalPages}
-                        className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                        className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 dashboard-body font-medium text-gray-700 hover:bg-gray-50'
                      >
                         Next
                      </button>
                   </div>
                   <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
                      <div>
-                        <p className='text-sm text-gray-700'>
+                        <p className='dashboard-body text-gray-700'>
                            Showing <span className='font-medium'>{startIdx + 1}</span> to{' '}
                            <span className='font-medium'>{Math.min(startIdx + rowsPerPage, data.length)}</span> of{' '}
                            <span className='font-medium'>{data.length}</span> results

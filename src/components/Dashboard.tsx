@@ -90,7 +90,7 @@ const Dashboard = () => {
                            <nav className='flex'>
                               <button
                                  onClick={() => setActiveSection('data')}
-                                 className={`px-4 py-3 text-sm font-medium ${
+                                 className={`px-4 py-3 dashboard-body font-medium ${
                                     activeSection === 'data'
                                        ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'
@@ -100,7 +100,7 @@ const Dashboard = () => {
                               </button>
                               <button
                                  onClick={() => setActiveSection('upload')}
-                                 className={`px-4 py-3 text-sm font-medium ${
+                                 className={`px-4 py-3 dashboard-body font-medium ${
                                     activeSection === 'upload'
                                        ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'
@@ -110,7 +110,7 @@ const Dashboard = () => {
                               </button>{' '}
                               <button
                                  onClick={() => setActiveSection('chat')}
-                                 className={`px-4 py-3 text-sm font-medium ${
+                                 className={`px-4 py-3 dashboard-body font-medium ${
                                     activeSection === 'chat'
                                        ? 'border-b-2 border-blue-600 text-blue-600'
                                        : 'text-gray-500 hover:text-gray-700'

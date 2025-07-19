@@ -192,7 +192,7 @@ const PricingPage = () => {
                      <ArrowLeft className='h-5 w-5 mr-2' />
                      Back to Dashboard
                   </button>
-                  <h1 className='text-xl font-semibold text-gray-900'>Choose Your Plan</h1>
+                  <h1 className='dashboard-heading text-gray-900'>Choose Your Plan</h1>
                   <div></div>
                </div>
             </div>
@@ -207,13 +207,10 @@ const PricingPage = () => {
                   transition={{ duration: 0.6 }}
                   className='text-center max-w-3xl mx-auto mb-12'
                >
-                  <h2
-                     className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'
-                     style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
+                  <h2 className='dashboard-heading text-gray-900 sm:text-2xl'>
                      Simple, Transparent Pricing
                   </h2>
-                  <p className='mt-4 text-lg text-gray-600'>Choose the perfect plan for your data needs</p>
+                  <p className='mt-4 dashboard-body text-gray-600'>Choose the perfect plan for your data needs</p>
 
                   {/* <div className='mt-8 flex justify-center'>
                      <div className='relative bg-white/25 p-1 rounded-full flex'>
@@ -262,18 +259,18 @@ const PricingPage = () => {
                         } bg-white/60`}
                      >
                         {plan.mostPopular && (
-                           <div className='absolute top-0 right-0 left-0 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-semibold text-center'>
+                           <div className='absolute top-0 right-0 left-0 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white dashboard-small-text font-semibold text-center'>
                               Most Popular
                            </div>
                         )}
 
                         <div className={`px-6 py-8 ${plan.mostPopular ? 'pt-10' : ''}`}>
-                           <h3 className='text-xl font-semibold text-gray-900'>{plan.name}</h3>
+                           <h3 className='dashboard-heading text-gray-900'>{plan.name}</h3>
                            <div className='mt-4 flex items-baseline'>
                               <span className='text-4xl font-bold text-gray-900'>${plan.price}</span>
-                              <span className='ml-1 text-gray-600'>/month</span>
+                              <span className='ml-1 dashboard-body text-gray-600'>/month</span>
                            </div>
-                           <p className='mt-2 text-gray-600'>{plan.description}</p>
+                           <p className='mt-2 dashboard-body text-gray-600'>{plan.description}</p>
 
                            <ul className='mt-6 space-y-3'>
                               {plan.features.map((feature, i) => (
@@ -284,7 +281,7 @@ const PricingPage = () => {
                                     <div className='flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-purple-100 text-purple-600'>
                                        <Check className='w-3.5 h-3.5' />
                                     </div>
-                                    <span className='ml-2 text-sm text-gray-600'>{feature}</span>
+                                    <span className='ml-2 dashboard-body text-gray-600'>{feature}</span>
                                  </li>
                               ))}
                            </ul>
@@ -319,11 +316,11 @@ const PricingPage = () => {
                   ))}
                </div>{' '}
                <div className='mt-12 text-center'>
-                  <h3 className='text-lg font-medium text-gray-900'>Need a custom solution?</h3>
-                  <p className='mt-2 text-gray-600'>
+                  <h3 className='dashboard-section-title text-gray-900'>Need a custom solution?</h3>
+                  <p className='mt-2 dashboard-body text-gray-600'>
                      Contact our sales team for a tailored package that meets your specific requirements.
                   </p>
-                  <button className='mt-4 inline-flex items-center px-6 py-2.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors'>
+                  <button className='mt-4 inline-flex items-center px-6 py-2.5 border border-gray-300 dashboard-body font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors'>
                      Contact Sales
                   </button>
                </div>

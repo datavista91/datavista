@@ -91,10 +91,10 @@ const AnalysisHistory = () => {
    if (history.length === 0) {
       return (
          <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Analysis History</h3>
+            <h3 className='dashboard-heading text-gray-900 mb-4'>Analysis History</h3>
             <div className='text-center py-8'>
                <FileText className='mx-auto h-12 w-12 text-gray-400' />
-               <h3 className='mt-2 text-sm font-medium text-gray-900'>No analysis history</h3>
+               <h3 className='mt-2 dashboard-section-title text-gray-900'>No analysis history</h3>
                <p className='mt-1 text-sm text-gray-500'>Upload and analyze CSV files to see them here.</p>
             </div>
          </div>
@@ -104,7 +104,7 @@ const AnalysisHistory = () => {
    return (
       <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-6'>
          <div className='flex items-center justify-between mb-6'>
-            <h3 className='text-lg font-medium text-gray-900'>Analysis History</h3>
+            <h3 className='dashboard-heading text-gray-900'>Analysis History</h3>
             <button
                onClick={handleClearHistory}
                className='flex items-center space-x-2 px-3 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors'
@@ -127,13 +127,13 @@ const AnalysisHistory = () => {
                            <FileText className='h-5 w-5 text-purple-600' />
                         </div>
                         <div className='flex-1 min-w-0'>
-                           <p className='text-sm font-medium text-gray-900 truncate'>{item.fileName}</p>
+                           <p className='dashboard-body font-medium text-gray-900 truncate'>{item.fileName}</p>
                            <div className='flex items-center space-x-4 mt-1'>
-                              <div className='flex items-center space-x-1 text-xs text-gray-500'>
+                              <div className='flex items-center space-x-1 dashboard-small-text text-gray-500'>
                                  <Calendar className='h-3 w-3' />
                                  <span>{formatDate(item.uploadDate)}</span>
                               </div>
-                              <div className='flex items-center space-x-1 text-xs text-gray-500'>
+                              <div className='flex items-center space-x-1 dashboard-small-text text-gray-500'>
                                  <HardDrive className='h-3 w-3' />
                                  <span>{formatFileSize(item.fileSize)}</span>
                               </div>
@@ -143,7 +143,7 @@ const AnalysisHistory = () => {
                      <div className='flex items-start space-x-2'>
                         <button
                            onClick={() => handleLoadAnalysis(item)}
-                           className='flex-shrink-0 flex items-center space-x-1 pr-2 py-1 rounded text-sm text-green-600 hover:text-green-600 hover:bg-green-100  transition-colors'
+                           className='flex-shrink-0 flex items-center space-x-1 pr-2 py-1 rounded dashboard-body text-green-600 hover:text-green-600 hover:bg-green-100  transition-colors'
                            title={`Load analysis for ${item.fileName}`}
                         >
                            <Play className='h-3 w-3' />

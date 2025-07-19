@@ -127,13 +127,10 @@ const Header = () => {
       <header className='bg-white border-b border-gray-200 shadow-sm'>
          <div className='px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between '>
             <div>
-               <h1
-                  className='text-lg font-bold text-gray-900'
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
-               >
+               <h1 className='dashboard-heading text-gray-900'>
                   {activeSectionHeader.charAt(0).toUpperCase() + activeSectionHeader.slice(1)}
                </h1>
-               <p className='text-gray-600 text-xs'>{activeSectionDescription}</p>
+               <p className='dashboard-small-text text-gray-600'>{activeSectionDescription}</p>
             </div>
 
             {/* {location.pathname.split('/')[1] === 'history' && (
@@ -167,16 +164,16 @@ const Header = () => {
                {showNotificationPanel && (
                   <div className='absolute right-16 top-14 w-96 max-h-[60vh] overflow-y-auto rounded-lg shadow-lg bg-white border border-blue-100 z-20'>
                      <div className='flex justify-between items-center px-4 py-2 border-b bg-blue-50'>
-                        <span className='font-semibold text-blue-700'>Notifications</span>
+                        <span className='dashboard-section-title text-blue-700'>Notifications</span>
                         <button
-                           className='text-xs text-blue-600 hover:underline'
+                           className='dashboard-small-text text-blue-600 hover:underline'
                            onClick={markAllAsRead}
                         >
                            Read All
                         </button>
                      </div>
                      {notifications.length === 0 ? (
-                        <div className='p-4 text-gray-500 text-sm'>No notifications</div>
+                        <div className='p-4 text-gray-500 dashboard-body'>No notifications</div>
                      ) : (
                         notifications.map((n) => (
                            <div
@@ -190,9 +187,9 @@ const Header = () => {
                               }}
                            >
                               <div className='flex-1'>
-                                 <div className='font-medium text-gray-900'>{n.title || 'Notification'}</div>
-                                 <div className='text-gray-600 text-xs'>{n.message || n.content}</div>
-                                 <div className='text-gray-400 text-xs mt-1'>
+                                 <div className='dashboard-section-title text-gray-900'>{n.title || 'Notification'}</div>
+                                 <div className='text-gray-600 dashboard-small-text'>{n.message || n.content}</div>
+                                 <div className='text-gray-400 dashboard-small-text mt-1'>
                                     {n.date
                                        ? new Date(n.date.seconds ? n.date.seconds * 1000 : n.date).toLocaleString()
                                        : ''}
@@ -220,13 +217,13 @@ const Header = () => {
                         onClick={() => setSelectedNotification(null)}
                      ></div>
                      <div className='bg-white rounded-lg shadow-lg p-6 w-full max-w-md border border-blue-200 relative z-10'>
-                        <h2 className='text-lg font-bold text-blue-700 mb-2'>
+                        <h2 className='dashboard-heading text-blue-700 mb-2'>
                            {selectedNotification.title || 'Notification'}
                         </h2>
-                        <p className='text-gray-700 mb-4'>
+                        <p className='dashboard-body text-gray-700 mb-4'>
                            {selectedNotification.message || selectedNotification.content}
                         </p>
-                        <div className='text-xs text-gray-400 mb-4'>
+                        <div className='dashboard-small-text text-gray-400 mb-4'>
                            {selectedNotification.date
                               ? new Date(
                                    selectedNotification.date.seconds
@@ -236,7 +233,7 @@ const Header = () => {
                               : ''}
                         </div>
                         <button
-                           className='px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
+                           className='px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dashboard-body font-medium'
                            onClick={() => setSelectedNotification(null)}
                         >
                            Close
@@ -266,13 +263,13 @@ const Header = () => {
                   {showUserMenu && (
                      <div className='absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10'>
                         <div className='py-1'>
-                           <div className='px-4 py-2 text-sm text-gray-700 border-b border-gray-100'>
-                              <div className='font-medium'>{user?.name}</div>
-                              <div className='text-gray-500 text-xs'>{user?.email}</div>
+                           <div className='px-4 py-2 dashboard-body text-gray-700 border-b border-gray-100'>
+                              <div className='dashboard-section-title'>{user?.name}</div>
+                              <div className='dashboard-small-text text-gray-500'>{user?.email}</div>
 
                               {/* Plan Indicator in Menu */}
                               <div
-                                 className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}
+                                 className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}
                               >
                                  {planInfo.icon}
                                  <span>{planInfo.name} Plan</span>
@@ -280,7 +277,7 @@ const Header = () => {
                            </div>
                            <button
                               onClick={logout}
-                              className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center'
+                              className='w-full text-left px-4 py-2 dashboard-body text-gray-700 hover:bg-gray-100 flex items-center'
                            >
                               <LogOut
                                  size={16}
