@@ -2,6 +2,9 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode 
 import { analysisHistoryService } from '../services/analysisHistoryService'
 import { useAuth } from './AuthContext'
 
+// Flag to skip saving to history when loading from history
+let skipNextSaveToHistory: boolean = false
+
 // History interfaces
 interface AnalysisHistoryItem {
    id: string
@@ -10,8 +13,6 @@ interface AnalysisHistoryItem {
    fileSize: number
    analysisData: any
 }
-
-let skipNextSaveToHistory = false
 
 // LocalStorage utility functions
 const STORAGE_KEY = 'datavista_analysis_history'
@@ -252,6 +253,19 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
    // Load analysis data from history item
    const loadAnalysisData = useCallback((historyItem: AnalysisHistoryItem) => {
       skipNextSaveToHistory = true // Skip next save to history
+      
+      // Debug logging to understand the data structure
+      console.log('🔍 Loading analysis data from history:', {
+         fileName: historyItem.fileName,
+         analysisDataKeys: Object.keys(historyItem.analysisData || {}),
+         summaryKeys: Object.keys(historyItem.analysisData?.summary || {}),
+         statisticsType: typeof historyItem.analysisData?.summary?.statistics,
+         statisticsIsArray: Array.isArray(historyItem.analysisData?.summary?.statistics),
+         statisticsKeys: historyItem.analysisData?.summary?.statistics ? Object.keys(historyItem.analysisData.summary.statistics) : 'N/A',
+         dataQualityType: typeof historyItem.analysisData?.summary?.dataQuality?.missingValues,
+         missingValuesIsArray: Array.isArray(historyItem.analysisData?.summary?.dataQuality?.missingValues)
+      })
+      
       setAnalysisData({
          sample: historyItem.analysisData.sample,
          summary: historyItem.analysisData.summary,

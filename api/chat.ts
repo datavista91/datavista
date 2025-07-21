@@ -69,6 +69,21 @@ class ServerGeminiClient {
 
    private createDataAnalysisPrompt(userMessage: string, analysisData: any): string {
       const overview = analysisData?.summary?.overview
+      
+      // Debug logging to understand the data structure on server
+      console.log('🔍 Server received analysisData:', {
+         hasAnalysisData: !!analysisData,
+         hasSummary: !!analysisData?.summary,
+         summaryKeys: analysisData?.summary ? Object.keys(analysisData.summary) : 'N/A',
+         statisticsType: typeof analysisData?.summary?.statistics,
+         statisticsIsArray: Array.isArray(analysisData?.summary?.statistics),
+         statisticsValue: analysisData?.summary?.statistics,
+         dataQualityType: typeof analysisData?.summary?.dataQuality,
+         missingValuesType: typeof analysisData?.summary?.dataQuality?.missingValues,
+         missingValuesIsArray: Array.isArray(analysisData?.summary?.dataQuality?.missingValues),
+         missingValuesValue: analysisData?.summary?.dataQuality?.missingValues
+      })
+      
       // Defensive: statistics must be a plain object
       const statistics =
          analysisData?.summary?.statistics &&
@@ -388,7 +403,12 @@ Provide a comprehensive and well-formatted response using proper markdown:
       }
 
       // Add key statistics from analysis data
-      const numericColumns = Object.entries(analysisData?.summary?.statistics || {})
+      const safeStatistics = (analysisData?.summary?.statistics && 
+         typeof analysisData.summary.statistics === 'object' && 
+         !Array.isArray(analysisData.summary.statistics))
+         ? analysisData.summary.statistics
+         : {}
+      const numericColumns = Object.entries(safeStatistics)
          .filter(([_, stats]: [string, any]) => stats.type === 'numeric')
          .map(([col, stats]: [string, any]) => ({
             column: col,
