@@ -26,12 +26,12 @@ class ServerGeminiClient {
 
          const prompt = this.createDataAnalysisPrompt(message, analysisData)
 
-         console.log('🚀 Sending request to Gemini from server...')
+         // console.log('🚀 Sending request to Gemini from server...')
 
          const result = await model.generateContent(prompt)
          const response = await result.response
 
-         console.log('✅ Gemini response received on server')
+         // console.log('✅ Gemini response received on server')
 
          // Determine response type based on user message
          const responseType = this.categorizeQuery(message)
@@ -71,18 +71,18 @@ class ServerGeminiClient {
       const overview = analysisData?.summary?.overview
       
       // Debug logging to understand the data structure on server
-      console.log('🔍 Server received analysisData:', {
-         hasAnalysisData: !!analysisData,
-         hasSummary: !!analysisData?.summary,
-         summaryKeys: analysisData?.summary ? Object.keys(analysisData.summary) : 'N/A',
-         statisticsType: typeof analysisData?.summary?.statistics,
-         statisticsIsArray: Array.isArray(analysisData?.summary?.statistics),
-         statisticsValue: analysisData?.summary?.statistics,
-         dataQualityType: typeof analysisData?.summary?.dataQuality,
-         missingValuesType: typeof analysisData?.summary?.dataQuality?.missingValues,
-         missingValuesIsArray: Array.isArray(analysisData?.summary?.dataQuality?.missingValues),
-         missingValuesValue: analysisData?.summary?.dataQuality?.missingValues
-      })
+      // console.log('🔍 Server received analysisData:', {
+      //    hasAnalysisData: !!analysisData,
+      //    hasSummary: !!analysisData?.summary,
+      //    summaryKeys: analysisData?.summary ? Object.keys(analysisData.summary) : 'N/A',
+      //    statisticsType: typeof analysisData?.summary?.statistics,
+      //    statisticsIsArray: Array.isArray(analysisData?.summary?.statistics),
+      //    statisticsValue: analysisData?.summary?.statistics,
+      //    dataQualityType: typeof analysisData?.summary?.dataQuality,
+      //    missingValuesType: typeof analysisData?.summary?.dataQuality?.missingValues,
+      //    missingValuesIsArray: Array.isArray(analysisData?.summary?.dataQuality?.missingValues),
+      //    missingValuesValue: analysisData?.summary?.dataQuality?.missingValues
+      // })
       
       // Defensive: statistics must be a plain object
       const statistics =
@@ -133,13 +133,13 @@ ${
             }, Std Dev: ${stats.stdDev?.toFixed(2)}`
          } else if (stats.type === 'categorical') {
             // Debug the topValues structure
-            console.log(`🔍 Processing ${columnName} topValues:`, {
-               hasTopValues: !!stats.topValues,
-               isArray: Array.isArray(stats.topValues),
-               length: stats.topValues?.length,
-               firstItem: stats.topValues?.[0],
-               topValuesStructure: stats.topValues
-            })
+            // console.log(`🔍 Processing ${columnName} topValues:`, {
+            //    hasTopValues: !!stats.topValues,
+            //    isArray: Array.isArray(stats.topValues),
+            //    length: stats.topValues?.length,
+            //    firstItem: stats.topValues?.[0],
+            //    topValuesStructure: stats.topValues
+            // })
             
             let topValues = 'None'
             if (stats.topValues && Array.isArray(stats.topValues) && stats.topValues.length > 0) {
