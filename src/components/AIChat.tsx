@@ -1,5 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, AlertTriangle, Database, ExternalLink, BarChart3, Presentation, Lightbulb } from 'lucide-react'
+import {
+   Send,
+   Bot,
+   User,
+   Sparkles,
+   AlertTriangle,
+   Database,
+   ExternalLink,
+   BarChart3,
+   Presentation,
+   Lightbulb,
+} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAnalysis } from '../context/AnalysisContext'
@@ -32,7 +43,7 @@ function AIChat() {
          console.error('Failed to initialize Gemini client:', err)
          setError(err.message)
       }
-   }, [])   // Update request count when messages change
+   }, []) // Update request count when messages change
    useEffect(() => {
       // Just for monitoring in dev mode
       if (geminiClient && import.meta.env.DEV) {
@@ -85,7 +96,8 @@ function AIChat() {
       try {
          if (!geminiClient) {
             throw new Error('AI service is not available. Please check your configuration.')
-         }         if (!hasData) {
+         }
+         if (!hasData) {
             const noDataMessage: ChatMessage = {
                id: (Date.now() + 1).toString(),
                type: 'ai',
@@ -109,15 +121,15 @@ Once you have data loaded, feel free to ask questions like:
             addMessage(noDataMessage)
             setIsTyping(false)
             return
-         }         // Call Gemini API with analysis context
+         } // Call Gemini API with analysis context
          const response: GeminiResponse = await geminiClient.generateResponse(userQuery, analysisData)
-         
+
          // Increment usage counter on successful request
          if (user) {
             console.log('🔢 Incrementing AI usage for user:', user.id)
             await userSubscriptionService.incrementAIUsage(user.id)
             console.log('✅ AI usage incremented successfully')
-         }         // Create AI message with enhanced data
+         } // Create AI message with enhanced data
          const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
@@ -125,7 +137,7 @@ Once you have data loaded, feel free to ask questions like:
             timestamp: new Date(),
             responseType: response.responseType,
             actionData: response.actionData,
-            hasAction: response.responseType !== 'general'
+            hasAction: response.responseType !== 'general',
          }
 
          addMessage(aiMessage)
@@ -136,23 +148,24 @@ Once you have data loaded, feel free to ask questions like:
                type: response.responseType,
                title: response.title,
                content: response.message,
-               data: response.actionData
+               data: response.actionData,
             })
          }
       } catch (err: any) {
          console.error('Error getting AI response:', err)
-           const errorMessage: ChatMessage = {
+         const errorMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: `I apologize, but I encountered an error: ${err.message}
 
-${err.message.includes('API key') ? 
-   'Please check that your Gemini API key is properly configured in the .env file.' : 
-   'Please try again or rephrase your question.'
+${
+   err.message.includes('API key')
+      ? 'Please check that your Gemini API key is properly configured in the .env file.'
+      : 'Please try again or rephrase your question.'
 }`,
             timestamp: new Date(),
          }
-         
+
          addMessage(errorMessage)
          setError(err.message)
       } finally {
@@ -160,7 +173,8 @@ ${err.message.includes('API key') ?
       }
    }
 
-   const handleKeyPress = (e: React.KeyboardEvent) => {      if (e.key === 'Enter' && !e.shiftKey) {
+   const handleKeyPress = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
          e.preventDefault()
          handleSendMessage()
       }
@@ -168,7 +182,7 @@ ${err.message.includes('API key') ?
 
    const handleActionClick = (responseType: string, actionData: any) => {
       console.log('Navigating to:', responseType, 'with data:', actionData)
-      
+
       // Navigate to the appropriate tab/page
       switch (responseType) {
          case 'visualization':
@@ -212,7 +226,9 @@ ${err.message.includes('API key') ?
    }
 
    return (
-      <div className='flex flex-col h-[500px] bg-gray-50 rounded-lg overflow-hidden border border-gray-200'>         {/* Header */}
+      <div className='flex flex-col h-[500px] bg-gray-50 rounded-lg overflow-hidden border border-gray-200'>
+         {' '}
+         {/* Header */}
          <div className='bg-white border-b border-gray-200 px-6 py-4'>
             <div className='flex items-center justify-between'>
                <div className='flex items-center space-x-3'>
@@ -222,33 +238,34 @@ ${err.message.includes('API key') ?
                   <div>
                      <h2 className='dashboard-heading text-gray-900'>AI Data Analyst</h2>
                      <p className='dashboard-body text-gray-500'>
-                        {hasData 
-                           ? `Analyzing ${analysisData.fileName || 'your dataset'} (${analysisData.summary?.overview?.totalRows?.toLocaleString()} rows)`
-                           : 'Upload data to start analysis'
-                        }
+                        {hasData
+                           ? `Analyzing ${
+                                analysisData.fileName || 'your dataset'
+                             } (${analysisData.summary?.overview?.totalRows?.toLocaleString()} rows)`
+                           : 'Upload data to start analysis'}
                      </p>
                   </div>
                </div>
-               
+
                {/* Status indicators */}
                <div className='flex items-center space-x-3'>
                   {/* Data status */}
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium ${
-                     hasData 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-600'
-                  }`}>
+                  <div
+                     className={`flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium ${
+                        hasData ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                     }`}
+                  >
                      <Database className='w-3 h-3' />
                      <span>{hasData ? 'Data Ready' : 'No Data'}</span>
                   </div>
-                  
+
                   {/* Request counter for development */}
                   {import.meta.env.DEV && geminiClient && (
                      <div className='flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-blue-100 text-blue-700'>
                         <span>{geminiClient.getRemainingRequests()} requests left</span>
                      </div>
                   )}
-                  
+
                   {/* Error indicator */}
                   {error && (
                      <div className='flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-red-100 text-red-700'>
@@ -257,7 +274,8 @@ ${err.message.includes('API key') ?
                      </div>
                   )}
                </div>
-            </div>                  {/* Development warning */}
+            </div>{' '}
+            {/* Development warning */}
             {import.meta.env.DEV && (
                <div className='mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg'>
                   <div className='flex items-center space-x-2'>
@@ -294,7 +312,8 @@ ${err.message.includes('API key') ?
                         }`}
                      >
                         {message.type === 'user' ? <User className='w-4 h-4' /> : <Bot className='w-4 h-4' />}
-                     </div>                     {/* Message Bubble */}
+                     </div>{' '}
+                     {/* Message Bubble */}
                      <div
                         className={`px-4 py-3 rounded-2xl ${
                            message.type === 'user'
@@ -307,12 +326,12 @@ ${err.message.includes('API key') ?
                         ) : (
                            <MarkdownRenderer content={message.content} />
                         )}
-                        
+
                         {/* Action buttons for AI responses */}
                         {message.hasAction && message.responseType !== 'general' && (
                            <div className='mt-3 pt-3 border-t border-gray-100'>
                               <div className='flex items-center space-x-2'>
-                                 <button 
+                                 <button
                                     onClick={() => handleActionClick(message.responseType!, message.actionData)}
                                     className='flex items-center space-x-2 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg dashboard-small-text font-medium transition-colors'
                                  >
@@ -326,7 +345,7 @@ ${err.message.includes('API key') ?
                               </div>
                            </div>
                         )}
-                        
+
                         <p className={`text-xs mt-2 ${message.type === 'user' ? 'text-purple-100' : 'text-gray-500'}`}>
                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
@@ -363,7 +382,8 @@ ${err.message.includes('API key') ?
                </motion.div>
             )}
             <div ref={messagesEndRef} />
-         </div>{' '}         {/* Input */}
+         </div>{' '}
+         {/* Input */}
          <div className='bg-white border-t border-gray-200 p-4'>
             <div className='flex items-center space-x-3'>
                <div className='flex-1 relative'>
@@ -372,14 +392,10 @@ ${err.message.includes('API key') ?
                      onChange={(e) => setInput(e.target.value)}
                      onKeyPress={handleKeyPress}
                      placeholder={
-                        hasData 
-                           ? 'Ask me about your data...' 
-                           : 'Upload data first to start asking questions...'
+                        hasData ? 'Ask me about your data...' : 'Upload data first to start asking questions...'
                      }
                      className={`w-full px-4 py-3 border rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm ${
-                        hasData 
-                           ? 'border-gray-300' 
-                           : 'border-gray-200 bg-gray-50'
+                        hasData ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                      }`}
                      rows={1}
                      style={{ minHeight: '44px', maxHeight: '120px' }}
@@ -394,7 +410,7 @@ ${err.message.includes('API key') ?
                   <Send className='w-4 h-4' />
                </button>
             </div>
-            
+
             {/* Helper text */}
             {!hasData && (
                <p className='text-xs text-gray-500 mt-2 flex items-center space-x-1'>
@@ -402,11 +418,35 @@ ${err.message.includes('API key') ?
                   <span>Upload a CSV file to start asking questions about your data</span>
                </p>
             )}
-            
+
             {hasData && (
-               <p className='text-xs text-gray-500 mt-2'>
-                  💡 Try asking: "Summarize my data", "What trends do you see?", "Suggest visualizations"
-               </p>
+               <div className='flex flex-wrap gap-2 mt-2'>
+                  <span className='text-xs text-gray-500 mt-1'>Try out:</span>
+                  {[
+                     'Summarize my data',
+                     'What trends do you see?',
+                     'Show visualizations',
+                     'Create presentation',
+                     'Generate report',
+                  ].map((suggestion) => (
+                     <button
+                        key={suggestion}
+                        type='button'
+                        className='px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-medium hover:bg-purple-200 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400'
+                        onClick={() => {
+                           setInput(suggestion)
+                           handleSendMessage()
+                           // setTimeout(() => {
+                           //    // Wait for input to update, then send
+                           //    handleSendMessage()
+                           // }, 0)
+                        }}
+                        disabled={isTyping}
+                     >
+                        {suggestion}
+                     </button>
+                  ))}
+               </div>
             )}
          </div>
       </div>
