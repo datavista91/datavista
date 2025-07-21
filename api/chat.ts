@@ -132,10 +132,36 @@ ${
                stats.max
             }, Std Dev: ${stats.stdDev?.toFixed(2)}`
          } else if (stats.type === 'categorical') {
-            const topValues = stats.topValues
-               ?.slice(0, 3)
-               ?.map(([value, count]: [string, number]) => `${value}(${count})`)
-               .join(', ')
+            // Debug the topValues structure
+            console.log(`🔍 Processing ${columnName} topValues:`, {
+               hasTopValues: !!stats.topValues,
+               isArray: Array.isArray(stats.topValues),
+               length: stats.topValues?.length,
+               firstItem: stats.topValues?.[0],
+               topValuesStructure: stats.topValues
+            })
+            
+            let topValues = 'None'
+            if (stats.topValues && Array.isArray(stats.topValues) && stats.topValues.length > 0) {
+               try {
+                  topValues = stats.topValues
+                     .slice(0, 3)
+                     .map((item: any) => {
+                        // Handle different possible formats of topValues
+                        if (Array.isArray(item) && item.length >= 2) {
+                           return `${item[0]}(${item[1]})`
+                        } else if (typeof item === 'object' && item.value !== undefined && item.count !== undefined) {
+                           return `${item.value}(${item.count})`
+                        } else {
+                           return String(item)
+                        }
+                     })
+                     .join(', ')
+               } catch (error) {
+                  console.warn('Error processing topValues:', error, stats.topValues)
+                  topValues = 'Error processing values'
+               }
+            }
             return `• ${columnName} (Categorical): ${stats.unique} unique values, Top values: ${topValues}`
          } else if (stats.type === 'date') {
             return `• ${columnName} (Date): ${stats.count} entries, Range: ${stats.min} to ${stats.max}`
