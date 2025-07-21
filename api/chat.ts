@@ -42,7 +42,10 @@ class ServerGeminiClient {
             timestamp: Date.now(),
             responseType,
             title,
-            actionData: responseType !== 'general' ? this.extractActionData(response.text(), responseType, analysisData) : undefined
+            actionData:
+               responseType !== 'general'
+                  ? this.extractActionData(response.text(), responseType, analysisData)
+                  : undefined,
          }
       } catch (error: any) {
          console.error('❌ Gemini API Error:', error)
@@ -66,10 +69,23 @@ class ServerGeminiClient {
 
    private createDataAnalysisPrompt(userMessage: string, analysisData: any): string {
       const overview = analysisData?.summary?.overview
-      const statistics = analysisData?.summary?.statistics
-      const dataQuality = analysisData?.summary?.dataQuality
+      // Defensive: statistics must be a plain object
+      const statistics =
+         analysisData?.summary?.statistics &&
+         typeof analysisData.summary.statistics === 'object' &&
+         !Array.isArray(analysisData.summary.statistics)
+            ? analysisData.summary.statistics
+            : {}
+      const dataQuality = analysisData?.summary?.dataQuality || {}
+      // Defensive: missingValues must be a plain object
+      const missingValues =
+         dataQuality.missingValues &&
+         typeof dataQuality.missingValues === 'object' &&
+         !Array.isArray(dataQuality.missingValues)
+            ? dataQuality.missingValues
+            : {}
       const sample = analysisData?.sample
-      
+
       // Determine the response type to customize the prompt
       const responseType = this.categorizeQuery(userMessage)
 
@@ -94,7 +110,7 @@ ${
 
 **Column Statistics:**
 ${
-   Object.entries(statistics || {})
+   Object.entries(statistics)
       .map(([columnName, stats]: [string, any]) => {
          if (stats.type === 'numeric') {
             return `• ${columnName} (Numeric): Mean: ${stats.mean?.toFixed(2)}, Min: ${stats.min}, Max: ${
@@ -116,7 +132,7 @@ ${
 
 **Data Quality:**
 - Missing Values: ${
-         Object.entries(dataQuality?.missingValues || {})
+         Object.entries(missingValues)
             .map(([col, count]) => `${col}: ${count}`)
             .join(', ') || 'None'
       }
@@ -231,66 +247,72 @@ Provide a comprehensive and well-formatted response using proper markdown:
 
    private categorizeQuery(query: string): 'general' | 'visualization' | 'insights' | 'presentation' {
       const lowerQuery = query.toLowerCase()
-      
+
       // Presentation keywords - CHECK FIRST but be more specific
-      if (lowerQuery.includes('presentation') || 
-          lowerQuery.includes('slide') ||
-          lowerQuery.includes('ppt') ||
-          lowerQuery.includes('powerpoint') ||
-          lowerQuery.includes('slideshow') ||
-          (lowerQuery.includes('create') || lowerQuery.includes('make') || lowerQuery.includes('generate')) && 
-          (lowerQuery.includes('presentation') || lowerQuery.includes('slide')) ||
-          lowerQuery.includes('export') && (lowerQuery.includes('presentation') || lowerQuery.includes('slide'))) {
+      if (
+         lowerQuery.includes('presentation') ||
+         lowerQuery.includes('slide') ||
+         lowerQuery.includes('ppt') ||
+         lowerQuery.includes('powerpoint') ||
+         lowerQuery.includes('slideshow') ||
+         ((lowerQuery.includes('create') || lowerQuery.includes('make') || lowerQuery.includes('generate')) &&
+            (lowerQuery.includes('presentation') || lowerQuery.includes('slide'))) ||
+         (lowerQuery.includes('export') && (lowerQuery.includes('presentation') || lowerQuery.includes('slide')))
+      ) {
          return 'presentation'
       }
-      
+
       // Visualization keywords - expanded
-      if (lowerQuery.includes('chart') || 
-          lowerQuery.includes('graph') || 
-          lowerQuery.includes('visualiz') || 
-          lowerQuery.includes('plot') ||
-          lowerQuery.includes('dashboard') ||
-          lowerQuery.includes('show me') && (lowerQuery.includes('data') || lowerQuery.includes('visual')) ||
-          lowerQuery.includes('create') && (lowerQuery.includes('chart') || lowerQuery.includes('graph')) ||
-          lowerQuery.includes('bar chart') ||
-          lowerQuery.includes('pie chart') ||
-          lowerQuery.includes('line chart') ||
-          lowerQuery.includes('scatter') ||
-          lowerQuery.includes('histogram') ||
-          lowerQuery.includes('heatmap')) {
+      if (
+         lowerQuery.includes('chart') ||
+         lowerQuery.includes('graph') ||
+         lowerQuery.includes('visualiz') ||
+         lowerQuery.includes('plot') ||
+         lowerQuery.includes('dashboard') ||
+         (lowerQuery.includes('show me') && (lowerQuery.includes('data') || lowerQuery.includes('visual'))) ||
+         (lowerQuery.includes('create') && (lowerQuery.includes('chart') || lowerQuery.includes('graph'))) ||
+         lowerQuery.includes('bar chart') ||
+         lowerQuery.includes('pie chart') ||
+         lowerQuery.includes('line chart') ||
+         lowerQuery.includes('scatter') ||
+         lowerQuery.includes('histogram') ||
+         lowerQuery.includes('heatmap')
+      ) {
          return 'visualization'
       }
-      
+
       // Insights keywords - expanded (moved after presentation check)
-      if (lowerQuery.includes('insight') || 
-          lowerQuery.includes('summary') || 
-          lowerQuery.includes('overview') ||
-          lowerQuery.includes('analysis') ||
-          lowerQuery.includes('trend') ||
-          lowerQuery.includes('pattern') ||
-          lowerQuery.includes('summarize') ||
-          lowerQuery.includes('analyze') ||
-          lowerQuery.includes('tell me about') ||
-          lowerQuery.includes('what do you see') ||
-          lowerQuery.includes('findings') ||
-          lowerQuery.includes('key points') ||
-          lowerQuery.includes('important') ||
-          lowerQuery.includes('correlation') ||
-          lowerQuery.includes('relationship') ||
-          lowerQuery.includes('report') && !lowerQuery.includes('presentation') ||
-          lowerQuery.includes('recommendations') ||
-          lowerQuery.includes('smart report') ||
-          (lowerQuery.includes('show me') || lowerQuery.includes('give me')) && 
-          (lowerQuery.includes('insight') || lowerQuery.includes('analysis') || lowerQuery.includes('report'))) {
+      if (
+         lowerQuery.includes('insight') ||
+         lowerQuery.includes('summary') ||
+         lowerQuery.includes('overview') ||
+         lowerQuery.includes('analysis') ||
+         lowerQuery.includes('trend') ||
+         lowerQuery.includes('pattern') ||
+         lowerQuery.includes('summarize') ||
+         lowerQuery.includes('analyze') ||
+         lowerQuery.includes('tell me about') ||
+         lowerQuery.includes('what do you see') ||
+         lowerQuery.includes('findings') ||
+         lowerQuery.includes('key points') ||
+         lowerQuery.includes('important') ||
+         lowerQuery.includes('correlation') ||
+         lowerQuery.includes('relationship') ||
+         (lowerQuery.includes('report') && !lowerQuery.includes('presentation')) ||
+         lowerQuery.includes('recommendations') ||
+         lowerQuery.includes('smart report') ||
+         ((lowerQuery.includes('show me') || lowerQuery.includes('give me')) &&
+            (lowerQuery.includes('insight') || lowerQuery.includes('analysis') || lowerQuery.includes('report')))
+      ) {
          return 'insights'
       }
-      
+
       return 'general'
    }
 
    private generateTitle(query: string, type: string): string {
       const truncatedQuery = query.length > 50 ? query.substring(0, 50) + '...' : query
-      
+
       switch (type) {
          case 'visualization':
             return `Data Visualization: ${truncatedQuery}`
@@ -321,17 +343,17 @@ Provide a comprehensive and well-formatted response using proper markdown:
          case 'visualization':
             return {
                suggestedCharts: this.extractChartSuggestions(response),
-               dataColumns: analysisData?.summary?.overview?.columns || []
+               dataColumns: analysisData?.summary?.overview?.columns || [],
             }
          case 'insights':
             return {
                keyMetrics: this.extractKeyMetrics(response, analysisData),
-               recommendations: this.extractRecommendations(response)
+               recommendations: this.extractRecommendations(response),
             }
          case 'presentation':
             return {
                sections: this.extractPresentationSections(response),
-               keyPoints: this.extractKeyPoints(response)
+               keyPoints: this.extractKeyPoints(response),
             }
          default:
             return null
@@ -340,25 +362,31 @@ Provide a comprehensive and well-formatted response using proper markdown:
 
    private extractChartSuggestions(response: string): string[] {
       const chartTypes = ['bar', 'line', 'pie', 'scatter', 'histogram', 'heatmap', 'area']
-      return chartTypes.filter(type => 
-         response.toLowerCase().includes(type + ' chart') || 
-         response.toLowerCase().includes(type + ' graph')
+      return chartTypes.filter(
+         (type) => response.toLowerCase().includes(type + ' chart') || response.toLowerCase().includes(type + ' graph')
       )
    }
 
    private extractKeyMetrics(response: string, analysisData: any): any[] {
       // Extract numerical insights from response and analysis data
       const metrics: any[] = []
-      
+
       // Add metrics mentioned in the response
       const lines = response.split('\n')
       for (const line of lines) {
-         if (line.includes('%') || line.includes('average') || line.includes('total') || 
-             line.includes('mean') || line.includes('median') || line.includes('max') || line.includes('min')) {
+         if (
+            line.includes('%') ||
+            line.includes('average') ||
+            line.includes('total') ||
+            line.includes('mean') ||
+            line.includes('median') ||
+            line.includes('max') ||
+            line.includes('min')
+         ) {
             metrics.push({ text: line.trim(), source: 'ai_response' })
          }
       }
-      
+
       // Add key statistics from analysis data
       const numericColumns = Object.entries(analysisData?.summary?.statistics || {})
          .filter(([_, stats]: [string, any]) => stats.type === 'numeric')
@@ -367,12 +395,12 @@ Provide a comprehensive and well-formatted response using proper markdown:
             mean: stats.mean,
             max: stats.max,
             min: stats.min,
-            source: 'data_analysis'
+            source: 'data_analysis',
          }))
-      
+
       // Combine both sources
       metrics.push(...numericColumns)
-      
+
       return metrics.slice(0, 6) // Top 6 metrics
    }
 
@@ -380,28 +408,27 @@ Provide a comprehensive and well-formatted response using proper markdown:
       // Extract recommendation sentences from response
       const sentences = response.split(/[.!?]+/)
       return sentences
-         .filter(sentence => 
-            sentence.toLowerCase().includes('recommend') ||
-            sentence.toLowerCase().includes('suggest') ||
-            sentence.toLowerCase().includes('should')
+         .filter(
+            (sentence) =>
+               sentence.toLowerCase().includes('recommend') ||
+               sentence.toLowerCase().includes('suggest') ||
+               sentence.toLowerCase().includes('should')
          )
-         .map(sentence => sentence.trim())
-         .filter(sentence => sentence.length > 10)
+         .map((sentence) => sentence.trim())
+         .filter((sentence) => sentence.length > 10)
          .slice(0, 3)
    }
 
    private extractPresentationSections(response: string): string[] {
       // Extract main sections/headers from response
       const sections = response.match(/#+\s+(.+)/g) || []
-      return sections.map(section => section.replace(/#+\s+/, '').trim())
+      return sections.map((section) => section.replace(/#+\s+/, '').trim())
    }
 
    private extractKeyPoints(response: string): string[] {
       // Extract bullet points or key insights
       const bullets = response.match(/[•\-*]\s+(.+)/g) || []
-      return bullets
-         .map(bullet => bullet.replace(/[•\-*]\s+/, '').trim())
-         .slice(0, 5)
+      return bullets.map((bullet) => bullet.replace(/[•\-*]\s+/, '').trim()).slice(0, 5)
    }
 }
 
@@ -424,9 +451,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(200).json(response)
    } catch (error: any) {
       console.error('Chat API Error:', error)
-      res.status(500).json({ 
+      res.status(500).json({
          error: error.message || 'Internal server error',
-         details: error.stack 
+         details: error.stack,
       })
    }
 }

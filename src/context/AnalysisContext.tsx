@@ -11,6 +11,8 @@ interface AnalysisHistoryItem {
    analysisData: any
 }
 
+let skipNextSaveToHistory = false
+
 // LocalStorage utility functions
 const STORAGE_KEY = 'datavista_analysis_history'
 
@@ -21,16 +23,20 @@ const saveAnalysisToHistory = async (historyItem: AnalysisHistoryItem, userId?: 
       const updatedHistory = [historyItem, ...existingHistory.slice(0, 9)] // Keep only 10 most recent
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
       console.log('Analysis saved to local storage successfully')
-      
+
       // Try to save to Firebase if user is authenticated
       if (userId) {
          try {
-            await analysisHistoryService.saveAnalysisToFirebase(userId, {
-               fileName: historyItem.fileName,
-               uploadDate: historyItem.uploadDate,
-               fileSize: historyItem.fileSize,
-               analysisData: historyItem.analysisData,
-            }, userEmail)
+            await analysisHistoryService.saveAnalysisToFirebase(
+               userId,
+               {
+                  fileName: historyItem.fileName,
+                  uploadDate: historyItem.uploadDate,
+                  fileSize: historyItem.fileSize,
+                  analysisData: historyItem.analysisData,
+               },
+               userEmail
+            )
             console.log('Analysis saved to Firebase successfully')
          } catch (firebaseError) {
             console.warn('Failed to save to Firebase, but local storage succeeded:', firebaseError)
@@ -57,7 +63,7 @@ const clearAnalysisHistory = async (userId?: string) => {
       // Always clear localStorage first
       localStorage.removeItem(STORAGE_KEY)
       console.log('Local storage cleared successfully')
-      
+
       // Try to clear Firebase if user is authenticated
       if (userId) {
          try {
@@ -77,10 +83,10 @@ const deleteAnalysisItem = async (id: string, userId?: string) => {
    try {
       // Always delete from localStorage first
       const existingHistory = getAnalysisHistory()
-      const updatedHistory = existingHistory.filter(item => item.id !== id)
+      const updatedHistory = existingHistory.filter((item) => item.id !== id)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
       console.log('Analysis deleted from local storage successfully')
-      
+
       // Try to delete from Firebase if user is authenticated
       if (userId) {
          try {
@@ -110,20 +116,24 @@ const syncFirebaseToLocal = async (userId: string) => {
 }
 
 // Helper function to merge local and Firebase histories without duplicates
-const mergeHistories = (localHistory: AnalysisHistoryItem[], firebaseHistory: AnalysisHistoryItem[]): AnalysisHistoryItem[] => {
+const mergeHistories = (
+   localHistory: AnalysisHistoryItem[],
+   firebaseHistory: AnalysisHistoryItem[]
+): AnalysisHistoryItem[] => {
    const merged = [...firebaseHistory]
-   
+
    // Add local items that aren't in Firebase (by fileName and uploadDate)
-   localHistory.forEach(localItem => {
-      const exists = firebaseHistory.some(fbItem => 
-         fbItem.fileName === localItem.fileName && 
-         Math.abs(new Date(fbItem.uploadDate).getTime() - new Date(localItem.uploadDate).getTime()) < 1000
+   localHistory.forEach((localItem) => {
+      const exists = firebaseHistory.some(
+         (fbItem) =>
+            fbItem.fileName === localItem.fileName &&
+            Math.abs(new Date(fbItem.uploadDate).getTime() - new Date(localItem.uploadDate).getTime()) < 1000
       )
       if (!exists) {
          merged.push(localItem)
       }
    })
-   
+
    // Sort by upload date (most recent first)
    return merged.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
 }
@@ -241,6 +251,7 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
 
    // Load analysis data from history item
    const loadAnalysisData = useCallback((historyItem: AnalysisHistoryItem) => {
+      skipNextSaveToHistory = true // Skip next save to history
       setAnalysisData({
          sample: historyItem.analysisData.sample,
          summary: historyItem.analysisData.summary,
@@ -336,6 +347,10 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
 
    // Save analysis to history when analysis is complete
    useEffect(() => {
+      if (skipNextSaveToHistory) {
+         skipNextSaveToHistory = false
+         return
+      }
       if (analysisData.summary && !analysisData.isProcessing && analysisData.fileName && analysisData.fileSize > 0) {
          console.log('Saving analysis to history...')
          const historyItem: AnalysisHistoryItem = {
@@ -358,7 +373,11 @@ export const AnalysisProvider = ({ children }: { children: ReactNode }) => {
       }
    }, [user?.id, syncWithFirebase])
 
-   return <AnalysisContext.Provider value={{ analysisData, analyzeData, loadAnalysisData, syncWithFirebase }}>{children}</AnalysisContext.Provider>
+   return (
+      <AnalysisContext.Provider value={{ analysisData, analyzeData, loadAnalysisData, syncWithFirebase }}>
+         {children}
+      </AnalysisContext.Provider>
+   )
 }
 
 // Export utility functions for use in other components

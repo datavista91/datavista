@@ -75,7 +75,7 @@ const AnalysisHistory = () => {
    const handleLoadAnalysis = (historyItem: AnalysisHistoryItem) => {
       // Load the analysis data into the context
       loadAnalysisData(historyItem)
-
+      console.log('Loading analysis data:', historyItem.analysisData)
       // Set the data for chat functionality
       setData(historyItem.analysisData.sample)
 
