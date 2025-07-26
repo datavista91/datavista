@@ -32,7 +32,36 @@ const PaymentSuccess = () => {
             }
 
             // Try to get payment ID from URL parameter or search params
-            const paymentIdToVerify = paymentId || searchParams.get('payment_id') || searchParams.get('paymentId')
+            const paymentIdToVerify = paymentId || 
+                                    searchParams.get('payment_id') || 
+                                    searchParams.get('paymentId') ||
+                                    searchParams.get('transaction_id') ||
+                                    searchParams.get('transactionId') ||
+                                    searchParams.get('order_id') ||
+                                    searchParams.get('orderId') ||
+                                    searchParams.get('id')
+            
+            console.log('🔍 PaymentSuccess debugging:', {
+               urlPaymentId: paymentId,
+               searchParams: Object.fromEntries(searchParams.entries()),
+               finalPaymentId: paymentIdToVerify,
+               currentUrl: window.location.href,
+               allPossibleIds: {
+                  payment_id: searchParams.get('payment_id'),
+                  paymentId: searchParams.get('paymentId'),
+                  transaction_id: searchParams.get('transaction_id'),
+                  transactionId: searchParams.get('transactionId'),
+                  order_id: searchParams.get('order_id'),
+                  orderId: searchParams.get('orderId'),
+                  id: searchParams.get('id'),
+               },
+               possibleStatus: {
+                  status: searchParams.get('status'),
+                  payment_status: searchParams.get('payment_status'),
+                  success: searchParams.get('success'),
+                  result: searchParams.get('result'),
+               }
+            })
             
             if (!paymentIdToVerify) {
                // Fallback to localStorage for backward compatibility
@@ -53,6 +82,33 @@ const PaymentSuccess = () => {
                }
                
                console.log('❌ No payment ID found in URL or localStorage')
+               console.log('🔄 Attempting to verify most recent payment for user...')
+               
+               // Try to verify the most recent payment for this user
+               try {
+                  const response = await fetch('/api/verify-recent-payment', {
+                     method: 'POST',
+                     headers: {
+                        'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify({
+                        userId: user.id
+                     })
+                  })
+                  
+                  const result = await response.json()
+                  
+                  if (response.ok && result.success) {
+                     console.log('✅ Found recent payment:', result.payment)
+                     setPaymentDetails(result.payment)
+                     setPaymentStatus('success')
+                     localStorage.removeItem('dodo_payment_attempt')
+                     return
+                  }
+               } catch (recentPaymentError) {
+                  console.log('❌ Could not verify recent payment:', recentPaymentError)
+               }
+               
                setErrorMessage('Payment ID not found. Please check your payment confirmation email or contact support.')
                setPaymentStatus('failed')
                return

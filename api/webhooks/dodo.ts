@@ -248,7 +248,7 @@ async function handlePaymentSuccess(paymentData: any) {
    try {
       console.log('✅ Processing successful payment:', JSON.stringify(paymentData, null, 2))
 
-      const { metadata, total_amount, payment_id, currency } = paymentData
+      const { metadata, total_amount, payment_id, currency, email } = paymentData
 
       if (!metadata) {
          throw new Error('Missing payment metadata')
@@ -267,6 +267,7 @@ async function handlePaymentSuccess(paymentData: any) {
          amount: total_amount,
          currency: currency || 'USD',
          paymentId: payment_id,
+         email: email || 'unknown',
       })
 
       // Get current timestamp in Indian time
@@ -379,6 +380,7 @@ async function handlePaymentSuccess(paymentData: any) {
       const globalPaymentData = {
          paymentId: payment_id,
          userId: userId,
+         userEmail: email || 'unknown', // Use email from payment data
          amount: total_amount,
          currency: currency || 'USD',
          planType: planType,

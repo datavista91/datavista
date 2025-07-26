@@ -22,15 +22,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { paymentId, userId } = req.body
 
+    console.log('🔍 Payment verification request:', { paymentId, userId })
+
     if (!paymentId || !userId) {
+      console.log('❌ Missing required parameters:', { paymentId: !!paymentId, userId: !!userId })
       return res.status(400).json({ error: 'Payment ID and User ID are required' })
     }
 
     // Check if this payment exists in our database (from webhook)
+    console.log('🔎 Checking payment in Firestore:', paymentId)
     const paymentRef = db.collection('payments').doc(paymentId)
     const paymentDoc = await paymentRef.get()
 
     if (!paymentDoc.exists) {
+      console.log('❌ Payment not found in Firestore:', paymentId)
+      
+      // Let's also check if there are any payments for this user
+      const userPaymentsQuery = await db.collection('payments')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(5)
+        .get()
+      
+      console.log('🔍 Recent payments for user:', userId, 'Count:', userPaymentsQuery.size)
+      userPaymentsQuery.forEach(doc => {
+        console.log('📄 Payment doc:', doc.id, doc.data())
+      })
+      
       return res.status(404).json({ error: 'Payment not found' })
     }
 
