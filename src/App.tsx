@@ -98,7 +98,7 @@ export function App() {
                         element={<GoogleSignInPage />}
                      />
                      <Route
-                        path='/payment-success'
+                        path='/payment-success/:paymentId?'
                         element={<PaymentSuccess />}
                      />
                      <Route

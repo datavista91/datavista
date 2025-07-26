@@ -374,6 +374,25 @@ async function handlePaymentSuccess(paymentData: any) {
       await paymentHistoryRef.set(paymentHistoryData)
       console.log('✅ Payment history recorded in Firestore')
 
+      // Also store in global payments collection for verification
+      const globalPaymentRef = db.collection('payments').doc(payment_id)
+      const globalPaymentData = {
+         paymentId: payment_id,
+         userId: userId,
+         amount: total_amount,
+         currency: currency || 'USD',
+         planType: planType,
+         basePlan: basePlanType,
+         billing: isAnnualPlan ? 'annual' : 'monthly',
+         status: 'paid',
+         timestamp: new Date().toISOString(),
+         provider: 'dodo',
+         metadata: metadata,
+      }
+      
+      await globalPaymentRef.set(globalPaymentData)
+      console.log('✅ Global payment record created for verification')
+
       console.log('🎉 Payment processing completed successfully:', {
          userId,
          planType,
