@@ -34,41 +34,107 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('🔎 Checking for payments after:', tenMinutesAgo)
     
-    const recentPaymentsQuery = await db.collection('payments')
-      .where('userId', '==', userId)
-      .where('status', '==', 'paid')
-      .where('timestamp', '>=', tenMinutesAgo)
-      .orderBy('timestamp', 'desc')
-      .limit(1)
-      .get()
+    try {
+      const recentPaymentsQuery = await db.collection('payments')
+        .where('userId', '==', userId)
+        .where('status', '==', 'paid')
+        .where('timestamp', '>=', tenMinutesAgo)
+        .orderBy('timestamp', 'desc')
+        .limit(1)
+        .get()
 
-    if (recentPaymentsQuery.empty) {
-      console.log('❌ No recent payments found for user:', userId)
-      return res.status(404).json({ 
-        error: 'No recent payments found',
-        debug: {
-          userId,
-          searchAfter: tenMinutesAgo,
-          currentTime: new Date().toISOString()
+      if (recentPaymentsQuery.empty) {
+        console.log('❌ No recent payments found, trying without timestamp filter...')
+        
+        // Try without timestamp filter - get most recent payment for user
+        const anyRecentPaymentQuery = await db.collection('payments')
+          .where('userId', '==', userId)
+          .where('status', '==', 'paid')
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get()
+          
+        if (anyRecentPaymentQuery.empty) {
+          console.log('❌ No payments found for user:', userId)
+          return res.status(404).json({ 
+            error: 'No payments found',
+            debug: {
+              userId,
+              searchAfter: tenMinutesAgo,
+              currentTime: new Date().toISOString()
+            }
+          })
+        }
+        
+        const paymentDoc = anyRecentPaymentQuery.docs[0]
+        const paymentData = paymentDoc.data()
+        
+        console.log('✅ Found payment (any time):', paymentDoc.id, paymentData)
+        
+        return res.status(200).json({
+          success: true,
+          payment: {
+            id: paymentDoc.id,
+            status: paymentData.status,
+            planType: paymentData.planType,
+            amount: paymentData.amount || 0,
+            timestamp: paymentData.timestamp,
+          }
+        })
+      }
+
+      const paymentDoc = recentPaymentsQuery.docs[0]
+      const paymentData = paymentDoc.data()
+
+      console.log('✅ Found recent payment:', paymentDoc.id, paymentData)
+
+      return res.status(200).json({
+        success: true,
+        payment: {
+          id: paymentDoc.id,
+          status: paymentData.status,
+          planType: paymentData.planType,
+          amount: paymentData.amount || 0,
+          timestamp: paymentData.timestamp,
         }
       })
-    }
-
-    const paymentDoc = recentPaymentsQuery.docs[0]
-    const paymentData = paymentDoc.data()
-
-    console.log('✅ Found recent payment:', paymentDoc.id, paymentData)
-
-    return res.status(200).json({
-      success: true,
-      payment: {
-        id: paymentDoc.id,
-        status: paymentData.status,
-        planType: paymentData.planType,
-        amount: paymentData.amount || 0,
-        timestamp: paymentData.timestamp,
+    } catch (firestoreError) {
+      console.error('❌ Firestore query error:', firestoreError)
+      
+      // Fallback: try simpler query without timestamp filtering
+      try {
+        const simpleQuery = await db.collection('payments')
+          .where('userId', '==', userId)
+          .orderBy('timestamp', 'desc')
+          .limit(1)
+          .get()
+          
+        if (!simpleQuery.empty) {
+          const paymentDoc = simpleQuery.docs[0]
+          const paymentData = paymentDoc.data()
+          
+          console.log('✅ Found payment with simple query:', paymentDoc.id)
+          
+          return res.status(200).json({
+            success: true,
+            payment: {
+              id: paymentDoc.id,
+              status: paymentData.status,
+              planType: paymentData.planType,
+              amount: paymentData.amount || 0,
+              timestamp: paymentData.timestamp,
+            }
+          })
+        }
+      } catch (simpleError) {
+        console.error('❌ Simple query also failed:', simpleError)
       }
-    })
+      
+      return res.status(404).json({ 
+        error: 'Database query failed',
+        debug: { userId, error: firestoreError.message }
+      })
+    }
 
   } catch (error) {
     console.error('❌ Recent payment verification error:', error)

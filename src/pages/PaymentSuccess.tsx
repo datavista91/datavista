@@ -64,27 +64,10 @@ const PaymentSuccess = () => {
             })
             
             if (!paymentIdToVerify) {
-               // Fallback to localStorage for backward compatibility
-               const storedAttempt = localStorage.getItem('dodo_payment_attempt')
-               if (storedAttempt) {
-                  const paymentAttempt = JSON.parse(storedAttempt)
-                  console.log('⚠️ No payment ID in URL, using localStorage fallback')
-                  setPaymentDetails({
-                     id: 'unknown',
-                     status: 'success',
-                     planType: paymentAttempt.planType,
-                     amount: 0,
-                     timestamp: paymentAttempt.timestamp
-                  })
-                  setPaymentStatus('success')
-                  localStorage.removeItem('dodo_payment_attempt')
-                  return
-               }
-               
                console.log('❌ No payment ID found in URL or localStorage')
                console.log('🔄 Attempting to verify most recent payment for user...')
                
-               // Try to verify the most recent payment for this user
+               // Try to verify the most recent payment for this user first
                try {
                   const response = await fetch('/api/verify-recent-payment', {
                      method: 'POST',
@@ -104,12 +87,31 @@ const PaymentSuccess = () => {
                      setPaymentStatus('success')
                      localStorage.removeItem('dodo_payment_attempt')
                      return
+                  } else {
+                     console.log('❌ No recent payment found:', result)
                   }
                } catch (recentPaymentError) {
                   console.log('❌ Could not verify recent payment:', recentPaymentError)
                }
                
-               setErrorMessage('Payment ID not found. Please check your payment confirmation email or contact support.')
+               // Fallback to localStorage for backward compatibility
+               const storedAttempt = localStorage.getItem('dodo_payment_attempt')
+               if (storedAttempt) {
+                  const paymentAttempt = JSON.parse(storedAttempt)
+                  console.log('⚠️ Using localStorage fallback')
+                  setPaymentDetails({
+                     id: 'unknown',
+                     status: 'success',
+                     planType: paymentAttempt.planType,
+                     amount: 0,
+                     timestamp: paymentAttempt.timestamp
+                  })
+                  setPaymentStatus('success')
+                  localStorage.removeItem('dodo_payment_attempt')
+                  return
+               }
+               
+               setErrorMessage('Payment verification failed. If your payment was successful, please check your email for confirmation.')
                setPaymentStatus('failed')
                return
             }
