@@ -2,7 +2,7 @@ import { auth } from '../firebase'
 
 class DodoPaymentsService {
    constructor() {
-      this.baseUrl = 'https://test.checkout.dodopayments.com'
+      this.baseUrl = 'https://checkout.dodopayments.com'
       this.productIds = {
          pro: import.meta.env.VITE_DODO_PRO_PRODUCT_ID,
          'pro-annual': import.meta.env.VITE_DODO_PRO_PRODUCT_ID_ANNUALLY,
@@ -26,12 +26,16 @@ class DodoPaymentsService {
          throw new Error(`Product ID not found for plan: ${planType}`)
       }
 
+      // Determine billing period from plan type
+      const billingPeriod = this.isAnnualPlan(planType) ? 'annual' : 'monthly'
+
       const params = new URLSearchParams({
          quantity: '1',
          redirect_url: this.redirectUrl,
          email: userEmail,
          metadata_userId: userId,
          metadata_planType: planType,
+         metadata_billingPeriod: billingPeriod,
          metadata_timestamp: new Date().toISOString(),
       })
 

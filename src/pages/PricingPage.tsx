@@ -3,6 +3,8 @@ import { Check, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+// @ts-ignore
+import dodoPaymentsService from '../services/dodoPaymentsService'
 
 const plans = [
    {
@@ -97,39 +99,33 @@ const PricingPage = () => {
       try {
          if (planId === 'pro' || planId === 'enterprise') {
             // Determine the product ID based on billing period
-            let productId: string;
-            let actualPlanType: string;
-            
+            let productId: string
+            let actualPlanType: string
+
             if (billingPeriod === 'annual') {
-               productId = planId === 'pro'
-                  ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID_ANNUALLY
-                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID_ANNUALLY;
-               actualPlanType = `${planId}-annual`;
+               productId =
+                  planId === 'pro'
+                     ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID_ANNUALLY
+                     : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID_ANNUALLY
+               actualPlanType = `${planId}-annual`
             } else {
-               productId = planId === 'pro'
-                  ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID
-                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID;
-               actualPlanType = planId;
+               productId =
+                  planId === 'pro'
+                     ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID
+                     : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID
+               actualPlanType = planId
             }
 
             if (!productId) {
                throw new Error(`Product ID not configured for ${planId} plan (${billingPeriod})`)
             }
 
-            const baseUrl = 'https://test.checkout.dodopayments.com'
-            const redirectUrl = `${window.location.origin}/payment-success`
-
-            const params = new URLSearchParams({
-               quantity: '1',
-               redirect_url: redirectUrl,
-               email: user.email || '',
-               metadata_userId: user.id,
-               metadata_planType: actualPlanType,
-               metadata_billingPeriod: billingPeriod,
-               metadata_timestamp: new Date().toISOString(),
-            })
-
-            const paymentUrl = `${baseUrl}/buy/${productId}?${params.toString()}`
+            // Use the centralized payment service to generate the payment URL
+            const paymentUrl = dodoPaymentsService.generatePaymentLink(
+               actualPlanType,
+               user.email || '',
+               user.id
+            )
 
             // Store payment attempt
             const paymentAttempt = {
