@@ -24,6 +24,9 @@ const PaymentSuccess = () => {
    useEffect(() => {
       const verifyPayment = async () => {
          try {
+            console.log('🚀 PaymentSuccess: Starting verification process')
+            console.log('🔍 User object:', user)
+            
             // If no user is logged in, redirect to login
             if (!user) {
                console.log('⚠️ No user logged in, redirecting to login')
@@ -69,6 +72,7 @@ const PaymentSuccess = () => {
                
                // Try to verify the most recent payment for this user first
                try {
+                  console.log('📞 Calling /api/verify-recent-payment with userId:', user.id)
                   const response = await fetch('/api/verify-recent-payment', {
                      method: 'POST',
                      headers: {
@@ -79,7 +83,9 @@ const PaymentSuccess = () => {
                      })
                   })
                   
+                  console.log('📞 Response status:', response.status)
                   const result = await response.json()
+                  console.log('📞 Response result:', result)
                   
                   if (response.ok && result.success) {
                      console.log('✅ Found recent payment:', result.payment)
@@ -95,7 +101,10 @@ const PaymentSuccess = () => {
                }
                
                // Fallback to localStorage for backward compatibility
+               console.log('🔍 Checking localStorage for dodo_payment_attempt...')
                const storedAttempt = localStorage.getItem('dodo_payment_attempt')
+               console.log('🔍 Stored attempt:', storedAttempt)
+               
                if (storedAttempt) {
                   const paymentAttempt = JSON.parse(storedAttempt)
                   console.log('⚠️ Using localStorage fallback')
@@ -111,6 +120,7 @@ const PaymentSuccess = () => {
                   return
                }
                
+               console.log('❌ All verification methods failed')
                setErrorMessage('Payment verification failed. If your payment was successful, please check your email for confirmation.')
                setPaymentStatus('failed')
                return
@@ -119,29 +129,38 @@ const PaymentSuccess = () => {
             console.log('🔍 Verifying payment:', paymentIdToVerify)
 
             // Call our verification API
-            const response = await fetch('/api/verify-payment', {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json',
-               },
-               body: JSON.stringify({
-                  paymentId: paymentIdToVerify,
-                  userId: user.id
+            try {
+               console.log('📞 Calling /api/verify-payment with:', { paymentId: paymentIdToVerify, userId: user.id })
+               const response = await fetch('/api/verify-payment', {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                     paymentId: paymentIdToVerify,
+                     userId: user.id
+                  })
                })
-            })
 
-            const result = await response.json()
+               console.log('📞 verify-payment Response status:', response.status)
+               const result = await response.json()
+               console.log('📞 verify-payment Response result:', result)
 
-            if (response.ok && result.success) {
-               console.log('✅ Payment verified successfully:', result.payment)
-               setPaymentDetails(result.payment)
-               setPaymentStatus('success')
-               
-               // Clear any old localStorage data
-               localStorage.removeItem('dodo_payment_attempt')
-            } else {
-               console.log('❌ Payment verification failed:', result)
-               setErrorMessage(result.error || 'Payment verification failed')
+               if (response.ok && result.success) {
+                  console.log('✅ Payment verified successfully:', result.payment)
+                  setPaymentDetails(result.payment)
+                  setPaymentStatus('success')
+                  
+                  // Clear any old localStorage data
+                  localStorage.removeItem('dodo_payment_attempt')
+               } else {
+                  console.log('❌ Payment verification failed:', result)
+                  setErrorMessage(result.error || 'Payment verification failed')
+                  setPaymentStatus('failed')
+               }
+            } catch (apiError) {
+               console.error('❌ API call error:', apiError)
+               setErrorMessage('Failed to verify payment. Please try again.')
                setPaymentStatus('failed')
             }
             
@@ -160,6 +179,44 @@ const PaymentSuccess = () => {
          navigate('/dashboard')
       } else {
          navigate('/pricing')
+      }
+   }
+
+   // Debug function to manually test recent payment verification
+   const testRecentPayment = async () => {
+      console.log('🧪 Manual test: Recent payment verification')
+      console.log('🔍 Current user:', user)
+      
+      if (!user) {
+         console.log('❌ No user for manual test')
+         return
+      }
+      
+      try {
+         console.log('📞 Manual API call to /api/verify-recent-payment')
+         const response = await fetch('/api/verify-recent-payment', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+               userId: user.id
+            })
+         })
+         
+         console.log('📞 Manual test response status:', response.status)
+         const result = await response.json()
+         console.log('📞 Manual test response result:', result)
+         
+         if (response.ok && result.success) {
+            console.log('✅ Manual test SUCCESS:', result.payment)
+            setPaymentDetails(result.payment)
+            setPaymentStatus('success')
+         } else {
+            console.log('❌ Manual test FAILED:', result)
+         }
+      } catch (error) {
+         console.error('❌ Manual test ERROR:', error)
       }
    }
 
@@ -280,6 +337,14 @@ const PaymentSuccess = () => {
                      className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                   >
                      Try Again
+                  </button>
+                  
+                  {/* Debug button - remove in production */}
+                  <button
+                     onClick={testRecentPayment}
+                     className="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                  >
+                     🧪 Debug: Test Recent Payment
                   </button>
                </motion.div>
             )
