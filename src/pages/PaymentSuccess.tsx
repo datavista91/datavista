@@ -84,7 +84,9 @@ const PaymentSuccess = () => {
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
                   <p className="text-gray-600 mb-4">
-                     Thank you for upgrading to <span className="font-semibold capitalize">{paymentDetails?.planType}</span> plan.
+                     Thank you for upgrading to <span className="font-semibold capitalize">
+                        {paymentDetails?.planType?.replace('-annual', '') || 'Pro'}</span> plan
+                     {paymentDetails?.planType?.includes('-annual') && <span className="text-green-600"> (Annual)</span>}.
                   </p>
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                      <h3 className="font-semibold text-green-800 mb-2">What's Next?</h3>

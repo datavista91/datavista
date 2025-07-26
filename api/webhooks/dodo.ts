@@ -281,9 +281,20 @@ async function handlePaymentSuccess(paymentData: any) {
          hour12: false,
       })
 
-      // Calculate subscription expiry (30 days from now)
+      // Calculate subscription expiry based on plan type
       const expiryDate = new Date()
-      expiryDate.setDate(expiryDate.getDate() + 30)
+      const isAnnualPlan = planType.includes('-annual')
+      
+      if (isAnnualPlan) {
+         // Annual subscription: 365 days
+         expiryDate.setDate(expiryDate.getDate() + 365)
+      } else {
+         // Monthly subscription: 30 days
+         expiryDate.setDate(expiryDate.getDate() + 30)
+      }
+
+      // Extract base plan type for features (remove -annual suffix if present)
+      const basePlanType = planType.replace('-annual', '')
 
       // Define plan features
       const planFeatures: any = {
@@ -315,11 +326,13 @@ async function handlePaymentSuccess(paymentData: any) {
       
       const subscriptionData = {
          subscription: {
-            plan: planType,
+            plan: basePlanType, // Store base plan type (pro/enterprise)
+            planType: planType, // Store full plan type (pro-annual/enterprise-annual)
+            billing: isAnnualPlan ? 'annual' : 'monthly',
             status: 'active',
             startDate: new Date().toISOString(),
             expiryDate: expiryDate.toISOString(),
-            features: planFeatures[planType] || {},
+            features: planFeatures[basePlanType] || {},
             lastUpdated: new Date().toISOString(),
          },
          // Reset usage limits
@@ -343,7 +356,9 @@ async function handlePaymentSuccess(paymentData: any) {
          paymentId: payment_id,
          amount: total_amount,
          currency: currency || 'USD',
-         planType,
+         planType: planType, // Store full plan type
+         basePlan: basePlanType, // Store base plan type
+         billing: isAnnualPlan ? 'annual' : 'monthly',
          status: 'completed',
          timestamp: new Date().toISOString(),
          indianTime: indianTime,
@@ -362,6 +377,8 @@ async function handlePaymentSuccess(paymentData: any) {
       console.log('🎉 Payment processing completed successfully:', {
          userId,
          planType,
+         basePlanType,
+         billing: isAnnualPlan ? 'annual' : 'monthly',
          paymentId: payment_id,
          amount: total_amount,
          indianTime,

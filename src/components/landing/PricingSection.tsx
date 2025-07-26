@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const plans = [
   {
+    id: 'free',
     name: 'Free',
     price: '0',
     description: 'Perfect for trying out DataVista',
@@ -19,6 +20,7 @@ const plans = [
     color: 'gray'
   },
   {
+    id: 'pro',
     name: 'Pro',
     price: '49',
     description: 'For professionals and small teams',
@@ -35,6 +37,7 @@ const plans = [
     color: 'purple'
   },
   {
+    id: 'enterprise',
     name: 'Enterprise',
     price: '199',
     description: 'For organizations with advanced needs',
@@ -71,8 +74,18 @@ const PricingSection = () => {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const navigate = useNavigate();
 
-  const handleSignUp = (plan: string) => {
-    navigate('/signup', { state: { selectedPlan: plan } });
+  const handleSignUp = (planId: string) => {
+    if (planId === 'free') {
+      navigate('/signup', { state: { selectedPlan: 'free' } });
+    } else {
+      // For paid plans, pass both plan and billing period
+      navigate('/signup', { 
+        state: { 
+          selectedPlan: planId,
+          billingPeriod: billingPeriod
+        } 
+      });
+    }
   };
 
   return (
@@ -134,7 +147,7 @@ const PricingSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
             <motion.div
-              key={plan.name}
+              key={plan.id}
               custom={index}
               variants={cardVariants}
               initial="hidden"
@@ -183,11 +196,11 @@ const PricingSection = () => {
                   className={`mt-8 w-full py-3 px-4 rounded-md flex items-center justify-center text-center ${
                     plan.mostPopular
                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
-                      : plan.name === 'Free' 
+                      : plan.id === 'free' 
                         ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                         : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700'
                   } font-medium`}
-                  onClick={() => handleSignUp(plan.name)}
+                  onClick={() => handleSignUp(plan.id)}
                 >
                   {plan.buttonText}
                   <ChevronRight className="ml-1 w-4 h-4" />

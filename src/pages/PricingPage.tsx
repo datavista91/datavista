@@ -96,14 +96,24 @@ const PricingPage = () => {
 
       try {
          if (planId === 'pro' || planId === 'enterprise') {
-            // Generate Dodo payment link
-            const productId =
-               planId === 'pro'
+            // Determine the product ID based on billing period
+            let productId: string;
+            let actualPlanType: string;
+            
+            if (billingPeriod === 'annual') {
+               productId = planId === 'pro'
+                  ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID_ANNUALLY
+                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID_ANNUALLY;
+               actualPlanType = `${planId}-annual`;
+            } else {
+               productId = planId === 'pro'
                   ? import.meta.env.VITE_DODO_PRO_PRODUCT_ID
-                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID
+                  : import.meta.env.VITE_DODO_ENTERPRISE_PRODUCT_ID;
+               actualPlanType = planId;
+            }
 
             if (!productId) {
-               throw new Error(`Product ID not configured for ${planId} plan`)
+               throw new Error(`Product ID not configured for ${planId} plan (${billingPeriod})`)
             }
 
             const baseUrl = 'https://test.checkout.dodopayments.com'
@@ -114,7 +124,8 @@ const PricingPage = () => {
                redirect_url: redirectUrl,
                email: user.email || '',
                metadata_userId: user.id,
-               metadata_planType: planId,
+               metadata_planType: actualPlanType,
+               metadata_billingPeriod: billingPeriod,
                metadata_timestamp: new Date().toISOString(),
             })
 
@@ -124,7 +135,8 @@ const PricingPage = () => {
             const paymentAttempt = {
                userId: user.id,
                email: user.email,
-               planType: planId,
+               planType: actualPlanType,
+               billingPeriod: billingPeriod,
                timestamp: new Date().toISOString(),
                status: 'initiated',
             }
