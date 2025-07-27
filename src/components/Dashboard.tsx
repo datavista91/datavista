@@ -84,7 +84,7 @@ const Dashboard = () => {
           </div> */}
                <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
                   {/* Main Content */}
-                  <div className='lg:col-span-3'>
+                  <div className='lg:col-span-4'>
                      <div className='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden'>
                         <div className='border-b border-gray-200'>
                            <nav className='flex'>
@@ -140,9 +140,9 @@ const Dashboard = () => {
                   </div>
 
                   {/* Sidebar */}
-                  <div className='lg:col-span-1'>
+                  {/* <div className='lg:col-span-1'>
                      <SubscriptionStatus />
-                  </div>
+                  </div> */}
                </div>
             </motion.div>
          )}

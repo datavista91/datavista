@@ -251,7 +251,7 @@ ${
                <div className='flex items-center space-x-3'>
                   {/* Data status */}
                   <div
-                     className={`flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium ${
+                     className={`flex items-center justify-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium w-28 ${
                         hasData ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                      }`}
                   >
@@ -261,7 +261,7 @@ ${
 
                   {/* Request counter for development */}
                   {import.meta.env.DEV && geminiClient && (
-                     <div className='flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-blue-100 text-blue-700'>
+                     <div className='flex items-center justify-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium bg-blue-100 text-blue-700 w-28'>
                         <span>{geminiClient.getRemainingRequests()} requests left</span>
                      </div>
                   )}

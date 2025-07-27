@@ -1,9 +1,10 @@
 import { Bell, LogOut, User, CheckCircle, Crown, Zap, Star } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocation } from 'react-router-dom'
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
 import { useSubscription } from '../hooks/useSubscription'
+import SubscriptionStatus from './SubscriptionStatus'
 
 const mapActiveSectionHeader = {
    dashboard: 'Dashboard',
@@ -29,6 +30,32 @@ const Header = () => {
    const [notifications, setNotifications] = useState<any[]>([])
    const [unreadCount, setUnreadCount] = useState(0)
    const [selectedNotification, setSelectedNotification] = useState<any>(null)
+   const [showPlanInfo, setShowPlanInfo] = useState(false)
+   const planInfoRef = useRef<HTMLDivElement>(null)
+   const notificationPanelRef = useRef<HTMLDivElement>(null)
+   const userMenuRef = useRef<HTMLDivElement>(null)
+   // Close popups on outside click
+   useEffect(() => {
+      function handleClickOutside(event: MouseEvent) {
+         if (showPlanInfo && planInfoRef.current && !planInfoRef.current.contains(event.target as Node)) {
+            setShowPlanInfo(false)
+         }
+         if (
+            showNotificationPanel &&
+            notificationPanelRef.current &&
+            !notificationPanelRef.current.contains(event.target as Node)
+         ) {
+            setShowNotificationPanel(false)
+         }
+         if (showUserMenu && userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+            setShowUserMenu(false)
+         }
+      }
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+         document.removeEventListener('mousedown', handleClickOutside)
+      }
+   }, [showPlanInfo, showNotificationPanel, showUserMenu])
    // Fetch notifications from Firebase Feedback collection and sync with localStorage
    useEffect(() => {
       const fetchNotifications = async () => {
@@ -149,7 +176,26 @@ const Header = () => {
                </div>
             )} */}
 
-            <div className='flex items-center space-x-4'>
+            <div className='flex items-center space-x-5'>
+               {/* Plan Indicator in Menu */}
+               <div
+                  ref={planInfoRef}
+                  style={{ position: 'relative', display: 'inline-block' }}
+               >
+                  <div
+                     className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium cursor-pointer ${planInfo.bgColor} ${planInfo.textColor}`}
+                     onClick={() => setShowPlanInfo(!showPlanInfo)}
+                  >
+                     {planInfo.icon}
+                     <span>{planInfo.name} Plan</span>
+                  </div>
+                  {showPlanInfo && (
+                     <div className='absolute right-0 top-8 w-96 mt-2 bg-white rounded-lg shadow-lg p-4 border border-gray-200 z-10'>
+                        <SubscriptionStatus />
+                     </div>
+                  )}
+               </div>
+
                <button
                   className='relative text-gray-500 hover:text-gray-700 focus:outline-none'
                   onClick={() => setShowNotificationPanel(!showNotificationPanel)}
@@ -162,7 +208,10 @@ const Header = () => {
 
                {/* Notification Panel */}
                {showNotificationPanel && (
-                  <div className='absolute right-16 top-14 w-96 max-h-[60vh] overflow-y-auto rounded-lg shadow-lg bg-white border border-blue-100 z-20'>
+                  <div
+                     ref={notificationPanelRef}
+                     className='absolute right-16 top-14 w-96 max-h-[60vh] overflow-y-auto rounded-lg shadow-lg bg-white border border-blue-100 z-20'
+                  >
                      <div className='flex justify-between items-center px-4 py-2 border-b bg-blue-50'>
                         <span className='dashboard-section-title text-blue-700'>Notifications</span>
                         <button
@@ -187,7 +236,9 @@ const Header = () => {
                               }}
                            >
                               <div className='flex-1'>
-                                 <div className='dashboard-section-title text-gray-900'>{n.title || 'Notification'}</div>
+                                 <div className='dashboard-section-title text-gray-900'>
+                                    {n.title || 'Notification'}
+                                 </div>
                                  <div className='text-gray-600 dashboard-small-text'>{n.message || n.content}</div>
                                  <div className='text-gray-400 dashboard-small-text mt-1'>
                                     {n.date
@@ -242,7 +293,10 @@ const Header = () => {
                   </div>
                )}
 
-               <div className='relative'>
+               <div
+                  className='relative'
+                  ref={userMenuRef}
+               >
                   <button
                      onClick={() => setShowUserMenu(!showUserMenu)}
                      className='h-8 w-8 rounded-full border-2 border-blue-600 flex items-center justify-center text-white overflow-hidden'
@@ -266,14 +320,6 @@ const Header = () => {
                            <div className='px-4 py-2 dashboard-body text-gray-700 border-b border-gray-100'>
                               <div className='dashboard-section-title'>{user?.name}</div>
                               <div className='dashboard-small-text text-gray-500'>{user?.email}</div>
-
-                              {/* Plan Indicator in Menu */}
-                              <div
-                                 className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full dashboard-small-text font-medium mt-2 ${planInfo.bgColor} ${planInfo.textColor}`}
-                              >
-                                 {planInfo.icon}
-                                 <span>{planInfo.name} Plan</span>
-                              </div>
                            </div>
                            <button
                               onClick={logout}
