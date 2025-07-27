@@ -3,6 +3,8 @@ import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore'
 
 export interface UserSubscription {
    plan: 'free' | 'pro' | 'enterprise'
+   planType?: string // Full plan type including billing (pro-annual, etc.)
+   billing?: 'monthly' | 'annual' // Billing period
    status: 'active' | 'inactive' | 'expired'
    startDate?: string
    expiryDate?: string

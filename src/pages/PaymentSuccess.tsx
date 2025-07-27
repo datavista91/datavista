@@ -1,14 +1,76 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, Crown, Zap, Calendar, BarChart3, Shield } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import { useSubscription } from '../hooks/useSubscription'
+
+interface PlanDetails {
+   name: string
+   icon: React.ReactNode
+   features: string[]
+   color: string
+   bgColor: string
+}
 
 const PaymentSuccess = () => {
    const { user } = useAuth()
+   const { subscription, refreshSubscription } = useSubscription()
    const navigate = useNavigate()
    const [paymentStatus, setPaymentStatus] = useState<'verifying' | 'success' | 'failed'>('verifying')
    const [errorMessage, setErrorMessage] = useState('')
+   const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null)
+
+   // Define plan information
+   const getPlanDetails = (planType: string): PlanDetails => {
+      const basePlan = planType.replace('-annual', '')
+      
+      switch (basePlan) {
+         case 'pro':
+            return {
+               name: 'Pro',
+               icon: <Zap className="w-6 h-6" />,
+               color: 'text-purple-600',
+               bgColor: 'bg-purple-50 border-purple-200',
+               features: [
+                  'Upload unlimited datasets',
+                  '500 AI requests per day',
+                  'Advanced AI insights and analysis',
+                  'Custom charts and dashboards',
+                  'Priority email support',
+                  'Team collaboration (up to 3 users)',
+                  'Advanced data export options',
+                  'PDF report generation'
+               ]
+            }
+         case 'enterprise':
+            return {
+               name: 'Enterprise',
+               icon: <Crown className="w-6 h-6" />,
+               color: 'text-amber-600',
+               bgColor: 'bg-amber-50 border-amber-200',
+               features: [
+                  'Everything in Pro',
+                  'Unlimited AI requests',
+                  'Dedicated success manager',
+                  'Custom integrations',
+                  'Advanced security features',
+                  'Unlimited team collaboration',
+                  'Training and onboarding',
+                  'SLA guarantees',
+                  'Priority phone support'
+               ]
+            }
+         default:
+            return {
+               name: 'Premium',
+               icon: <BarChart3 className="w-6 h-6" />,
+               color: 'text-blue-600',
+               bgColor: 'bg-blue-50 border-blue-200',
+               features: ['Premium features activated']
+            }
+      }
+   }
 
    useEffect(() => {
       const verifyPayment = async () => {
@@ -23,11 +85,29 @@ const PaymentSuccess = () => {
 
             console.log('✅ User authenticated:', user.email)
 
-            // Since subscription is updated via webhook, let's just show success
-            // and redirect to dashboard after a short delay
-            console.log('🎉 Payment completed - subscription updated via webhook')
+            // Refresh subscription to get latest data
+            await refreshSubscription()
 
-            setPaymentStatus('success')
+            // Check if we have subscription data
+            if (subscription && subscription.plan !== 'free') {
+               const details = getPlanDetails(subscription.planType || subscription.plan)
+               setPlanDetails(details)
+               console.log('🎉 Payment completed - subscription updated via webhook')
+               setPaymentStatus('success')
+            } else {
+               // If subscription isn't updated yet, wait a bit more
+               console.log('⏳ Subscription not updated yet, checking again...')
+               setTimeout(() => {
+                  if (subscription && subscription.plan !== 'free') {
+                     const details = getPlanDetails(subscription.planType || subscription.plan)
+                     setPlanDetails(details)
+                     setPaymentStatus('success')
+                  } else {
+                     // Still show success as webhook should have processed it
+                     setPaymentStatus('success')
+                  }
+               }, 2000)
+            }
 
             // Clear any localStorage data
             localStorage.removeItem('dodo_payment_attempt')
@@ -39,7 +119,7 @@ const PaymentSuccess = () => {
       }
 
       verifyPayment()
-   }, [user]) // Re-run when user state changes
+   }, [user, subscription, refreshSubscription]) // Re-run when user or subscription state changes
 
    const handleContinue = () => {
       if (paymentStatus === 'success') {
@@ -73,14 +153,66 @@ const PaymentSuccess = () => {
                >
                   <CheckCircle className='w-16 h-16 mx-auto mb-4 text-green-500' />
                   <h2 className='text-2xl font-bold text-gray-900 mb-2'>Payment Successful!</h2>
-                  <p className='text-gray-600 mb-6'>
-                     Thank you for your purchase. Your subscription has been activated and you now have access to all
-                     premium features.
-                  </p>
+                  
+                  {planDetails ? (
+                     <div className='mb-6'>
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${planDetails.bgColor} ${planDetails.color} mb-4`}>
+                           {planDetails.icon}
+                           <span className='font-semibold'>{planDetails.name} Plan Activated</span>
+                        </div>
+                        
+                        {subscription && (
+                           <div className='bg-gray-50 rounded-lg p-4 mb-4 text-left'>
+                              <div className='grid grid-cols-2 gap-4 text-sm'>
+                                 <div>
+                                    <span className='text-gray-500'>Plan:</span>
+                                    <p className='font-semibold'>{planDetails.name} {subscription.billing === 'annual' ? '(Annual)' : '(Monthly)'}</p>
+                                 </div>
+                                 {subscription.expiryDate && (
+                                    <div>
+                                       <span className='text-gray-500'>Expires:</span>
+                                       <p className='font-semibold'>{new Date(subscription.expiryDate).toLocaleDateString()}</p>
+                                    </div>
+                                 )}
+                                 <div>
+                                    <span className='text-gray-500'>Status:</span>
+                                    <p className='font-semibold text-green-600'>Active</p>
+                                 </div>
+                                 <div>
+                                    <span className='text-gray-500'>AI Requests:</span>
+                                    <p className='font-semibold'>{subscription.features.aiRequestsPerDay === 'unlimited' ? 'Unlimited' : `${subscription.features.aiRequestsPerDay}/day`}</p>
+                                 </div>
+                              </div>
+                           </div>
+                        )}
+                        
+                        <div className={`${planDetails.bgColor} border rounded-lg p-4 mb-6`}>
+                           <h3 className={`${planDetails.color} font-semibold mb-3 flex items-center gap-2`}>
+                              <Shield className="w-4 h-4" />
+                              Your New Features
+                           </h3>
+                           <ul className='text-sm text-gray-700 space-y-2'>
+                              {planDetails.features.map((feature, index) => (
+                                 <li key={index} className='flex items-start gap-2'>
+                                    <CheckCircle className='w-4 h-4 text-green-500 mt-0.5 flex-shrink-0' />
+                                    {feature}
+                                 </li>
+                              ))}
+                           </ul>
+                        </div>
+                     </div>
+                  ) : (
+                     <p className='text-gray-600 mb-6'>
+                        Thank you for your purchase. Your subscription has been activated and you now have access to all premium features.
+                     </p>
+                  )}
 
-                  <div className='bg-green-50 border border-green-200 rounded-lg p-4 mb-6'>
-                     <h3 className='dashboard-section-title text-green-800 mb-2'>What's Next?</h3>
-                     <ul className='dashboard-body text-green-700 space-y-1'>
+                  <div className='bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6'>
+                     <h3 className='text-blue-800 font-semibold mb-2 flex items-center gap-2'>
+                        <Calendar className="w-4 h-4" />
+                        What's Next?
+                     </h3>
+                     <ul className='text-blue-700 text-sm space-y-1'>
                         <li>• Your subscription is now active</li>
                         <li>• Access premium features in the dashboard</li>
                         <li>• Upload and analyze unlimited datasets</li>
@@ -88,10 +220,12 @@ const PaymentSuccess = () => {
                         <li>• Check your email for the receipt</li>
                      </ul>
                   </div>
+                  
                   <button
                      onClick={handleContinue}
-                     className='bg-blue-600 text-white px-6 py-3 rounded-lg dashboard-body font-semibold hover:bg-blue-700 transition-colors'
+                     className='bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto'
                   >
+                     <BarChart3 className="w-4 h-4" />
                      Go to Dashboard
                   </button>
                </motion.div>
