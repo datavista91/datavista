@@ -2,7 +2,6 @@ import { useState } from 'react'
 import FileUploader from './FileUploader'
 import DataPreview from './DataPreview'
 import ChartPanel from './ChartPanel'
-import SubscriptionStatus from './SubscriptionStatus'
 import { useData } from '../context/DataContext'
 import { useAnalysis } from '../context/AnalysisContext'
 import { motion } from 'framer-motion'
@@ -138,11 +137,6 @@ const Dashboard = () => {
                         </div>
                      </div>
                   </div>
-
-                  {/* Sidebar */}
-                  {/* <div className='lg:col-span-1'>
-                     <SubscriptionStatus />
-                  </div> */}
                </div>
             </motion.div>
          )}
