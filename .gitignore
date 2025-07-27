@@ -17,5 +17,4 @@ USER_EMAIL_INTEGRATION.md
 GEMINI_SETUP.md
 test-api.js
 DODO_INTEGRATION_COMPLETE.md
-documentation/DODO_INTEGRATION_GUIDE.md
-documentation/IMPLEMENTATION_SUMMARY.md
+documentation/** 

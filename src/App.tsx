@@ -91,16 +91,8 @@ export function App() {
                               path='/'
                               element={<LandingPage />}
                            />
-                           {/* <Route
-                              path='/login'
-                              element={<GoogleSignInPage />}
-                           /> */}
-                           {/* <Route
-                              path='/signup'
-                              element={<GoogleSignInPage />}
-                           /> */}
                            <Route
-                              path='/payment-success'
+                              path='/payment-success/:paymentId?'
                               element={<PaymentSuccess />}
                            />
                            <Route

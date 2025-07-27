@@ -248,13 +248,16 @@ async function handlePaymentSuccess(paymentData: any) {
    try {
       console.log('✅ Processing successful payment:', JSON.stringify(paymentData, null, 2))
 
-      const { metadata, total_amount, payment_id, currency } = paymentData
+      const { metadata, total_amount, payment_id, currency, customer } = paymentData
 
       if (!metadata) {
          throw new Error('Missing payment metadata')
       }
 
       const { userId, planType } = metadata
+      
+      // Extract email from customer object
+      const userEmail = customer?.email || 'unknown'
 
       if (!userId || !planType) {
          console.error('❌ Missing required metadata:', { userId, planType, metadata })
@@ -267,6 +270,7 @@ async function handlePaymentSuccess(paymentData: any) {
          amount: total_amount,
          currency: currency || 'USD',
          paymentId: payment_id,
+         email: userEmail,
       })
 
       // Get current timestamp in Indian time
@@ -281,9 +285,20 @@ async function handlePaymentSuccess(paymentData: any) {
          hour12: false,
       })
 
-      // Calculate subscription expiry (30 days from now)
+      // Calculate subscription expiry based on plan type
       const expiryDate = new Date()
-      expiryDate.setDate(expiryDate.getDate() + 30)
+      const isAnnualPlan = planType.includes('-annual')
+      
+      if (isAnnualPlan) {
+         // Annual subscription: 365 days
+         expiryDate.setDate(expiryDate.getDate() + 365)
+      } else {
+         // Monthly subscription: 30 days
+         expiryDate.setDate(expiryDate.getDate() + 30)
+      }
+
+      // Extract base plan type for features (remove -annual suffix if present)
+      const basePlanType = planType.replace('-annual', '')
 
       // Define plan features
       const planFeatures: any = {
@@ -315,11 +330,13 @@ async function handlePaymentSuccess(paymentData: any) {
       
       const subscriptionData = {
          subscription: {
-            plan: planType,
+            plan: basePlanType, // Store base plan type (pro/enterprise)
+            planType: planType, // Store full plan type (pro-annual/enterprise-annual)
+            billing: isAnnualPlan ? 'annual' : 'monthly',
             status: 'active',
             startDate: new Date().toISOString(),
             expiryDate: expiryDate.toISOString(),
-            features: planFeatures[planType] || {},
+            features: planFeatures[basePlanType] || {},
             lastUpdated: new Date().toISOString(),
          },
          // Reset usage limits
@@ -343,7 +360,9 @@ async function handlePaymentSuccess(paymentData: any) {
          paymentId: payment_id,
          amount: total_amount,
          currency: currency || 'USD',
-         planType,
+         planType: planType, // Store full plan type
+         basePlan: basePlanType, // Store base plan type
+         billing: isAnnualPlan ? 'annual' : 'monthly',
          status: 'completed',
          timestamp: new Date().toISOString(),
          indianTime: indianTime,
@@ -359,9 +378,31 @@ async function handlePaymentSuccess(paymentData: any) {
       await paymentHistoryRef.set(paymentHistoryData)
       console.log('✅ Payment history recorded in Firestore')
 
+      // Also store in global payments collection for verification
+      const globalPaymentRef = db.collection('payments').doc(payment_id)
+      const globalPaymentData = {
+         paymentId: payment_id,
+         userId: userId,
+         userEmail: userEmail, // Use email from customer object
+         amount: total_amount,
+         currency: currency || 'USD',
+         planType: planType,
+         basePlan: basePlanType,
+         billing: isAnnualPlan ? 'annual' : 'monthly',
+         status: 'paid',
+         timestamp: new Date().toISOString(),
+         provider: 'dodo',
+         metadata: metadata,
+      }
+      
+      await globalPaymentRef.set(globalPaymentData)
+      console.log('✅ Global payment record created for verification')
+
       console.log('🎉 Payment processing completed successfully:', {
          userId,
          planType,
+         basePlanType,
+         billing: isAnnualPlan ? 'annual' : 'monthly',
          paymentId: payment_id,
          amount: total_amount,
          indianTime,
