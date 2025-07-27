@@ -43,14 +43,16 @@ const DashboardLayout = () => {
                   <Route
                      path='/visualizations'
                      element={<ChartPanel />}
-                  />{' '}                  <Route
+                  />{' '}
+                  <Route
                      path='/reports'
                      element={<SmartReports />}
                   />
                   <Route
                      path='/history'
                      element={<AnalysisHistory />}
-                  />                  <Route
+                  />{' '}
+                  <Route
                      path='/share'
                      element={<EnhancedPresentations />}
                   />
@@ -80,35 +82,40 @@ const DashboardLayout = () => {
 
 export function App() {
    return (
-      <BrowserRouter>         <AuthProvider>
-            <DataProvider>               <AnalysisProvider>
+      <BrowserRouter>
+         {' '}
+         <AuthProvider>
+            <DataProvider>
+               {' '}
+               <AnalysisProvider>
                   <AIResponseProvider>
                      <ChatProvider>
-                  <Routes>
-                     <Route
-                        path='/'
-                        element={<LandingPage />}
-                     />
-                     <Route
-                        path='/login'
-                        element={<GoogleSignInPage />}
-                     />
-                     <Route
-                        path='/signup'
-                        element={<GoogleSignInPage />}
-                     />
-                     <Route
-                        path='/payment-success/:paymentId?'
-                        element={<PaymentSuccess />}
-                     />
-                     <Route
-                        path='/*'
-                        element={
-                           <ProtectedRoute>
-                              <DashboardLayout />
-                           </ProtectedRoute>
-                        }
-                     />                  </Routes>
+                        <Routes>
+                           <Route
+                              path='/'
+                              element={<LandingPage />}
+                           />
+                           <Route
+                              path='/login'
+                              element={<GoogleSignInPage />}
+                           />
+                           <Route
+                              path='/signup'
+                              element={<GoogleSignInPage />}
+                           />
+                           <Route
+                              path='/payment-success/:paymentId?'
+                              element={<PaymentSuccess />}
+                           />
+                           <Route
+                              path='/*'
+                              element={
+                                 <ProtectedRoute>
+                                    <DashboardLayout />
+                                 </ProtectedRoute>
+                              }
+                           />{' '}
+                        </Routes>
                      </ChatProvider>
                   </AIResponseProvider>
                </AnalysisProvider>
