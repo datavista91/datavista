@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { useData } from '../context/DataContext'
 import { useAnalysis } from '../context/AnalysisContext'
+import { useData } from '../context/DataContext'
+import CleanFlowChart from './CleanFlowChart'
 
 const DataPreview = () => {
    const { data } = useData()
    const { analysisData } = useAnalysis()
    const [page, setPage] = useState(1)
+   const [showFlowCharts, setShowFlowCharts] = useState(false)
+   const [flowChartMode, setFlowChartMode] = useState<'clean'>('clean')
    const rowsPerPage = 10
 
    if (!data || !data.length) {
@@ -70,6 +73,39 @@ const DataPreview = () => {
                )}
             </div>
          )}
+
+         {/* Flow Charts Toggle */}
+         <div className='bg-white rounded-lg shadow-sm border border-gray-200'>
+            <div className='px-6 py-4 border-b border-gray-200'>
+               <div className='flex justify-between items-center'>
+                  <h3 className='dashboard-heading text-gray-900'>Data Visualization</h3>
+                  <div className='flex gap-2 items-center'>
+                     {showFlowCharts && (
+                        <span className="text-sm text-gray-600 font-medium">
+                           Professional Mode
+                        </span>
+                     )}
+                     <button
+                        onClick={() => setShowFlowCharts(!showFlowCharts)}
+                        className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors'
+                     >
+                        {showFlowCharts ? 'Hide Flow Charts' : 'Show Flow Charts'}
+                     </button>
+                  </div>
+               </div>
+            </div>
+            {showFlowCharts && (
+               <div className='p-6'>
+                                     <CleanFlowChart 
+                      data={data} 
+                      onChartUpdate={(charts) => {
+                         // Handle chart updates if needed
+                         console.log('Charts updated:', charts);
+                      }} 
+                   />
+               </div>
+            )}
+         </div>
 
          {/* Data Table */}
          <div className='bg-white rounded-lg shadow-sm border border-gray-200'>

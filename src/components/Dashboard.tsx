@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import FileUploader from './FileUploader'
-import DataPreview from './DataPreview'
-import ChartPanel from './ChartPanel'
-import { useData } from '../context/DataContext'
-import { useAnalysis } from '../context/AnalysisContext'
 import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { useAnalysis } from '../context/AnalysisContext'
+import { useData } from '../context/DataContext'
 import AIChat from './AIChat'
+import ChartPanel from './ChartPanel'
+import DataPreview from './DataPreview'
+import FileUploader from './FileUploader'
 
 const Dashboard = () => {
    const { hasData } = useData()
@@ -21,7 +21,7 @@ const Dashboard = () => {
                animate={{ opacity: 1 }}
                className='flex h-full items-center justify-center'
             >
-               <FileUploader />
+                               <FileUploader />
             </motion.div>
          ) : (
             <motion.div
@@ -129,11 +129,11 @@ const Dashboard = () => {
                                  </div>
                               </div>
                            )}{' '}
-                           {activeSection === 'upload' && (
-                              <div className='py-8 flex justify-center'>
-                                 <FileUploader compact />
-                              </div>
-                           )}
+                                                                                     {activeSection === 'upload' && (
+                                <div className='py-8 flex justify-center'>
+                                   <FileUploader compact />
+                                </div>
+                             )}
                         </div>
                      </div>
                   </div>

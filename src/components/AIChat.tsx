@@ -1,24 +1,25 @@
-import { useState, useRef, useEffect } from 'react'
-import {
-   Send,
-   Bot,
-   User,
-   Sparkles,
-   AlertTriangle,
-   Database,
-   ExternalLink,
-   BarChart3,
-   Presentation,
-   Lightbulb,
-} from 'lucide-react'
 import { motion } from 'framer-motion'
+import {
+    AlertTriangle,
+    BarChart3,
+    Bot,
+    Database,
+    ExternalLink,
+    Lightbulb,
+    Presentation,
+    Send,
+    Sparkles,
+    User,
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAnalysis } from '../context/AnalysisContext'
 import { useAIResponses } from '../context/AIResponseContext'
-import { useChat, ChatMessage } from '../context/ChatContext'
+import { useAnalysis } from '../context/AnalysisContext'
 import { useAuth } from '../context/AuthContext'
-import { getGeminiClient, GeminiResponse } from '../utils/geminiClient'
+import { ChatMessage, useChat } from '../context/ChatContext'
 import userSubscriptionService from '../services/userSubscriptionService'
+import { GeminiResponse, getGeminiClient } from '../utils/geminiClient'
+
 import MarkdownRenderer from './MarkdownRenderer'
 
 function AIChat() {
@@ -93,10 +94,10 @@ function AIChat() {
       setIsTyping(true)
       setError(null)
 
-      try {
-         if (!geminiClient) {
-            throw new Error('AI service is not available. Please check your configuration.')
-         }
+             try {
+          if (!geminiClient) {
+             throw new Error('AI service is not available. Please check your configuration.')
+          }
          if (!hasData) {
             const noDataMessage: ChatMessage = {
                id: (Date.now() + 1).toString(),
@@ -243,6 +244,7 @@ ${
                                 analysisData.fileName || 'your dataset'
                              } (${analysisData.summary?.overview?.totalRows?.toLocaleString()} rows)`
                            : 'Upload data to start analysis'}
+                        
                      </p>
                   </div>
                </div>
