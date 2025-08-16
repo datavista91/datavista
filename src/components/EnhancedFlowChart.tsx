@@ -320,7 +320,7 @@ const EnhancedFlowChart: React.FC<FlowChartProps> = ({ data, onChartUpdate }) =>
               dataKey={chart.yAxis}
               opacity={chart.config.opacity}
             >
-              {chart.data.map((entry, index) => (
+              {chart.data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
               ))}
             </Pie>

@@ -1,4 +1,4 @@
-import { Activity, BarChart3, Grid3X3, Layers, PieChart, Scatter, Target, TrendingUp } from 'lucide-react';
+import { Activity, BarChart3, Grid3X3, Layers, PieChart, Target, TrendingUp } from 'lucide-react';
 import React from 'react';
 
 export interface ChartTemplate {
@@ -148,7 +148,7 @@ export const chartTemplates: ChartTemplate[] = [
     name: 'Scatter Plot',
     description: 'Show relationships between two variables',
     type: 'scatter',
-    icon: <Scatter className="w-6 h-6" />,
+    icon: <Grid3X3 className="w-6 h-6" />,
     category: 'correlation',
     recommendedFor: ['Correlation analysis', 'Outlier detection', 'Regression analysis'],
     config: {

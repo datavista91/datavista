@@ -194,7 +194,7 @@ const FlowChart: React.FC<FlowChartProps> = ({ data, onChartUpdate }) => {
               fill={chart.color}
               dataKey={chart.yAxis}
             >
-              {chart.data.map((entry, index) => (
+              {chart.data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
               ))}
             </Pie>

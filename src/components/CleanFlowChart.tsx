@@ -77,11 +77,10 @@ interface CleanFlowChartProps {
 
   const CleanFlowChart: React.FC<CleanFlowChartProps> = ({ data, onChartUpdate }) => {
     const [charts, setCharts] = useState<ChartData[]>([]);
-    const [editingChart, setEditingChart] = useState<string | null>(null);
     const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isMountedRef = useRef(true);
     const isUpdatingRef = useRef(false);
-    const [isGeneratingCharts, setIsGeneratingCharts] = useState(false);
+
     const [selectedChartType, setSelectedChartType] = useState<ChartData['type']>('line');
     const [showChartSelector, setShowChartSelector] = useState(false);
     const [draggedChart, setDraggedChart] = useState<string | null>(null);
@@ -95,8 +94,6 @@ interface CleanFlowChartProps {
     const [editingDataPoint, setEditingDataPoint] = useState<{ chartId: string; index: number; field: string } | null>(null);
     const [showDataEditor, setShowDataEditor] = useState(false);
     const [showChartEditor, setShowChartEditor] = useState<string | null>(null);
-    const [showAnnotations, setShowAnnotations] = useState(false);
-    const [editingAnnotation, setEditingAnnotation] = useState<{ chartId: string; annotationId: string } | null>(null);
 
     // Simple update function to prevent infinite loops
     const debouncedUpdate = useCallback((updatedCharts: ChartData[]) => {
@@ -165,51 +162,7 @@ interface CleanFlowChartProps {
     window.URL.revokeObjectURL(url);
   }, [charts]);
 
-  const downloadAllChartsAsZip = useCallback(async () => {
-    try {
-      const JSZip = (await import('jszip')).default;
-      const zip = new JSZip();
 
-      // Add CSV files for each chart
-      charts.forEach(chart => {
-        const csvContent = [
-          [chart.xAxis, chart.yAxis, ...(chart.secondaryYAxis ? [chart.secondaryYAxis] : [])],
-          ...chart.data.map(row => [
-            row[chart.xAxis] || '',
-            row[chart.yAxis] || '',
-            ...(chart.secondaryYAxis ? [row[chart.secondaryYAxis] || ''] : [])
-          ])
-        ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-
-        zip.file(`chart-${chart.id}.csv`, csvContent);
-      });
-
-      // Add a summary file
-      const summary = {
-        totalCharts: charts.length,
-        charts: charts.map(chart => ({
-          id: chart.id,
-          type: chart.type,
-          title: chart.title,
-          dataPoints: chart.data.length,
-          xAxis: chart.xAxis,
-          yAxis: chart.yAxis
-        }))
-      };
-
-      zip.file('charts-summary.json', JSON.stringify(summary, null, 2));
-
-      const content = await zip.generateAsync({ type: 'blob' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = `flowcharts-${new Date().toISOString().split('T')[0]}.zip`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.error('Error creating ZIP file:', error);
-      alert('Error creating ZIP file. Please try again.');
-    }
-  }, [charts]);
 
   const defaultColors = [
     '#3B82F6', // Blue
@@ -266,157 +219,14 @@ interface CleanFlowChartProps {
     return () => intervals.forEach(clearInterval);
   }, [charts, generateRealTimePoint]);
 
-  const generateInitialCharts = useCallback(() => {
-    if (data.length === 0 || isGeneratingCharts) return;
-    setIsGeneratingCharts(true);
-
-    const headers = Object.keys(data[0]);
-    const numericHeaders = headers.filter(header => 
-      typeof data[0][header] === 'number' || !isNaN(Number(data[0][header]))
-    );
-    const categoricalHeaders = headers.filter(header => 
-      typeof data[0][header] === 'string' && !numericHeaders.includes(header)
-    );
-
-    const initialCharts: ChartData[] = [];
-
-    // Line Chart
-    if (numericHeaders.length >= 2) {
-      const chartData = data.slice(0, 50).map((row, index) => ({
-        index,
-        [numericHeaders[0]]: Number(row[numericHeaders[0]]),
-        [numericHeaders[1]]: Number(row[numericHeaders[1]])
-      }));
-
-      initialCharts.push({
-        id: 'chart-1',
-        type: 'line',
-        title: `${numericHeaders[0]} Trend Analysis`,
-        data: chartData,
-        xAxis: 'index',
-        yAxis: numericHeaders[0],
-        color: defaultColors[0],
-        size: { width: 600, height: 450 },
-        position: { x: 20, y: 20 },
-        config: {
-          showGrid: true,
-          showLegend: true,
-          showTooltip: true,
-          opacity: 1,
-          strokeWidth: 3,
-          smooth: true,
-          fillOpacity: 0.3,
-          showDataLabels: false
-        },
-        realTime: {
-          enabled: false,
-          interval: 1000,
-          maxDataPoints: 100
-        },
-        customColors: {},
-        customSizes: {},
-        customOpacities: {},
-        customStrokes: {},
-        annotations: []
-      });
-    }
-
-    // Bar Chart
-    if (categoricalHeaders.length > 0 && numericHeaders.length > 0) {
-      const categories = [...new Set(data.slice(0, 20).map(row => row[categoricalHeaders[0]]))];
-      const chartData = categories.map(category => {
-        const filteredData = data.filter(row => row[categoricalHeaders[0]] === category);
-        const avgValue = filteredData.reduce((sum, row) => sum + Number(row[numericHeaders[0]] || 0), 0) / filteredData.length;
-        return { category, value: Math.round(avgValue * 100) / 100 };
-      });
-
-      initialCharts.push({
-        id: 'chart-2',
-        type: 'bar',
-        title: `${categoricalHeaders[0]} Distribution`,
-        data: chartData,
-        xAxis: 'category',
-        yAxis: 'value',
-        color: defaultColors[1],
-        size: { width: 600, height: 450 },
-        position: { x: 650, y: 20 },
-        config: {
-          showGrid: true,
-          showLegend: true,
-          showTooltip: true,
-          opacity: 0.9,
-          strokeWidth: 2,
-          smooth: false,
-          fillOpacity: 0.3,
-          showDataLabels: false
-        },
-        realTime: {
-          enabled: false,
-          interval: 1000,
-          maxDataPoints: 50
-        },
-        customColors: {},
-        customSizes: {},
-        customOpacities: {},
-        customStrokes: {},
-        annotations: []
-      });
-    }
-
-    // Pie Chart
-    if (categoricalHeaders.length > 0 && numericHeaders.length > 0) {
-      const categories = [...new Set(data.slice(0, 8).map(row => row[categoricalHeaders[0]]))];
-      const chartData = categories.map(category => {
-        const filteredData = data.filter(row => row[categoricalHeaders[0]] === category);
-        const totalValue = filteredData.reduce((sum, row) => sum + Number(row[numericHeaders[0]] || 0), 0);
-        return { name: category, value: Math.round(totalValue * 100) / 100 };
-      });
-
-      initialCharts.push({
-        id: 'chart-3',
-        type: 'pie',
-        title: `${categoricalHeaders[0]} Composition`,
-        data: chartData,
-        xAxis: 'name',
-        yAxis: 'value',
-        color: defaultColors[2],
-        size: { width: 500, height: 500 },
-        position: { x: 20, y: 500 },
-        config: {
-          showGrid: false,
-          showLegend: true,
-          showTooltip: true,
-          opacity: 0.9,
-          strokeWidth: 2,
-          smooth: false,
-          fillOpacity: 0.3,
-          showDataLabels: false
-        },
-        realTime: {
-          enabled: false,
-          interval: 1000,
-          maxDataPoints: 20
-        },
-        customColors: {},
-        customSizes: {},
-        customOpacities: {},
-        customStrokes: {},
-        annotations: []
-      });
-    }
-
-    setCharts(initialCharts);
-    // Use debounced update to prevent infinite loops
-    debouncedUpdate(initialCharts);
-    // Reset loading state after a short delay
-    setTimeout(() => setIsGeneratingCharts(false), 100);
-  }, [data, defaultColors, debouncedUpdate]);
+  
 
   useEffect(() => {
     if (data.length > 0) {
-      generateInitialCharts();
+      // Don't generate charts automatically - user will add them manually
+      console.log('Data loaded, but no charts generated automatically');
     }
-  }, [data, generateInitialCharts]);
+  }, [data]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -429,49 +239,155 @@ interface CleanFlowChartProps {
     };
   }, []);
 
+  // Monitor showDataEditor state changes
+  useEffect(() => {
+    console.log('showDataEditor state changed to:', showDataEditor);
+  }, [showDataEditor]);
+
+  // Monitor showChartSelector state changes
+  useEffect(() => {
+    console.log('showChartSelector state changed to:', showChartSelector);
+  }, [showChartSelector]);
+
+  // Monitor editingDataPoint state changes
+  useEffect(() => {
+    console.log('editingDataPoint state changed to:', editingDataPoint);
+  }, [editingDataPoint]);
 
 
-  const addNewChart = useCallback(() => {
+
+
+
+  const createMultipleCharts = useCallback((chartType: ChartData['type'], quantity: number) => {
     if (data.length === 0) return;
     
     const headers = Object.keys(data[0] || {});
-    const newChart: ChartData = {
-      id: `chart-${Date.now()}`,
-      type: selectedChartType,
-      title: `${selectedChartType.charAt(0).toUpperCase() + selectedChartType.slice(1)} Chart ${charts.length + 1}`,
-      data: data.slice(0, 10), // Use first 10 rows
-      xAxis: headers[0] || '',
-      yAxis: headers[1] || '',
-      color: defaultColors[charts.length % defaultColors.length],
-      size: { width: 400, height: 300 },
-      position: { x: 50 + (charts.length * 50), y: 50 + (charts.length * 50) },
-      config: {
-        showGrid: true,
-        showLegend: true,
-        showTooltip: true,
-        opacity: 0.8,
-        strokeWidth: 2,
-        smooth: true,
-        fillOpacity: 0.3,
-        showDataLabels: false
-      },
-      realTime: {
-        enabled: false,
-        interval: 2000,
-        maxDataPoints: 50
-      },
-      customColors: {},
-      customSizes: {},
-      customOpacities: {},
-      customStrokes: {},
-      annotations: []
-    };
+    const newCharts: ChartData[] = [];
     
-    setCharts(prev => [...prev, newChart]);
+    for (let i = 0; i < quantity; i++) {
+      const chartId = `chart-${Date.now()}-${i}`;
+      const chartDataResult = generateChartData(chartType, data, headers);
+      
+      const newChart: ChartData = {
+        id: chartId,
+        type: chartType,
+        title: `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart ${charts.length + i + 1}`,
+        data: chartDataResult.data,
+        xAxis: chartDataResult.xAxis || headers[0] || '',
+        yAxis: chartDataResult.yAxis || headers[1] || '',
+        color: defaultColors[(charts.length + i) % defaultColors.length],
+        size: { width: 500, height: 400 },
+        position: { 
+          x: 20 + (i * 520), 
+          y: 20 + (Math.floor(i / 2) * 420) 
+        },
+        config: {
+          showGrid: true,
+          showLegend: true,
+          showTooltip: true,
+          opacity: 0.8,
+          strokeWidth: 2,
+          smooth: true,
+          fillOpacity: 0.3,
+          showDataLabels: false
+        },
+        realTime: {
+          enabled: false,
+          interval: 2000,
+          maxDataPoints: 50
+        },
+        customColors: {},
+        customSizes: {},
+        customOpacities: {},
+        customStrokes: {},
+        annotations: []
+      };
+      
+      newCharts.push(newChart);
+    }
+    
+    setCharts(prev => {
+      const updatedCharts = [...prev, ...newCharts];
+      console.log('Adding multiple charts:', newCharts);
+      console.log('Updated charts array:', updatedCharts);
+      // Use debounced update to prevent infinite loops
+      debouncedUpdate(updatedCharts);
+      return updatedCharts;
+    });
     setShowChartSelector(false);
-    // Use debounced update to prevent infinite loops
-    debouncedUpdate([...charts, newChart]);
-  }, [data, selectedChartType, charts, debouncedUpdate, defaultColors]);
+  }, [data, charts, debouncedUpdate, defaultColors]);
+
+  const generateChartData = useCallback((chartType: ChartData['type'], data: any[], headers: string[]) => {
+    const numericHeaders = headers.filter(header => 
+      typeof data[0][header] === 'number' || !isNaN(Number(data[0][header]))
+    );
+    const categoricalHeaders = headers.filter(header => 
+      typeof data[0][header] === 'string' && !numericHeaders.includes(header)
+    );
+
+    switch (chartType) {
+      case 'line':
+      case 'area':
+        return {
+          data: data.slice(0, 30).map((row, index) => ({
+            index,
+            [numericHeaders[0] || 'x']: Number(row[numericHeaders[0]]) || index,
+            [numericHeaders[1] || 'y']: Number(row[numericHeaders[1]]) || Math.random() * 100
+          })),
+          xAxis: 'index',
+          yAxis: numericHeaders[0] || 'x'
+        };
+      
+      case 'bar':
+      case 'pie':
+        if (categoricalHeaders.length > 0 && numericHeaders.length > 0) {
+          const categories = [...new Set(data.slice(0, 15).map(row => row[categoricalHeaders[0]]))];
+          return {
+            data: categories.map(category => {
+              const filteredData = data.filter(row => row[categoricalHeaders[0]] === category);
+              const value = filteredData.reduce((sum, row) => sum + Number(row[numericHeaders[0]] || 0), 0) / filteredData.length;
+              return chartType === 'pie' ? { name: category, value: Math.round(value * 100) / 100 } : { category, value: Math.round(value * 100) / 100 };
+            }),
+            xAxis: chartType === 'pie' ? 'name' : 'category',
+            yAxis: 'value'
+          };
+        }
+        break;
+      
+      case 'scatter':
+        return {
+          data: data.slice(0, 20).map((row, index) => ({
+            index,
+            [numericHeaders[0] || 'x']: Number(row[numericHeaders[0]]) || index,
+            [numericHeaders[1] || 'y']: Number(row[numericHeaders[1]]) || Math.random() * 100
+          })),
+          xAxis: numericHeaders[0] || 'x',
+          yAxis: numericHeaders[1] || 'y'
+        };
+      
+      default:
+        return {
+          data: data.slice(0, 10).map((row, index) => ({
+            index,
+            [headers[0] || 'x']: row[headers[0]] || index,
+            [headers[1] || 'y']: row[headers[1]] || Math.random() * 100
+          })),
+          xAxis: headers[0] || 'x',
+          yAxis: headers[1] || 'y'
+        };
+    }
+    
+    // Fallback
+    return {
+      data: data.slice(0, 10).map((row, index) => ({
+        index,
+        [headers[0] || 'x']: row[headers[0]] || index,
+        [headers[1] || 'y']: row[headers[1]] || Math.random() * 100
+      })),
+      xAxis: headers[0] || 'x',
+      yAxis: headers[1] || 'y'
+    };
+  }, []);
 
   const updateChart = useCallback((chartId: string, updates: Partial<ChartData>) => {
     const updatedCharts = charts.map(chart => 
@@ -483,7 +399,10 @@ interface CleanFlowChartProps {
   }, [charts, debouncedUpdate]);
 
   const deleteChart = useCallback((chartId: string) => {
+    console.log('deleteChart called with:', chartId);
+    console.log('Current charts:', charts);
     const updatedCharts = charts.filter(chart => chart.id !== chartId);
+    console.log('Updated charts after deletion:', updatedCharts);
     setCharts(updatedCharts);
     // Use debounced update to prevent infinite loops
     debouncedUpdate(updatedCharts);
@@ -547,12 +466,18 @@ interface CleanFlowChartProps {
   }, [draggedChart, handleMouseMove, handleMouseUp]);
 
   const toggleChartSelection = useCallback((chartId: string) => {
-    if (fullscreenChart) return;
-    setSelectedCharts(prev => 
-      prev.includes(chartId) 
+    console.log('toggleChartSelection called with:', chartId);
+    if (fullscreenChart) {
+      console.log('Fullscreen active, ignoring selection');
+      return;
+    }
+    setSelectedCharts(prev => {
+      const newSelection = prev.includes(chartId) 
         ? prev.filter(id => id !== chartId)
-        : [...prev, chartId]
-    );
+        : [...prev, chartId];
+      console.log('New selection:', newSelection);
+      return newSelection;
+    });
   }, [fullscreenChart]);
 
   const deleteSelectedCharts = useCallback(() => {
@@ -577,6 +502,7 @@ interface CleanFlowChartProps {
         }
         return chart;
       });
+      console.log('Updated charts after edit:', updatedCharts);
       // Use debounced update to prevent infinite loops
       debouncedUpdate(updatedCharts);
       return updatedCharts;
@@ -585,12 +511,6 @@ interface CleanFlowChartProps {
 
   const addDataPoint = useCallback((chartId: string) => {
     console.log('addDataPoint function called for chart:', chartId);
-    
-    // Prevent multiple executions
-    if (updateTimeoutRef.current) {
-      console.log('Update already in progress, skipping...');
-      return;
-    }
     
     setCharts(prev => {
       console.log('Previous charts state:', prev);
@@ -624,12 +544,6 @@ interface CleanFlowChartProps {
   const removeDataPoint = useCallback((chartId: string, index: number) => {
     console.log('removeDataPoint function called with:', { chartId, index });
     
-    // Prevent multiple executions
-    if (updateTimeoutRef.current) {
-      console.log('Update already in progress, skipping...');
-      return;
-    }
-    
     setCharts(prev => {
       console.log('Previous charts state:', prev);
       const updatedCharts = prev.map(chart => {
@@ -652,12 +566,6 @@ interface CleanFlowChartProps {
 
   const duplicateDataPoint = useCallback((chartId: string, index: number) => {
     console.log('duplicateDataPoint function called with:', { chartId, index });
-    
-    // Prevent multiple executions
-    if (updateTimeoutRef.current) {
-      console.log('Update already in progress, skipping...');
-      return;
-    }
     
     setCharts(prev => {
       console.log('Previous charts state:', prev);
@@ -711,131 +619,13 @@ interface CleanFlowChartProps {
     });
   }, [debouncedUpdate]);
 
-  const updateCustomColor = useCallback((chartId: string, elementKey: string, color: string) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const customColors = { ...chart.customColors, [elementKey]: color };
-          return { ...chart, customColors };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  const updateCustomSize = useCallback((chartId: string, elementKey: string, size: number) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const customSizes = { ...chart.customSizes, [elementKey]: size };
-          return { ...chart, customSizes };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  const updateCustomOpacity = useCallback((chartId: string, elementKey: string, opacity: number) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const customOpacities = { ...chart.customOpacities, [elementKey]: opacity };
-          return { ...chart, customOpacities };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  const updateCustomStroke = useCallback((chartId: string, elementKey: string, stroke: number) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const customStrokes = { ...chart.customStrokes, [elementKey]: stroke };
-          return { ...chart, customStrokes };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  // Annotation functions
-  const addAnnotation = useCallback((chartId: string, x: number, y: number, text: string) => {
-    const newAnnotation = {
-      id: `annotation-${Date.now()}`,
-      x,
-      y,
-      text,
-      color: '#3B82F6',
-      fontSize: 12
-    };
-
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const annotations = [...(chart.annotations || []), newAnnotation];
-          return { ...chart, annotations };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  const updateAnnotation = useCallback((chartId: string, annotationId: string, updates: Partial<NonNullable<ChartData['annotations']>[0]>) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const annotations = chart.annotations?.map(ann => 
-            ann.id === annotationId ? { ...ann, ...updates } : ann
-          ) || [];
-          return { ...chart, annotations };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
-
-  const removeAnnotation = useCallback((chartId: string, annotationId: string) => {
-    setCharts(prev => {
-      const updatedCharts = prev.map(chart => {
-        if (chart.id === chartId) {
-          const annotations = chart.annotations?.filter(ann => ann.id !== annotationId) || [];
-          return { ...chart, annotations };
-        }
-        return chart;
-      });
-      // Use debounced update to prevent infinite loops
-      debouncedUpdate(updatedCharts);
-      return updatedCharts;
-    });
-  }, [debouncedUpdate]);
 
 
 
 
 
-  const renderChartEditor = useCallback((chart: ChartData) => {
-    // This function is referenced but not implemented - using modal instead
-    return null;
-  }, []);
+
+
 
   const renderChart = (chart: ChartData) => {
     const chartData = realTimeData[chart.id] || chart.data;
@@ -909,7 +699,7 @@ interface CleanFlowChartProps {
                 dataKey={chart.yAxis}
                 opacity={chart.config.opacity}
               >
-                {chartData.map((entry, index) => (
+                {chartData.map((_, index) => (
                   <Cell 
                     key={`cell-${index}`} 
                     fill={defaultColors[index % defaultColors.length]}
@@ -1114,6 +904,20 @@ interface CleanFlowChartProps {
         <div>
           <h3 className="text-2xl font-bold text-gray-900">Professional Data Flow Charts</h3>
           <p className="text-gray-600 mt-1">Create, customize, and analyze your data with precision</p>
+          <div className="mt-2 text-sm text-gray-500">
+            Selected Charts: {selectedCharts.length} | Total Charts: {charts.length}
+            <button 
+              onClick={() => {
+                console.log('Manual data editor trigger');
+                console.log('Current showDataEditor state:', showDataEditor);
+                setShowDataEditor(true);
+                console.log('Setting showDataEditor to true');
+              }}
+              className="ml-4 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
+            >
+              Test Data Editor
+            </button>
+          </div>
         </div>
         <div className="flex gap-3">
           {selectedCharts.length > 0 && (
@@ -1153,7 +957,12 @@ interface CleanFlowChartProps {
                 Edit Data ({charts.length} charts)
               </button>
             <button
-              onClick={() => setShowChartSelector(true)}
+              onClick={() => {
+                console.log('Add Chart button clicked');
+                console.log('Current showChartSelector state:', showChartSelector);
+                setShowChartSelector(true);
+                console.log('Setting showChartSelector to true');
+              }}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               <Plus size={16} />
@@ -1167,8 +976,12 @@ interface CleanFlowChartProps {
       {/* Chart Selector Modal */}
       {showChartSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Create New Chart</h3>
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Create Charts</h3>
+            <div className="text-sm text-gray-500 mb-4">
+              Modal State: {showChartSelector ? 'Open' : 'Closed'} | 
+              Selected Type: {selectedChartType}
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Chart Type</label>
@@ -1188,12 +1001,36 @@ interface CleanFlowChartProps {
                   <option value="heatmap">Heatmap</option>
                 </select>
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Number of Charts</label>
+                <select
+                  id="chartQuantity"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="1">1 Chart</option>
+                  <option value="2">2 Charts</option>
+                  <option value="3">3 Charts</option>
+                  <option value="4">4 Charts</option>
+                  <option value="5">5 Charts</option>
+                  <option value="6">6 Charts</option>
+                  <option value="7">7 Charts</option>
+                  <option value="8">8 Charts</option>
+                  <option value="9">9 Charts</option>
+                  <option value="10">10 Charts</option>
+                </select>
+              </div>
+              
               <div className="flex gap-3">
                 <button
-                  onClick={addNewChart}
+                  onClick={() => {
+                    const quantity = parseInt((document.getElementById('chartQuantity') as HTMLSelectElement)?.value || '1');
+                    console.log('Create Charts button clicked - Type:', selectedChartType, 'Quantity:', quantity);
+                    createMultipleCharts(selectedChartType, quantity);
+                  }}
                   className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Create Chart
+                  Create Charts
                 </button>
                 <button
                   onClick={() => setShowChartSelector(false)}
@@ -1213,8 +1050,16 @@ interface CleanFlowChartProps {
           <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">Data Editor - Charts: {charts.length}</h3>
+              <div className="text-sm text-gray-500">
+                Modal State: {showDataEditor ? 'Open' : 'Closed'} | 
+                Charts: {charts.length} | 
+                Selected: {selectedCharts.length}
+              </div>
               <button
-                onClick={() => setShowDataEditor(false)}
+                onClick={() => {
+                  console.log('Closing data editor modal');
+                  setShowDataEditor(false);
+                }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X size={20} />
@@ -1306,6 +1151,7 @@ interface CleanFlowChartProps {
                                   <div
                                     onClick={() => {
                                       console.log('Cell clicked:', { chartId: chart.id, index, field, value: row[field] });
+                                      console.log('Setting editingDataPoint to:', { chartId: chart.id, index, field });
                                       setEditingDataPoint({ chartId: chart.id, index, field });
                                     }}
                                     className="cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
@@ -1532,15 +1378,20 @@ interface CleanFlowChartProps {
         className="relative min-h-[1200px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-2 border-dashed border-gray-300"
         style={{ position: 'relative' }}
       >
+        <div className="mb-4 text-sm text-gray-600">
+          Debug: Rendering {charts.length} charts
+        </div>
         {charts.map((chart) => (
           <div
             key={chart.id}
             id={`chart-${chart.id}`}
             className={`absolute bg-white rounded-xl shadow-xl border-2 transition-all duration-200 ${
               selectedCharts.includes(chart.id) 
-                ? 'border-blue-500 shadow-2xl' 
+                ? 'border-blue-500 shadow-2xl bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             } ${draggedChart === chart.id ? 'z-50' : 'z-10'}`}
+            data-selected={selectedCharts.includes(chart.id)}
+            data-chart-id={chart.id}
             style={{
               left: chart.position.x,
               top: chart.position.y,
@@ -1549,12 +1400,21 @@ interface CleanFlowChartProps {
               cursor: draggedChart === chart.id ? 'grabbing' : 'grab'
             }}
             onMouseDown={(e) => handleMouseDown(e, chart.id)}
-            onClick={() => toggleChartSelection(chart.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('Chart clicked:', chart.id);
+              toggleChartSelection(chart.id);
+            }}
           >
             {/* Professional Chart Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-xl">
               <div className="flex items-center gap-3">
                 <h4 className="font-semibold text-gray-900 truncate">{chart.title}</h4>
+                {selectedCharts.includes(chart.id) && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                    SELECTED
+                  </span>
+                )}
                 {chart.realTime.enabled && (
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                     LIVE
@@ -1585,7 +1445,10 @@ interface CleanFlowChartProps {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    console.log('Edit Data button clicked for chart:', chart.id);
+                    console.log('Current showDataEditor state:', showDataEditor);
                     setShowDataEditor(true);
+                    console.log('Setting showDataEditor to true');
                   }}
                   className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                   title="Edit Data"
@@ -1646,8 +1509,7 @@ interface CleanFlowChartProps {
               </div>
             </div>
 
-            {/* Chart Editor Overlay */}
-            {renderChartEditor(chart)}
+
           </div>
         ))}
 
@@ -1655,8 +1517,15 @@ interface CleanFlowChartProps {
           <div className="text-center py-20 text-gray-500">
             <div className="text-6xl mb-4">📊</div>
             <p className="text-xl font-medium mb-2">No charts yet</p>
-            <p className="text-sm text-gray-400">Click "Add Chart" to create your first professional visualization</p>
-            <p className="text-xs mt-2 text-gray-300">Drag charts to reposition • Click to select • Use settings for customization</p>
+            <p className="text-sm text-gray-400">Click "Add Chart" to create your custom visualizations</p>
+            <p className="text-xs mt-2 text-gray-300">
+              Choose chart type • Select quantity (1-10) • Customize as needed
+            </p>
+            <div className="mt-4 text-xs text-gray-400">
+              <p>• Select from 9 chart types: Line, Bar, Pie, Area, Scatter, Composed, Radar, Funnel, Heatmap</p>
+              <p>• Create 1 to 10 charts at once</p>
+              <p>• Each chart positioned automatically for optimal viewing</p>
+            </div>
           </div>
         )}
       </div>

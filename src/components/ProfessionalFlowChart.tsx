@@ -6,7 +6,7 @@ import {
     Settings,
     Trash2, X
 } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Area,
     AreaChart,
@@ -498,7 +498,7 @@ const ProfessionalFlowChart: React.FC<ProfessionalFlowChartProps> = ({ data, onC
               opacity={chart.config.opacity}
               animationDuration={chart.config.animation ? 1000 : 0}
             >
-              {chartData.map((entry, index) => (
+              {chartData.map((_, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={defaultColors[index % defaultColors.length]}

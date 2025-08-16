@@ -8,7 +8,7 @@ const DataPreview = () => {
    const { analysisData } = useAnalysis()
    const [page, setPage] = useState(1)
    const [showFlowCharts, setShowFlowCharts] = useState(false)
-   const [flowChartMode, setFlowChartMode] = useState<'clean'>('clean')
+ 
    const rowsPerPage = 10
 
    if (!data || !data.length) {
